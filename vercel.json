@@ -1,0 +1,17 @@
+{
+  "outputDirectory": ".next",
+  "crons": [
+    {
+      "path": "/api/cron/admin-daily-digest",
+      "schedule": "0 13 * * *"
+    },
+    {
+      "path": "/api/cron/policy-monitor",
+      "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/cron/cms-feed-sync",
+      "schedule": "30 14 * * *"
+    }
+  ]
+}

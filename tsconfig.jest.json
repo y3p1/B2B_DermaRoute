@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "module": "CommonJS",
+    "moduleResolution": "Node"
+  },
+  "include": ["backend/**/*.ts", "app/api/**/*.ts", "db/**/*.ts"],
+  "exclude": ["node_modules", ".next", "out", ".server-dist"]
+}

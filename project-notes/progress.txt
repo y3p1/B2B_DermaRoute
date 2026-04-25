@@ -1,0 +1,43 @@
+  All four tasks are complete. Here's a summary of the changes:
+
+  Task 1: 30-Minute Inactivity Timeout
+
+  New file: hooks/useInactivityTimeout.ts
+  - Tracks mousemove, keydown, click, scroll, touchstart on window
+  - Uses useRef for timer (no re-renders) and throttles activity detection to once per 60s
+  - Only active when status === "authenticated" and not on a public path
+  - On timeout: calls logout() from Zustand store, then redirects to /admin/signin?reason=timeout or /auth?reason=timeout based on
+  accountType
+  - Cleans up listeners and timer on unmount
+
+  Edited: app/client-layout.tsx
+  - Added useInactivityTimeout() call alongside useRouteGuard()
+
+  Task 2: BAA PDF Download for Admin
+
+  Edited: components/auth/signup/providers/agreement/AgreementPDF.tsx
+  - Added 4 optional props: businessAssociateName, businessAssociateSignature, businessAssociateTitle, businessAssociateDate
+  - Page 6 BA column now populates with these props when provided (signature rendered via <Image>)
+  - Backward compatible — existing signup flow doesn't pass these props, defaults apply
+
+  Edited: components/admin/baa-providers/BaaProviderViewClient.tsx
+  - Added imports: Download icon, pdf from @react-pdf/renderer, AgreementPDF
+  - Added downloading state and handleDownloadPDF handler (same pattern as SignupStep3Agreement.tsx)
+  - Added "Download PDF" button conditionally shown when row.status === "approved"
+  
+  Changes made                                                                                                                             
+                                                                                                                                           
+  1. app/api/order-products/route.ts — Removed requireAdminOrClinicStaff middleware from the POST handler (and its unused import), leaving 
+  just requireAuth since role checking is now handled in the controller.                                                                 
+  2. backend/controllers/productOrders.controller.ts — Updated createOrderProductController to:                                            
+    - Also check getProviderProfileByUserId after admin/clinic_staff
+    - For providers: validate the BV request belongs to them (providerId check) and that its status is "approved"                          
+    - Set createdBy to provider.id and createdByType to "provider"                                                                         
+  3. backend/services/productOrders.service.ts — Expanded createdByType union to include "provider".                                       
+  4. components/dashboard/ProviderDashboardClient.tsx — Added:
+    - ProductOrderModal import and state
+    - hasApprovedBv derived from bvRequests
+    - "Create Product Order" button in the Order Products tab header — disabled with CSS tooltip when no approved BVs exist, enabled and
+  opens modal when approved BVs exist
+    - ProductOrderModal rendered at bottom, refreshing product orders on creation
+

@@ -1,0 +1,1 @@
+Place your static assets (images, etc) here. Migrated from src/assets.

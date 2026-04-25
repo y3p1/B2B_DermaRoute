@@ -1,0 +1,284 @@
+  Onboarding Report: Integrity Tissue (Staging Branch)                                                                                                     
+                                                                                                                                                           
+  ---                                                                                                                                                      
+  1. Project Overview                                                                                                                                      
+                                                                                                                                                           
+  Integrity Tissue is a multi-role healthcare provider portal for the tissue graft industry. It manages the full lifecycle of Benefits Verification (BV)   
+  requests — verifying insurance coverage before tissue procedures — along with Business Associate Agreements (BAAs), product orders, and a product
+  catalog.
+
+  Three user roles:
+  - Providers — submit BV requests, sign BAA agreements
+  - Admins — manage everything: verify BV requests, countersign BAAs, manage products/forms/users
+  - Clinic Staff — same management access as admins
+
+  ---
+  2. Tech Stack
+
+  ┌──────────┬───────────────────────────────────────────────────────────────────────┐
+  │  Layer   │                              Technology                               │
+  ├──────────┼───────────────────────────────────────────────────────────────────────┤
+  │ Frontend │ Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4         │
+  ├──────────┼───────────────────────────────────────────────────────────────────────┤
+  │ UI       │ shadcn/ui (Radix), TanStack Table, Lucide icons                       │
+  ├──────────┼───────────────────────────────────────────────────────────────────────┤
+  │ Forms    │ React Hook Form + Zod, React Signature Canvas                         │
+  ├──────────┼───────────────────────────────────────────────────────────────────────┤
+  │ State    │ Zustand (auth store)                                                  │
+  ├──────────┼───────────────────────────────────────────────────────────────────────┤
+  │ Backend  │ Next.js API routes (app/api/) — no separate Express server on staging │
+  ├──────────┼───────────────────────────────────────────────────────────────────────┤
+  │ Database │ PostgreSQL via Supabase, Drizzle ORM                                  │
+  ├──────────┼───────────────────────────────────────────────────────────────────────┤
+  │ Auth     │ Supabase Auth (phone OTP signin), Twilio Verify (signup OTP)          │
+  ├──────────┼───────────────────────────────────────────────────────────────────────┤
+  │ Email    │ SendGrid (transactional emails)                                       │
+  ├──────────┼───────────────────────────────────────────────────────────────────────┤
+  │ SMS      │ Twilio (OTP only)                                                     │
+  ├──────────┼───────────────────────────────────────────────────────────────────────┤
+  │ Storage  │ Supabase Storage (BV form PDFs, BAA signatures)                       │
+  ├──────────┼───────────────────────────────────────────────────────────────────────┤
+  │ Testing  │ Jest + custom test utils for API routes                               │
+  ├──────────┼───────────────────────────────────────────────────────────────────────┤
+  │ Hooks    │ Husky + lint-staged (pre-commit)                                      │
+  └──────────┴───────────────────────────────────────────────────────────────────────┘
+
+  Notable change from main: The backend migrated from a custom Express server to Next.js API routes (app/api/), with controllers/services still in a
+  backend/ folder.
+
+  ---
+  3. Project Structure
+
+  integrity-tissue/
+  ├── app/                          # Next.js pages + API routes
+  │   ├── api/                      # ~35 API endpoints
+  │   │   ├── admin-accounts/       # Admin/staff user creation
+  │   │   ├── admin-signup/         # Admin signup
+  │   │   ├── clinic-staff-signup/  # Clinic staff signup
+  │   │   ├── provider-signup/      # Provider signup (was /api/provider-signup)
+  │   │   ├── send-otp/             # OTP send
+  │   │   ├── verify-otp/           # OTP verify
+  │   │   ├── me/                   # Current user profile
+  │   │   ├── bv-requests/          # BV request CRUD + verify
+  │   │   ├── bv-forms/             # BV form upload/download/manage
+  │   │   ├── baa-providers/        # BAA agreement CRUD
+  │   │   ├── order-products/       # Product order CRUD
+  │   │   ├── products/             # Product catalog CRUD
+  │   │   ├── manufacturers/        # Manufacturer CRUD
+  │   │   ├── insurances/           # Insurance CRUD
+  │   │   ├── wound-sizes/          # Wound size options
+  │   │   └── health/               # Health check
+  │   ├── auth/                     # Provider sign-in
+  │   ├── signup/                   # Provider signup (5-step wizard)
+  │   ├── dashboard/                # Provider dashboard
+  │   ├── admin/                    # Admin pages
+  │   │   ├── signin/, signup/      # Admin auth
+  │   │   ├── baa-providers/        # BAA management (list/view/edit)
+  │   │   └── users/new/            # Create admin users
+  │   ├── clinic-staff/             # Clinic staff pages (mirrors admin)
+  │   ├── baa-providers/[id]/       # Shared BAA detail view
+  │   └── api-documentation/        # API docs page
+  │
+  ├── backend/                      # Server-side logic (used by API routes)
+  │   ├── controllers/              # 16 controllers
+  │   ├── services/                 # 18+ services (DB, SendGrid, Twilio, etc.)
+  │   ├── middlewares/              # Auth, CORS, rate limiting
+  │   ├── utils/                    # asyncHandler, httpError
+  │   └── __tests__/                # 8 test files
+  │
+  ├── db/                           # Drizzle ORM schemas
+  │   ├── provider.ts               # provider_acct
+  │   ├── admin.ts                  # admin_acct
+  │   ├── clinic-staff.ts           # clinic_staff_acct
+  │   ├── bv-requests.ts            # BV requests
+  │   ├── bv-forms.ts               # BV form files
+  │   ├── bv-products.ts            # Order products + wound sizes
+  │   ├── products.ts               # Product catalog
+  │   ├── manufacturers.ts          # Manufacturers
+  │   ├── insurances.ts             # Insurance types
+  │   ├── baa-provider.ts           # BAA agreements
+  │   └── enums.ts                  # provider_role, baa_status, approver_role
+  │
+  ├── components/
+  │   ├── admin/                    # Admin-specific components
+  │   ├── clinic-staff/             # Clinic staff dashboard (7 tabs)
+  │   ├── dashboard/                # Shared: BV tables, product orders, BAA views
+  │   ├── auth/signup/              # Signup flows (provider, admin, clinic-staff)
+  │   └── ui/                       # shadcn/ui primitives
+  │
+  ├── supabase/rls/                 # Row Level Security SQL policies (11 files)
+  ├── scripts/apply-rls-policies.sh # Auto-apply RLS after migrations
+  ├── docs/                         # Architecture & feature docs
+  ├── lib/                          # API client, auth utils, feature flags
+  ├── store/                        # Zustand auth store
+  └── hooks/                        # useRouteGuard
+
+  ---
+  4. What's Implemented
+
+  Auth & Accounts
+
+  - Phone OTP sign-in for all 3 roles (separate flows per role)
+  - Provider 5-step signup wizard with BAA agreement + digital signature
+  - Admin and clinic staff signup flows
+  - Admin can create new admin/clinic-staff accounts
+  - Conflict detection (duplicate phone/email)
+  - OTP rate limiting (server + client side) with Twilio fraud guard handling
+
+  BV Requests (Core Feature)
+
+  - Create BV requests with clinical details (wound type/size/location, insurance, ICD-10)
+  - List requests (providers see own, admins/staff see all)
+  - Verify/approve requests (admin/staff)
+  - Status notifications via email to providers
+
+  BAA Management
+
+  - Two-stage digital signature flow: provider signs → admin/staff countersigns
+  - Signatures stored in Supabase Storage
+  - Status workflow: signed → pending → approved
+  - Email notifications on status changes
+
+  BV Forms
+
+  - Upload BV form PDFs per manufacturer (OX, TIDE, Tiger, etc.)
+  - Filter by manufacturer, commercial type, search
+  - Signed URL downloads (1hr expiry), bulk download
+  - Full CRUD with storage cleanup on delete
+
+  Product Orders
+
+  - Create orders linked to BV requests
+  - Status tracking: pending → shipped → completed / cancelled
+  - Admin/staff CRUD with edit/delete
+
+  Product Catalog
+
+  - Manufacturers, Products, Insurances — full CRUD for each
+  - Products include Q-codes, pricing, wound size associations, commercial flag
+  - Quarter/year tracking for pricing periods
+
+  Admin/Clinic Staff Dashboard
+
+  - 7+ tabs: Product Orders, BV Requests, BAA Providers, Products, Manufacturers, Insurances, BV Forms
+  - Searchable data tables with pagination and skeleton loading
+  - Verification modals, confirmation dialogs, status badges
+
+  Notifications
+
+  - SendGrid email: new BV requests, account creation, BAA status changes
+  - Professional HTML templates
+  - Batch sending to all admins/staff
+
+  Security
+
+  - RLS policies for all tables + storage buckets (11 SQL files)
+  - Auto-apply script after db:push
+  - Role-based middleware (requireAuth, requireAdminOrClinicStaff)
+
+  ---
+  5. What's Incomplete or Concerning
+
+  ┌──────────────────────────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │           Item           │                                                         Details                                                         │
+  ├──────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ 66 console.log           │ Debugging logs scattered through production code — needs cleanup                                                        │
+  │ statements               │                                                                                                                         │
+  ├──────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ order_products dual      │ Table serves as both product metadata templates AND order instances — confusing schema                                  │
+  │ purpose                  │                                                                                                                         │
+  ├──────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Env var naming           │ NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY still has NEXT_PUBLIC_ prefix in some references — this is a secret key that must │
+  │                          │  not leak to the client                                                                                                 │
+  ├──────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ In-memory rate limiting  │ OTP abuse guard uses Map() — resets on deploy, doesn't work across serverless instances                                 │
+  ├──────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ No frontend tests        │ Only backend tests exist                                                                                                │
+  ├──────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Product Orders mock data │ Docs mention mock data in implementation — verify real data flows                                                       │
+  ├──────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ No explicit TODOs        │ No TODO/FIXME comments found in code                                                                                    │
+  └──────────────────────────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+  ---
+  6. Code Quality & Patterns
+
+  Strengths:
+  - Clean controller → service → DB layer separation
+  - Consistent Zod validation on API inputs
+  - Typed API client with generics
+  - Comprehensive RLS policies with documentation
+  - Good error handling (HttpError class, centralized error middleware)
+  - Pre-commit hooks enforce lint + build
+
+  Patterns:
+  - Multi-role auth with separate middleware chains
+  - Shared dashboard component (ClinicStaffDashboardClient) reused for admin with titleOverride
+  - Zustand for auth state, React Hook Form for forms
+  - Fire-and-forget notifications (don't block API responses)
+
+  Debt:
+  - The order_products table is overloaded — serves two conceptually different purposes
+  - Some controllers are large — could benefit from further service extraction
+  - No database indexes defined beyond primary keys in schema files
+
+  ---
+  7. Entry Points & User Flows
+
+  Provider flow:
+  /signup → clinic details → verify phone (OTP) → sign BAA agreement → confirm → auto-login → /dashboard → create BV requests
+
+  Admin flow:
+  /admin/signup → verify phone → /admin dashboard → manage BV requests, BAAs, products, forms, users
+
+  Clinic Staff flow:
+  /clinic-staff/signup → verify phone → /clinic-staff dashboard → same management as admin
+
+  BV Request lifecycle:
+  Provider creates → admins/staff notified via email → admin verifies/approves → provider notified of status
+
+  ---
+  8. Dependencies & Configuration
+
+  Environment variables needed (.env.local):
+  # Supabase
+  NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+  NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+  SUPABASE_SERVICE_ROLE_KEY=eyJ...          # BACKEND ONLY - no NEXT_PUBLIC_
+
+  # Twilio
+  TWILIO_ACCOUNT_SID=AC...
+  TWILIO_AUTH_TOKEN=...
+  TWILIO_VERIFY_SERVICE_SID=VA...
+
+  # SendGrid
+  SENDGRID_API_KEY=SG...
+  SENDGRID_FROM_EMAIL=noreply@integritytissue.com
+
+  # App
+  APP_URL=http://localhost:3000
+  NEXT_PUBLIC_APP_NAME=Integrity Tissue
+  NEXT_PUBLIC_ALLOW_INTERNATIONAL_PHONE=false
+
+  Setup:
+  npm install
+  # Create .env.local with vars above
+  npm run db:push              # Push schema + apply RLS
+  npm run seed:all             # Seed data (manufacturers, products, insurances)
+  npm run dev                  # Dev server at :3000
+  npm run test                 # Run backend tests
+
+  ---
+  9. Recommended First Steps
+
+  1. Get credentials — You need Supabase project access, Twilio account, and SendGrid API key from whoever provisioned them. Check if there's a shared .env
+   or secrets manager.
+  2. Get it running — npm install, set up .env.local, npm run dev. Walk through all 3 signup flows.
+  3. Audit the service role key — Search for NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY and confirm it's never bundled client-side. Rename to
+  SUPABASE_SERVICE_ROLE_KEY if needed.
+  4. Clean up console.logs — 66 debug statements in production code. Quick grep and remove.
+  5. Understand the BV lifecycle end-to-end — Create a BV request as provider, then approve it as admin. This touches the core business logic.
+  6. Review the Supabase dashboard — Check auth settings, storage buckets, and verify RLS policies are actually applied (the SQL files define them but you
+  need to confirm they're active).
+  7. Clarify the order_products schema — Understand whether the dual-purpose design is intentional or needs refactoring.
+  8. Read the docs — docs/ folder has architecture decisions, email flow diagrams, and RBAC setup notes that explain the "why" behind design choices.

@@ -1,0 +1,132 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1767723985584,
+      "tag": "0000_workable_swarm",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1768836155184,
+      "tag": "0001_brown_lethal_legion",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1768931842994,
+      "tag": "0002_flat_loki",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1769098954136,
+      "tag": "0003_talented_nebula",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1769502608224,
+      "tag": "0004_silly_william_stryker",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1769742584313,
+      "tag": "0005_simple_piledriver",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1769742711244,
+      "tag": "0006_serious_the_twelve",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1769936879949,
+      "tag": "0007_rapid_phalanx",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1770266370241,
+      "tag": "0008_chilly_marvel_zombies",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1770267155031,
+      "tag": "0009_brainy_madame_web",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1771776130663,
+      "tag": "0010_cheerful_caretaker",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1771863210759,
+      "tag": "0011_fearless_vision",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1771869910100,
+      "tag": "0012_outstanding_goblin_queen",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1771871828939,
+      "tag": "0013_elite_captain_flint",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1771959164251,
+      "tag": "0014_slimy_pride",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1772048526534,
+      "tag": "0015_lean_microbe",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1774881040767,
+      "tag": "0016_real_hammerhead",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1775903011604,
+      "tag": "0017_dark_pretty_boy",
+      "breakpoints": true
+    }
+  ]
+}

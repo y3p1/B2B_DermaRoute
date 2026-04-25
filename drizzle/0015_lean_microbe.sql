@@ -1,0 +1,1 @@
+ALTER TABLE "bv_forms" ADD COLUMN "commercial" boolean;

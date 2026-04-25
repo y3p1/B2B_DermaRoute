@@ -1,0 +1,1 @@
+ALTER TABLE "bv_requests" ALTER COLUMN "id" SET DEFAULT gen_random_uuid();

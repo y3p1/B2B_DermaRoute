@@ -1,0 +1,1 @@
+ALTER TABLE "manufacturers" ADD COLUMN "commercial" boolean DEFAULT false NOT NULL;
