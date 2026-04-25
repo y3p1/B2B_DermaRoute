@@ -222,7 +222,7 @@ export async function getBulkSignedDownloadUrls(
         id: form.id,
         name: form.name,
         fileName: form.fileName,
-        signedUrl: batchData[i]!.signedUrl,
+        signedUrl: batchData[i]!.signedUrl ?? "",
       }));
     }
   }
