@@ -94,6 +94,7 @@ const AdminDashboardClient: React.FC = () => {
   const role = useAuthStore((s) => s.role);
 
   React.useEffect(() => {
+    if (isClientDemoMode()) return;
     if (authStatus === "unauthenticated") {
       router.replace("/admin/signin");
     }

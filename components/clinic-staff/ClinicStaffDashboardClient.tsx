@@ -24,6 +24,7 @@ import {
 import { useAuthStore } from "@/store/auth";
 import { supabase } from "@/lib/supabaseClient";
 import { apiGet } from "@/lib/apiClient";
+import { isClientDemoMode } from "@/lib/demoMode";
 import DashboardNavbar from "@/components/dashboard/DashboardNavbar";
 import BaaProvidersEmbeddedClient from "@/components/admin/baa-providers/BaaProvidersEmbeddedClient";
 import BvVerificationModal from "@/components/clinic-staff/BvVerificationModal";
@@ -248,6 +249,7 @@ export default function ClinicStaffDashboardClient({
   }, [token]);
 
   React.useEffect(() => {
+    if (isClientDemoMode()) return;
     if (status === "unauthenticated") router.replace("/auth");
   }, [router, status]);
 

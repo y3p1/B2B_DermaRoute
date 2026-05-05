@@ -4,6 +4,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { apiGet } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
+import { isClientDemoMode } from "@/lib/demoMode";
 import DashboardNavbar from "@/components/dashboard/DashboardNavbar";
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import DashboardFilters from "@/components/dashboard/DashboardFilters";
@@ -70,6 +71,7 @@ const DashboardClient: React.FC = () => {
   }, [token]);
 
   React.useEffect(() => {
+    if (isClientDemoMode()) return;
     if (authStatus === "unauthenticated") {
       router.replace("/auth");
     }
