@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql, type SQL } from "drizzle-orm";
 
 import { woundMeasurements } from "../../db/wound-measurements";
 import { bvRequests } from "../../db/bv-requests";
@@ -471,9 +471,7 @@ export async function getAlternativeProducts(
   }
 
   // Build conditions: always filter by the insurance's commercial type
-  const conditions: ReturnType<typeof eq>[] = [
-    eq(products.commercial, isCommercial),
-  ];
+  const conditions: SQL[] = [eq(products.commercial, isCommercial)];
 
   // If manufacturer routing exists, narrow to those manufacturers
   if (manufacturerIds.length > 0) {
@@ -481,7 +479,7 @@ export async function getAlternativeProducts(
       sql`${products.manufacturerId} IN (${sql.join(
         manufacturerIds.map((id) => sql`${id}`),
         sql`, `,
-      )})` as any,
+      )})`,
     );
   }
 

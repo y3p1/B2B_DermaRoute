@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from "../http/types";
+import { isDemoMode } from "../../lib/demoMode";
 
 type RateLimitOptions = {
   windowMs: number;
@@ -11,6 +12,8 @@ export function rateLimit(options: RateLimitOptions) {
   const store = new Map<string, Entry>();
 
   return (req: Request, res: Response, next: NextFunction) => {
+    if (isDemoMode()) return next();
+
     const now = Date.now();
     const key = req.ip || req.socket.remoteAddress || "unknown";
 

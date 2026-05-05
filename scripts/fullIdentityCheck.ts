@@ -32,9 +32,10 @@ async function fullIdentityCheck() {
     }
 
     // 2. Database Tables
-    const provider = await sql`SELECT user_id, account_phone FROM provider_acct WHERE account_phone = ${phone}`;
-    const admin = await sql`SELECT user_id, account_phone FROM admin_acct WHERE account_phone = ${phone}`;
-    const staff = await sql`SELECT user_id, account_phone FROM clinic_staff_acct WHERE account_phone = ${phone}`;
+    type UserRow = { user_id: string; account_phone: string };
+    const provider = await sql<UserRow[]>`SELECT user_id, account_phone FROM provider_acct WHERE account_phone = ${phone}`;
+    const admin = await sql<UserRow[]>`SELECT user_id, account_phone FROM admin_acct WHERE account_phone = ${phone}`;
+    const staff = await sql<UserRow[]>`SELECT user_id, account_phone FROM clinic_staff_acct WHERE account_phone = ${phone}`;
 
     console.log("\nDatabase Records (Stored UID):");
     console.log(" - provider_acct:", provider[0]?.user_id || "None");
@@ -43,7 +44,7 @@ async function fullIdentityCheck() {
 
     if (authUser) {
       console.log("\nSync Status:");
-      const checkSync = (name: string, record: any) => {
+      const checkSync = (name: string, record: { user_id: string } | undefined) => {
         if (!record) return;
         if (record.user_id !== authUser.id) {
           console.log(` ❌ ${name}: Mismatched ID! (DB: ${record.user_id})`);

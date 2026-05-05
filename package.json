@@ -1,6 +1,6 @@
 {
-  "name": "integrity-tissue",
-  "version": "0.1.0",
+  "name": "derma-route",
+  "version": "3.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -13,6 +13,9 @@
     "db:push": "npx drizzle-kit push --config ./backend/drizzle.config.ts && npm run db:rls",
     "db:rls": "npx tsx scripts/applyRls.ts",
     "db:push-only": "npx drizzle-kit push --config ./backend/drizzle.config.ts",
+    "db:apply": "tsx scripts/applyDrizzleMigrations.ts",
+    "db:wipe": "tsx scripts/wipePublicSchema.ts",
+    "db:demo-init": "npm run db:apply && npm run db:rls",
     "seed:admin": "tsx backend/scripts/seedAdmin.ts",
     "seed:bv": "tsx backend/scripts/seedBV.ts",
     "seed:manufacturers:q1": "tsx backend/scripts/seedManufacturersQ12026.ts",
@@ -20,6 +23,8 @@
     "seed:clinic-staff": "tsx backend/scripts/seedClinicStaff.ts",
     "seed:provider": "tsx backend/scripts/seedProvider.ts",
     "seed:insurances": "tsx backend/scripts/seedInsurances.ts",
+    "seed:demo": "tsx scripts/demo/resetDemo.ts",
+    "seed:demo:users": "tsx backend/scripts/demo/seedDemoUsers.ts",
     "prepare": "husky"
   },
   "dependencies": {

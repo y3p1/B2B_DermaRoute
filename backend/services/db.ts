@@ -9,8 +9,20 @@ let cachedPostgresClient: ReturnType<typeof postgres> | undefined;
 
 export function getDb() {
   const databaseUrl = getRequiredEnv("DATABASE_URL");
+
+  // Safety guard: refuse to start if demo mode points at prod DB
+  if (process.env.DEMO_MODE === "true") {
+    const denyFragment = process.env.PROD_DB_URL_FRAGMENT;
+    if (denyFragment && databaseUrl.includes(denyFragment)) {
+      console.error(
+        "[SAFETY] DEMO_MODE=true but DATABASE_URL matches PROD_DB_URL_FRAGMENT. " +
+        "Refusing to connect — this would corrupt production data.",
+      );
+      process.exit(1);
+    }
+  }
+
   // Automatically use the Supabase Transaction Pooler port (6543) if 5432 is provided
-  // This prevents "Failed query" errors caused by IPv4 deprecation or connection limits
   const transactionPoolUrl = databaseUrl.replace(":5432/", ":6543/");
 
   if (!cachedPostgresClient) {

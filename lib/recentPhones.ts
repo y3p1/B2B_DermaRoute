@@ -1,5 +1,5 @@
-const STORAGE_KEY = "integrity-tissue:lastSuccessfulPhone:v1";
-const LEGACY_STORAGE_KEY = "integrity-tissue:recentPhones:v1";
+﻿const STORAGE_KEY = "derma-route:lastSuccessfulPhone:v1";
+const LEGACY_STORAGE_KEY = "derma-route:recentPhones:v1";
 
 function normalizePhoneE164(input: string): string {
   const trimmed = input.trim();

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { useForm } from "react-hook-form";
@@ -214,7 +214,7 @@ export function Step1ClinicalInfo({
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6">
         <div className="font-bold">Practice:</div>
         <div>
-          <span className="font-bold">Rep:</span> Integrity Tissue Solutions -
+          <span className="font-bold">Rep:</span> Derma Route -
           Will
         </div>
       </div>

@@ -76,8 +76,14 @@ export async function createBvRequestController(req: Request, res: Response) {
       ]);
 
       // Combine all recipients (automatically removes duplicates if any)
+      // Include ADMIN_NOTIFICATION_EMAIL env var as a guaranteed fallback
+      const fallbackEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
       const allRecipients = Array.from(
-        new Set([...adminEmails, ...clinicStaffEmails, "will@integritytissue.com"]),
+        new Set([
+          ...adminEmails,
+          ...clinicStaffEmails,
+          ...(fallbackEmail ? [fallbackEmail] : []),
+        ]),
       );
 
       if (allRecipients.length > 0) {

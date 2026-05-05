@@ -4,12 +4,24 @@ import { eq } from "drizzle-orm";
 
 import { adminAcct } from "../../db/admin";
 import { getDb } from "../services/db";
+import { isDemoMode } from "../../lib/demoMode";
 
 export async function requireAdmin(
   _req: Request,
   res: Response,
   next: NextFunction,
 ) {
+  if (isDemoMode()) {
+    if (res.locals.demoRole !== "admin") {
+      return res
+        .status(403)
+        .json({ error: "Demo: switch to admin role to access this." });
+    }
+    res.locals.adminAcctId = "demo-admin-acct-id";
+    res.locals.adminRole = "admin";
+    return next();
+  }
+
   const userId = res.locals.userId as string | undefined;
   if (!userId) {
     return res.status(401).json({ error: "Unauthorized" });

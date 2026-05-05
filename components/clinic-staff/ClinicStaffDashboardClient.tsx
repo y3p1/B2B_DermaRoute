@@ -397,7 +397,7 @@ export default function ClinicStaffDashboardClient({
 
   const activeItem = navItems.find((n) => n.key === tab);
 
-  const SidebarContent = ({ onClose }: { onClose?: () => void }) => (
+  const renderSidebar = (onClose?: () => void) => (
     <div className="flex flex-col h-full">
       {/* Sidebar header */}
       <div className="flex items-center justify-between px-4 py-4 border-b border-slate-200">
@@ -462,7 +462,7 @@ export default function ClinicStaffDashboardClient({
       <div className="flex flex-1 overflow-hidden">
         {/* Desktop sidebar */}
         <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-slate-200 shrink-0 sticky top-18 h-[calc(100vh-72px)] overflow-y-auto">
-          <SidebarContent />
+          {renderSidebar()}
         </aside>
 
         {/* Mobile sidebar overlay */}
@@ -476,7 +476,7 @@ export default function ClinicStaffDashboardClient({
             />
             {/* Drawer */}
             <aside className="absolute left-0 top-0 bottom-0 w-72 bg-white shadow-2xl flex flex-col animate-in slide-in-from-left duration-200">
-              <SidebarContent onClose={() => setSidebarOpen(false)} />
+              {renderSidebar(() => setSidebarOpen(false))}
             </aside>
           </div>
         )}
@@ -711,6 +711,9 @@ export default function ClinicStaffDashboardClient({
                                       Date
                                     </th>
                                     <th className="py-3 px-4 font-medium">
+                                      Clinic Name
+                                    </th>
+                                    <th className="py-3 px-4 font-medium">
                                       Place of Service
                                     </th>
                                     <th className="py-3 px-4 font-medium">
@@ -734,7 +737,7 @@ export default function ClinicStaffDashboardClient({
                                   {paginatedRequests.length === 0 ? (
                                     <tr>
                                       <td
-                                        colSpan={6}
+                                        colSpan={8}
                                         className="h-24 text-center text-slate-500"
                                       >
                                         No results.
@@ -750,10 +753,12 @@ export default function ClinicStaffDashboardClient({
                                           {request.createdAt ? String(request.createdAt).slice(0, 10) : "N/A"}
                                         </td>
                                         <td className="py-4 px-4 font-semibold">
+                                          {request.practice ?? "N/A"}
+                                        </td>
+                                        <td className="py-4 px-4 font-semibold">
                                           {request.placeOfService ?? "N/A"}
                                         </td>
                                         <td className="py-4 px-4">
-                                          {/* We don't have initials in BvRequestRow for clinic staff yet, but let's assume we map it or add it to BvRequestRow */}
                                           {request.initials ?? "N/A"}
                                         </td>
                                         <td className="py-4 px-4 hidden sm:table-cell">

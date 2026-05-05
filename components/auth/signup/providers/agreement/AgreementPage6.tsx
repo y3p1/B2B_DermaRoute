@@ -1,8 +1,6 @@
-import React, { useEffect } from "react";
+﻿import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { pdf } from "@react-pdf/renderer";
-import AgreementPDF from "./AgreementPDF";
 
 import {
   Form,
@@ -62,7 +60,7 @@ export default function AgreementPage6(props: AgreementPage6Props) {
         <p className="ml-6">
           <strong>to Business Associate:</strong>
           <br />
-          Integrity Tissue Solutions, Attn: Privacy Officer
+          Derma Route, Attn: Privacy Officer
           <br />
           10 Hwy 98 STE 315 PMB#38 Bonaire, GA 31005
         </p>
@@ -259,7 +257,7 @@ export default function AgreementPage6(props: AgreementPage6Props) {
               </div>
               <div className="space-y-4 p-2 md:p-0 rounded-md">
                 <p className="font-semibold mb-4">
-                  Integrity Tissue Solutions:
+                  Derma Route:
                 </p>
                 <FormField
                   control={form.control}

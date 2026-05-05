@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import IntegrityTissueLogo from "@/components/IntegrityTissueLogo";
 import Link from "next/link";
@@ -59,7 +59,7 @@ export default function NotFoundPage() {
         </div>
       </div>
       <footer className="mt-16 text-white/40 text-xs text-center w-full">
-        &copy; {new Date().getFullYear()} Integrity Tissue. All rights reserved.
+        &copy; {new Date().getFullYear()} Derma Route. All rights reserved.
       </footer>
     </div>
   );

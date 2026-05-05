@@ -14,14 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Integrity Tissue Solutions",
+  title: "DermaRoute Demo",
   description:
-    "Integrity Tissue Solutions specialized medical service provider, likely focused on wound care management, indicated by their provider portal for, presumably, managing patient tissue health. The company likely addresses issues related to impaired skin integrity, such as pressure ulcers, wounds, and infections, using specialized techniques for prevention and treatment",
-  icons: {
-    icon: "/favicon.png",
-    shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
-  },
+    "Demo environment for the DermaRoute B2B portal. Routing benefit verifications at the speed of care.",
 };
 
 export default function RootLayout({
@@ -32,21 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/favicon.ico?v=1" />
-        <link rel="shortcut icon" href="/favicon.ico?v=1" />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/favicon-32x32.png?v=1"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/favicon-16x16.png?v=1"
-        />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=1" />
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%232563eb'/><text x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='Arial' font-weight='bold' font-size='20' fill='white'>D</text></svg>" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

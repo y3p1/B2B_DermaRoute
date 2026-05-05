@@ -120,6 +120,32 @@ export default function EnhancedOrderModal({
     ? products.filter(p => p.manufacturerId === formData.manufacturerId)
     : [];
 
+  const fetchInitialData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [bvRes, insRes, wsRes] = await Promise.all([
+        apiGet<{ success: true; data: BvRequest[] }>("/api/bv-requests", { token: token ?? undefined }),
+        apiGet<{ success: true; data: Insurance[] }>("/api/insurances", { token: token ?? undefined }),
+        apiGet<{ success: true; data: WoundSizeOption[] }>("/api/bv/wound-sizes", { token: token ?? undefined }),
+      ]);
+
+      // Filter for Approved + Proof Verified
+      const eligible = (bvRes.data || []).filter(
+        (bv) => bv.status === "approved" && bv.proofStatus === "verified"
+      );
+
+      setBvRequests(eligible);
+      setInsurances(insRes.data || []);
+      setWoundSizeOptions(wsRes.data || []);
+    } catch (err) {
+      console.error("[OrderWizard] Initial data fetch failed:", err);
+      setError("Failed to load initial order records. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // -- Initialization --
   React.useEffect(() => {
     if (open && token) {
@@ -148,32 +174,6 @@ export default function EnhancedOrderModal({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, token]);
-
-  const fetchInitialData = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [bvRes, insRes, wsRes] = await Promise.all([
-        apiGet<{ success: true; data: BvRequest[] }>("/api/bv-requests", { token: token ?? undefined }),
-        apiGet<{ success: true; data: Insurance[] }>("/api/insurances", { token: token ?? undefined }),
-        apiGet<{ success: true; data: WoundSizeOption[] }>("/api/bv/wound-sizes", { token: token ?? undefined }),
-      ]);
-
-      // Filter for Approved + Proof Verified
-      const eligible = (bvRes.data || []).filter(
-        (bv) => bv.status === "approved" && bv.proofStatus === "verified"
-      );
-
-      setBvRequests(eligible);
-      setInsurances(insRes.data || []);
-      setWoundSizeOptions(wsRes.data || []);
-    } catch (err) {
-      console.error("[OrderWizard] Initial data fetch failed:", err);
-      setError("Failed to load initial order records. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const fetchStep1ProductData = async (bv: BvRequest) => {
     setLoading(true);

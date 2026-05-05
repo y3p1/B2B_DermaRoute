@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useEffect, useState } from "react";
 
 export default function ApiDocsClient() {
@@ -46,7 +46,7 @@ export default function ApiDocsClient() {
             letterSpacing: -1,
           }}
         >
-          Integrity Tissue API Documentation
+          Derma Route API Documentation
         </h2>
         <p style={{ fontSize: 18, margin: "8px 0 0 0", opacity: 0.95 }}>
           Professional API reference and Postman usage guide for all endpoints.

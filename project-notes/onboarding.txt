@@ -1,9 +1,9 @@
-  Onboarding Report: Integrity Tissue (Staging Branch)                                                                                                     
+﻿  Onboarding Report: Derma Route (Staging Branch)                                                                                                     
                                                                                                                                                            
   ---                                                                                                                                                      
   1. Project Overview                                                                                                                                      
                                                                                                                                                            
-  Integrity Tissue is a multi-role healthcare provider portal for the tissue graft industry. It manages the full lifecycle of Benefits Verification (BV)   
+  Derma Route is a multi-role healthcare provider portal for the tissue graft industry. It manages the full lifecycle of Benefits Verification (BV)   
   requests — verifying insurance coverage before tissue procedures — along with Business Associate Agreements (BAAs), product orders, and a product
   catalog.
 
@@ -257,7 +257,7 @@
 
   # App
   APP_URL=http://localhost:3000
-  NEXT_PUBLIC_APP_NAME=Integrity Tissue
+  NEXT_PUBLIC_APP_NAME=Derma Route
   NEXT_PUBLIC_ALLOW_INTERNATIONAL_PHONE=false
 
   Setup:

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import ClinicStaffDashboardClient from "@/components/clinic-staff/ClinicStaffDashboardClient";
 
 export const metadata = {
@@ -5,5 +6,9 @@ export const metadata = {
 };
 
 export default function ClinicStaffDashboardPage() {
-  return <ClinicStaffDashboardClient />;
+  return (
+    <Suspense>
+      <ClinicStaffDashboardClient />
+    </Suspense>
+  );
 }

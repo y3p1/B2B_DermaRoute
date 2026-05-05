@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import ProviderDashboardClient from "@/components/dashboard/ProviderDashboardClient";
 
 export const metadata = {
@@ -5,5 +6,9 @@ export const metadata = {
 };
 
 export default function DashboardPage() {
-  return <ProviderDashboardClient />;
+  return (
+    <Suspense>
+      <ProviderDashboardClient />
+    </Suspense>
+  );
 }

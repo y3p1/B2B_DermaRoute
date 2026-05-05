@@ -14,7 +14,6 @@ import { useAuthStore } from "@/store/auth";
 import { supabase } from "@/lib/supabaseClient";
 import { apiGet } from "@/lib/apiClient";
 import DashboardNavbar from "@/components/dashboard/DashboardNavbar";
-import BvVerificationModal from "@/components/clinic-staff/BvVerificationModal";
 import BVModal from "@/components/dashboard/BvModal";
 import BvDataTable from "@/components/dashboard/BvDataTable";
 import BvDetailModal from "@/components/dashboard/BvDetailModal";
@@ -310,7 +309,7 @@ export default function ProviderDashboardClient() {
 
   const activeItem = navItems.find((n) => n.key === tab);
 
-  const SidebarContent = ({ onClose }: { onClose?: () => void }) => (
+  const renderSidebar = (onClose?: () => void) => (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-4 py-4 border-b border-slate-200">
         <div>
@@ -435,7 +434,7 @@ export default function ProviderDashboardClient() {
       <div className="flex flex-1 overflow-hidden">
         {/* Desktop sidebar */}
         <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-slate-200 shrink-0 sticky top-18 h-[calc(100vh-72px)] overflow-y-auto">
-          <SidebarContent />
+          {renderSidebar()}
         </aside>
 
         {/* Mobile sidebar overlay */}
@@ -447,7 +446,7 @@ export default function ProviderDashboardClient() {
               aria-hidden="true"
             />
             <aside className="absolute left-0 top-0 bottom-0 w-72 bg-white shadow-2xl flex flex-col animate-in slide-in-from-left duration-200">
-              <SidebarContent onClose={() => setSidebarOpen(false)} />
+              {renderSidebar(() => setSidebarOpen(false))}
             </aside>
           </div>
         )}

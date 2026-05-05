@@ -3,7 +3,7 @@ export const runtime = "nodejs";
 import { promises as fs } from "fs";
 import path from "path";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const docPath = path.join(process.cwd(), "API_DOCUMENTATION.md");
   try {
     const doc = await fs.readFile(docPath, "utf-8");
@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
       status: 200,
       headers: { "Content-Type": "text/markdown; charset=utf-8" },
     });
-  } catch (e) {
+  } catch {
     return new NextResponse("API documentation not found.", { status: 404 });
   }
 }

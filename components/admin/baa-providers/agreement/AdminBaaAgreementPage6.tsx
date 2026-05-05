@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -76,7 +76,7 @@ export default function AdminBaaAgreementPage6(
         <p className="ml-6">
           <strong>to Business Associate:</strong>
           <br />
-          Integrity Tissue Solutions, Attn: Privacy Officer
+          Derma Route, Attn: Privacy Officer
           <br />
           10 Hwy 98 STE 315 PMB#38 Bonaire, GA 31005
         </p>
@@ -180,10 +180,10 @@ export default function AdminBaaAgreementPage6(
             </div>
           </div>
 
-          {/* Right Column: Integrity Tissue Solutions (Business Associate - EDITABLE or READ ONLY) */}
+          {/* Right Column: Derma Route (Business Associate - EDITABLE or READ ONLY) */}
           <div className="space-y-4">
             <h3 className="font-semibold text-base">
-              Integrity Tissue Solutions:
+              Derma Route:
             </h3>
 
             <div>

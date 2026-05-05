@@ -12,6 +12,10 @@
     {
       "path": "/api/cron/cms-feed-sync",
       "schedule": "30 14 * * *"
+    },
+    {
+      "path": "/api/cron/demo-reset",
+      "schedule": "0 8 * * *"
     }
   ]
 }

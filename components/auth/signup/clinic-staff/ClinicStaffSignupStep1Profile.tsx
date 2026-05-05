@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/dialog";
 import { ApiError, apiPost } from "@/lib/apiClient";
 import { ALLOW_INTERNATIONAL_PHONE } from "@/lib/featureFlags";
+import { isClientDemoMode } from "@/lib/demoMode";
 
 const phoneRegex = ALLOW_INTERNATIONAL_PHONE ? /^\+\d{10,15}$/ : /^\+1\d{10}$/;
 const phoneError = ALLOW_INTERNATIONAL_PHONE
@@ -103,6 +104,13 @@ export default function ClinicStaffSignupStep1Profile({
   });
 
   const handleSubmit = async (values: ClinicStaffProfileForm) => {
+    if (isClientDemoMode()) {
+      setSubmitError({
+        title: "Demo mode",
+        description: "Sign-up is illustrative only. Use the role switcher in the banner to explore the portal.",
+      });
+      return;
+    }
     setIsSubmitting(true);
     setSubmitError(null);
 

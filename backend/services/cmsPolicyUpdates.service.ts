@@ -1,4 +1,4 @@
-import { eq, desc, sql, and } from "drizzle-orm";
+﻿import { eq, desc, sql, and } from "drizzle-orm";
 import { getDb } from "./db";
 import { cmsFeedSources, cmsPolicyUpdates } from "../../db/cms-policy-updates";
 import { XMLParser } from "fast-xml-parser";
@@ -257,7 +257,7 @@ export async function syncRssFeeds(): Promise<{
     sourcesChecked++;
     try {
       const response = await fetch(source.feedUrl, {
-        headers: { "User-Agent": "IntegrityTissue-CMSMonitor/1.0" },
+        headers: { "User-Agent": "DermaRoute-CMSMonitor/1.0" },
         signal: AbortSignal.timeout(20_000),
       });
 

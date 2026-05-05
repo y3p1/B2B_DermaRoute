@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { getDb } from "./db";
 import { manufacturers } from "../../db/manufacturers";
+import { products } from "../../db/products";
+import { orderProducts } from "../../db/bv-products";
 import { eq, and } from "drizzle-orm";
+import { HttpError } from "../utils/httpError";
 
 export const createManufacturerSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -27,7 +30,7 @@ export async function listManufacturers(filters?: { commercial?: boolean }) {
     .select()
     .from(manufacturers)
     .where(conditions.length > 0 ? and(...conditions) : undefined)
-    .orderBy(manufacturers.createdAt);
+    .orderBy(manufacturers.createdAt, manufacturers.id);
 
   return result;
 }
@@ -81,6 +84,23 @@ export async function updateManufacturer(
 
 export async function deleteManufacturer(id: string) {
   const db = getDb();
+
+  // Block delete if any product orders (bv_products) reference this manufacturer — non-nullable FK
+  const linkedOrders = await db
+    .select({ id: orderProducts.id })
+    .from(orderProducts)
+    .where(eq(orderProducts.manufacturerId, id))
+    .limit(1);
+
+  if (linkedOrders.length > 0) {
+    throw new HttpError(409, "Existing Product Record linked to this Manufacturer exists.");
+  }
+
+  // Unlink catalog products before deleting to avoid FK constraint violation
+  await db
+    .update(products)
+    .set({ manufacturerId: null })
+    .where(eq(products.manufacturerId, id));
 
   const deleted = await db
     .delete(manufacturers)

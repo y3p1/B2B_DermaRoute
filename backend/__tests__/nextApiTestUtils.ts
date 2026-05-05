@@ -8,7 +8,7 @@ type CallRouteOptions = {
 export async function callRoute(
   handler: (req: Request) => Promise<Response> | Response,
   options: CallRouteOptions,
-): Promise<{ res: Response; json: any; text: string }> {
+): Promise<{ res: Response; json: unknown; text: string }> {
   const headers: Record<string, string> = {
     ...(options.headers ?? {}),
   };
@@ -29,7 +29,7 @@ export async function callRoute(
   const res = await handler(req);
 
   const text = await res.text();
-  let json: any = null;
+  let json: unknown = null;
   try {
     json = text ? JSON.parse(text) : null;
   } catch {

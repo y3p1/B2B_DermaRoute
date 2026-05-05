@@ -5,7 +5,6 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog";
 import BvDetailClient from "./BvDetailClient";
 import BVModal from "./BvModal";
@@ -30,7 +29,7 @@ export default function BvDetailModal({
   onOpenChange,
   id,
   edit,
-  initialData,
+  initialData: _initialData,
   onUpdated,
   onRequestEdit,
 }: Props) {

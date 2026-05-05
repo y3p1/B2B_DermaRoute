@@ -1,7 +1,8 @@
 import { z } from "zod";
-import { eq, ilike, or, and, isNull, inArray, SQL } from "drizzle-orm";
+import { eq, ilike, or, and, isNull, inArray, SQL, sql, exists } from "drizzle-orm";
 import { getDb } from "./db";
 import { bvForms } from "../../db/bv-forms";
+import { manufacturers } from "../../db/manufacturers";
 import { getSupabaseAdminClient } from "./supabaseAdmin";
 
 // ─── Validation schemas ──────────────────────────────────────────────────────
@@ -61,6 +62,17 @@ export async function listBvForms(filters?: {
     );
     if (commercialCond) conditions.push(commercialCond);
   }
+
+  // Only return forms whose manufacturer still exists in the manufacturers table.
+  // This ensures that when manufacturers are deleted, their BV forms automatically
+  // stop appearing in the provider's download list.
+  const manufacturerExistsCond = exists(
+    db
+      .select({ one: sql`1` })
+      .from(manufacturers)
+      .where(sql`LOWER(${manufacturers.name}) = LOWER(${bvForms.manufacturer})`),
+  );
+  conditions.push(manufacturerExistsCond);
 
   let query = db.select().from(bvForms).$dynamic();
   if (conditions.length > 0) {

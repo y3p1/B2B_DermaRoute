@@ -1,4 +1,4 @@
-# Integrity Tissue Solutions (ITS) — Web Platform
+﻿# Derma Route (ITS) — Web Platform
 
 **Version:** 2.0 (Revised)
 **Stack:** Next.js + TypeScript · Supabase · Vercel · Twilio · SendGrid · GitHub
@@ -7,7 +7,7 @@
 
 ## 1. Project Overview
 
-Integrity Tissue Solutions (ITS) is a wound care product distribution company. This platform is a web-based portal that connects clinics/providers with the ITS admin team to streamline Benefits Verification (BV), product ordering, and compliance tracking.
+Derma Route (ITS) is a wound care product distribution company. This platform is a web-based portal that connects clinics/providers with the ITS admin team to streamline Benefits Verification (BV), product ordering, and compliance tracking.
 
 **Three core workflows:**
 

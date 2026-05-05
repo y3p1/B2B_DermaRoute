@@ -2,6 +2,7 @@
 import React from "react";
 import { useRouteGuard } from "@/hooks/useRouteGuard";
 import { useInactivityTimeout } from "@/hooks/useInactivityTimeout";
+import { DemoBanner } from "@/components/demo/DemoBanner";
 
 export default function ClientLayout({
   children,
@@ -15,5 +16,10 @@ export default function ClientLayout({
     return null;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <DemoBanner />
+      {children}
+    </>
+  );
 }

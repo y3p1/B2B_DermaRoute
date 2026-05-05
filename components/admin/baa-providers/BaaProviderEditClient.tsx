@@ -1,14 +1,12 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import SignatureCanvas from "react-signature-canvas";
 
 import { apiGet, apiPatch } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
-import { Button } from "@/components/ui/button";
 import IntegrityTissueLogo from "@/components/IntegrityTissueLogo";
 import BackButton from "@/components/BackButton";
 import AdminBaaAgreementPages from "./agreement/AdminBaaAgreementPages";

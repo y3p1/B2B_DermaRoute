@@ -1,4 +1,4 @@
-# 📧 BV Email Notifications - Documentation Index
+﻿# 📧 BV Email Notifications - Documentation Index
 
 ## Overview
 
@@ -354,7 +354,7 @@ For questions, issues, or feature requests:
 
 ## 📄 License
 
-Copyright © 2026 Integrity Tissue Solutions. All rights reserved.
+Copyright © 2026 Derma Route. All rights reserved.
 
 ---
 

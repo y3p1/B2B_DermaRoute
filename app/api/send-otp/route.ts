@@ -1,3 +1,5 @@
+import { NextResponse } from "next/server";
+import { isDemoMode } from "../../../lib/demoMode";
 import { sendOtpController } from "../../../backend/controllers/otp.controller";
 import { corsMiddleware } from "../../../backend/middlewares/cors";
 import { errorHandler } from "../../../backend/middlewares/errorHandler";
@@ -15,6 +17,10 @@ const sendGuard = otpSendAbuseGuard({
 });
 
 export async function POST(request: Request) {
+  if (isDemoMode()) {
+    return NextResponse.json({ success: true, demo: true });
+  }
+
   return runServerPipeline(request, {
     middlewares: [cors, baseRateLimit, sendGuard],
     handler: sendOtpController,

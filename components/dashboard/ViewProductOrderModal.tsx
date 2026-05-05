@@ -28,11 +28,23 @@ type OrderProductDetail = {
   productCode: string | null;
   woundSize: string | null;
   woundType: string | null;
+  woundLocation: string | null;
   insurance: string | null;
   placeOfService: string | null;
   notes: string | null;
   createdBy: string | null;
   createdByType: string | null;
+  patientInitials: string | null;
+  // BV timeline fields
+  applicationDate: string | null;
+  bvDeliveryDate: string | null;
+  // Delivery detail fields
+  deliveryAddress: string | null;
+  deliveryCity: string | null;
+  deliveryState: string | null;
+  deliveryZip: string | null;
+  deliveryDate: string | null;
+  contactPhone: string | null;
 };
 
 type Manufacturer = {
@@ -71,9 +83,12 @@ export default function ViewProductOrderModal({
   const [isEditing, setIsEditing] = React.useState(false);
   const [manufacturers, setManufacturers] = React.useState<Manufacturer[]>([]);
   const [products, setProducts] = React.useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = React.useState<Product[]>([]);
   
   const [editManufacturerId, setEditManufacturerId] = React.useState("");
+  const filteredProducts = React.useMemo(
+    () => editManufacturerId ? products.filter(p => p.manufacturerId === editManufacturerId) : products,
+    [products, editManufacturerId]
+  );
   const [editProductId, setEditProductId] = React.useState("");
   const [editStatus, setEditStatus] = React.useState("");
   const [editNotes, setEditNotes] = React.useState("");
@@ -139,22 +154,6 @@ export default function ViewProductOrderModal({
     setIsEditing(!isEditing);
   };
   
-  // Filter products when manufacturer changes in Edit Mode
-  React.useEffect(() => {
-    if (isEditing) {
-      if (editManufacturerId) {
-        const filtered = products.filter(p => p.manufacturerId === editManufacturerId);
-        setFilteredProducts(filtered);
-        
-        if (editProductId && !filtered.some(p => p.id === editProductId)) {
-          setEditProductId("");
-        }
-      } else {
-        setFilteredProducts(products);
-      }
-    }
-  }, [editManufacturerId, products, editProductId, isEditing]);
-
   const handleClose = () => {
     setOrderDetail(null);
     setError(null);
@@ -193,7 +192,7 @@ export default function ViewProductOrderModal({
     setError(null);
 
     try {
-      const updated = await apiPatch<{ success: true; data: OrderProductDetail }, any>(
+      const updated = await apiPatch<{ success: true; data: OrderProductDetail }, { status: string; manufacturerId: string; productId: string; notes: string }>(
         `/api/order-products/${orderId}`, 
         { 
           status: editStatus,
@@ -372,7 +371,13 @@ export default function ViewProductOrderModal({
                     {isEditing ? (
                       <select
                         value={editManufacturerId}
-                        onChange={(e) => setEditManufacturerId(e.target.value)}
+                        onChange={(e) => {
+                          const newMfgId = e.target.value;
+                          setEditManufacturerId(newMfgId);
+                          if (editProductId && !products.some(p => p.manufacturerId === newMfgId && p.id === editProductId)) {
+                            setEditProductId("");
+                          }
+                        }}
                         className="w-full h-[38px] rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         <option value="">Select a manufacturer...</option>
@@ -415,10 +420,14 @@ export default function ViewProductOrderModal({
                 </div>
               </div>
 
-              {/* Read-Only BV Details */}
-              <div className="bg-gray-50 rounded-lg p-4 space-y-3 border border-gray-200 opacity-80">
-                <div className="text-sm font-semibold text-gray-700 mb-3">BV Request Details (Read-Only)</div>
+              {/* Patient & Clinical Details (from BV Request - Step 1) */}
+              <div className="bg-gray-50 rounded-lg p-4 space-y-3 border border-gray-200">
+                <div className="text-sm font-semibold text-gray-700 mb-3">Patient & Clinical Details</div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-600">Patient Initials</Label>
+                    <div className="text-sm text-gray-900 px-3 py-2 bg-white rounded-md border border-gray-200 font-semibold">{orderDetail.patientInitials || "N/A"}</div>
+                  </div>
                   <div className="space-y-1">
                     <Label className="text-xs font-medium text-gray-600">Practice</Label>
                     <div className="text-sm text-gray-900 px-3 py-2 bg-white rounded-md border border-gray-200">{orderDetail.practice || "N/A"}</div>
@@ -434,6 +443,63 @@ export default function ViewProductOrderModal({
                   <div className="space-y-1">
                     <Label className="text-xs font-medium text-gray-600">Wound Type</Label>
                     <div className="text-sm text-gray-900 px-3 py-2 bg-white rounded-md border border-gray-200">{orderDetail.woundType || "N/A"}</div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-600">Wound Size</Label>
+                    <div className="text-sm text-gray-900 px-3 py-2 bg-white rounded-md border border-gray-200">{orderDetail.woundSize || "N/A"}</div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-600">Wound Location</Label>
+                    <div className="text-sm text-gray-900 px-3 py-2 bg-white rounded-md border border-gray-200">{orderDetail.woundLocation || "N/A"}</div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-600">Place of Service</Label>
+                    <div className="text-sm text-gray-900 px-3 py-2 bg-white rounded-md border border-gray-200">{orderDetail.placeOfService || "N/A"}</div>
+                  </div>
+                  {orderDetail.applicationDate && (
+                    <div className="space-y-1">
+                      <Label className="text-xs font-medium text-gray-600">Application Date</Label>
+                      <div className="text-sm text-gray-900 px-3 py-2 bg-white rounded-md border border-gray-200">{orderDetail.applicationDate}</div>
+                    </div>
+                  )}
+                  {orderDetail.bvDeliveryDate && (
+                    <div className="space-y-1">
+                      <Label className="text-xs font-medium text-gray-600">BV Delivery Date</Label>
+                      <div className="text-sm text-gray-900 px-3 py-2 bg-white rounded-md border border-gray-200">{orderDetail.bvDeliveryDate}</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Delivery Details (from Step 2) */}
+              <div className="bg-gray-50 rounded-lg p-4 space-y-3 border border-gray-200">
+                <div className="text-sm font-semibold text-gray-700 mb-3">Delivery Details</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1 md:col-span-2">
+                    <Label className="text-xs font-medium text-gray-600">Delivery Address</Label>
+                    <div className="text-sm text-gray-900 px-3 py-2 bg-white rounded-md border border-gray-200">
+                      {orderDetail.deliveryAddress || "N/A"}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-600">City</Label>
+                    <div className="text-sm text-gray-900 px-3 py-2 bg-white rounded-md border border-gray-200">{orderDetail.deliveryCity || "N/A"}</div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-600">State</Label>
+                    <div className="text-sm text-gray-900 px-3 py-2 bg-white rounded-md border border-gray-200">{orderDetail.deliveryState || "N/A"}</div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-600">ZIP Code</Label>
+                    <div className="text-sm text-gray-900 px-3 py-2 bg-white rounded-md border border-gray-200">{orderDetail.deliveryZip || "N/A"}</div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-600">Requested Delivery Date</Label>
+                    <div className="text-sm text-gray-900 px-3 py-2 bg-white rounded-md border border-gray-200">{orderDetail.deliveryDate || "N/A"}</div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-600">Contact Phone</Label>
+                    <div className="text-sm text-gray-900 px-3 py-2 bg-white rounded-md border border-gray-200">{orderDetail.contactPhone || "N/A"}</div>
                   </div>
                 </div>
               </div>

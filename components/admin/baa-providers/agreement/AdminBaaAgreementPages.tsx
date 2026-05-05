@@ -1,5 +1,4 @@
-import React from "react";
-import AgreementPage1 from "@/components/auth/signup/providers/agreement/AgreementPage1";
+﻿import React from "react";
 import AgreementPage2 from "@/components/auth/signup/providers/agreement/AgreementPage2";
 import AgreementPage3 from "@/components/auth/signup/providers/agreement/AgreementPage3";
 import AgreementPage4 from "@/components/auth/signup/providers/agreement/AgreementPage4";
@@ -78,7 +77,7 @@ export default function AdminBaaAgreementPages(
             <span className="inline-block px-3 py-1 bg-gray-100 border border-gray-300 rounded">
               {coveredEntity || "N/A"}
             </span>{" "}
-            (&quot;Covered Entity&quot;) and Integrity Tissue Solutions
+            (&quot;Covered Entity&quot;) and Derma Route
             (&quot;Business Associate&quot;), each individually a
             &quot;Party&quot; and together the &quot;Parties.&quot;
           </p>

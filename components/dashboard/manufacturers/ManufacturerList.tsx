@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 
+type Manufacturer = { id: string; name: string };
+
 export default function ManufacturerList({
   onEdit,
 }: {
-  onEdit?: (manufacturer: any) => void;
+  onEdit?: (manufacturer: Manufacturer) => void;
 }) {
-  const [manufacturers, setManufacturers] = useState<any[]>([]);
+  const [manufacturers, setManufacturers] = useState<Manufacturer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

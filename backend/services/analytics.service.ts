@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, sql, desc, isNotNull, isNull } from "drizzle-orm";
+import { eq, sql, desc } from "drizzle-orm";
 
 import { getDb } from "./db";
 import { orderOutcomes } from "../../db/order-outcomes";

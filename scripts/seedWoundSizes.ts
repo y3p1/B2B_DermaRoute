@@ -52,8 +52,13 @@ async function seed() {
       ADD CONSTRAINT wound_sizes_key_unique UNIQUE (key)
     `;
     console.log("   ✓ unique constraint added\n");
-  } catch (err: any) {
-    if (err.code === "42710") {
+  } catch (err: unknown) {
+    if (
+      typeof err === "object" &&
+      err !== null &&
+      "code" in err &&
+      (err as { code: string }).code === "42710"
+    ) {
       // constraint already exists
       console.log("   ✓ unique constraint already exists\n");
     } else {

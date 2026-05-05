@@ -1,18 +1,10 @@
-import Image from "next/image";
-import ITSLogo from "../../../../assets/images/ITS-logo.jpg";
+import BrandLogo from "../../BrandLogo";
 
 export default function SignupLogoHeader() {
   return (
     <div className="flex flex-col items-center mb-8 mt-0">
-      <div className="w-64 h-40 relative">
-        <Image
-          src={ITSLogo}
-          alt="Integrity Tissue Solutions Logo"
-          width={384}
-          height={240}
-          className="object-contain rounded-lg"
-          priority
-        />
+      <div className="w-64 h-24 relative flex items-center justify-center">
+        <BrandLogo width={220} height={55} />
       </div>
     </div>
   );

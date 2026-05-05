@@ -1,6 +1,11 @@
 import { create } from "zustand";
 import { supabase } from "@/lib/supabaseClient";
 import { ApiError, apiGet } from "@/lib/apiClient";
+import {
+  isClientDemoMode,
+  setDemoRoleCookie,
+  type DemoRole,
+} from "@/lib/demoMode";
 
 type MeResponse = {
   success: true;
@@ -74,6 +79,7 @@ interface AuthState {
   clear: () => void;
 
   hydrate: () => Promise<void>;
+  switchDemoRole: (role: DemoRole) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -112,10 +118,39 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }),
 
   hydrate: async () => {
-    // Only show loading state on initial load — not on silent re-hydrations
-    // (e.g. token refresh on tab focus). Setting "loading" when already
-    // authenticated causes shouldBlockRender to unmount the page, making it
-    // appear as a full reload and wiping any form state.
+    if (isClientDemoMode()) {
+      const currentStatus = get().status;
+      if (currentStatus === "idle") {
+        set({ status: "loading", error: null });
+      }
+      try {
+        // Browser sends demo_role cookie automatically; server reads it in requireAuth
+        const me = await apiGet<MeResponse>("/api/me");
+        set({
+          status: "authenticated",
+          jwt: "demo-token",
+          user: me.data.user,
+          provider: me.data.provider,
+          admin: me.data.admin,
+          role: me.data.role,
+          accountType: me.data.accountType,
+          error: null,
+        });
+      } catch {
+        set({
+          status: "unauthenticated",
+          jwt: null,
+          user: null,
+          provider: null,
+          admin: null,
+          role: null,
+          accountType: null,
+          error: null,
+        });
+      }
+      return;
+    }
+
     const currentStatus = get().status;
     if (currentStatus === "idle") {
       set({ status: "loading", error: null });
@@ -196,7 +231,30 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
+  switchDemoRole: async (role) => {
+    if (!isClientDemoMode()) return;
+
+    setDemoRoleCookie(role);
+    set({
+      status: "loading",
+      jwt: "demo-token",
+      user: null,
+      provider: null,
+      admin: null,
+      role: null,
+      accountType: null,
+      error: null,
+    });
+
+    await get().hydrate();
+  },
+
   logout: async () => {
+    if (isClientDemoMode()) {
+      document.cookie = "demo_role=; path=/; max-age=0";
+      window.location.href = "/demo";
+      return;
+    }
     await supabase.auth.signOut();
     set({
       status: "unauthenticated",

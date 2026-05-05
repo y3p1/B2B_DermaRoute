@@ -1,4 +1,4 @@
-/* eslint-disable react/no-unescaped-entities */
+﻿/* eslint-disable react/no-unescaped-entities */
 import React from "react";
 import {
   Document,
@@ -115,7 +115,7 @@ const AgreementPDF = ({
   <Document>
     <Page size="A4" style={styles.page}>
       {/* Logo - Using placeholder text since we need to handle image properly */}
-      <Text style={styles.title}>INTEGRITY TISSUE SOLUTIONS</Text>
+      <Text style={styles.title}>DERMA ROUTE</Text>
       <Text style={styles.title}>BUSINESS ASSOCIATE AGREEMENT</Text>
 
       {/* Page 1 Content */}
@@ -155,7 +155,7 @@ const AgreementPDF = ({
           </View>
         </View>
         <Text style={styles.paragraph}>
-          Integrity Tissue Solutions ("Business Associate"), each individually a
+          Derma Route ("Business Associate"), each individually a
           "Party" and together the "Parties."
         </Text>
         <Text style={styles.paragraph}>
@@ -490,7 +490,7 @@ const AgreementPDF = ({
         <Text style={[styles.paragraph, styles.indent]}>
           <Text style={styles.bold}>to Business Associate:</Text>
           {"\n"}
-          Integrity Tissue Solutions, Attn: Privacy Officer
+          Derma Route, Attn: Privacy Officer
           {"\n"}
           10 Hwy 98 STE 315 PMB#38 Bonaire, GA 31005
         </Text>
@@ -572,7 +572,7 @@ const AgreementPDF = ({
             {/* Business Associate Column */}
             <View style={styles.signatureColumn}>
               <Text style={[styles.paragraph, styles.bold]}>
-                Integrity Tissue Solutions:
+                Derma Route:
               </Text>
               <Text style={styles.fieldLabel}>By</Text>
               <Text style={styles.fieldValue}>

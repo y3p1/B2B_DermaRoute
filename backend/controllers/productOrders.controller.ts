@@ -1,4 +1,5 @@
 import type { Request, Response } from "../http/types";
+import { isDemoMode } from "../../lib/demoMode";
 
 import {
   createOrderProduct,
@@ -24,7 +25,7 @@ import {
   getProviderProfileByUserId,
   getBvRequestById,
 } from "../services/bvRequests.service";
-import { sendOrderSubmissionNotification, sendOrderStatusNotificationToProvider } from "../services/sendgrid.service";
+import { sendOrderSubmissionNotification, sendOrderSubmissionConfirmationToProvider, sendOrderStatusNotificationToProvider } from "../services/sendgrid.service";
 import { scoreOrder } from "../services/riskScoring.service";
 
 function getLastPathSegment(pathname: string): string | null {
@@ -175,7 +176,7 @@ export async function createOrderProductController(
   }
   // -------------------------------------------------
 
-  // Send email notification to admins and clinic staff (fire-and-forget)
+  // Send email notifications (fire-and-forget)
   (async () => {
     try {
       const [adminEmails, clinicStaffEmails] = await Promise.all([
@@ -183,42 +184,53 @@ export async function createOrderProductController(
         getAllClinicStaffEmails(),
       ]);
 
+      // Include ADMIN_NOTIFICATION_EMAIL env var as a guaranteed fallback
+      const fallbackEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
       const allRecipients = Array.from(
-        new Set([...adminEmails, ...clinicStaffEmails]),
+        new Set([
+          ...adminEmails,
+          ...clinicStaffEmails,
+          ...(fallbackEmail ? [fallbackEmail] : []),
+        ]),
       );
 
-      if (allRecipients.length > 0) {
-        // Fetch full order details (joined with BV, provider, manufacturer, product)
-        const orderDetails = await getOrderProductById(created.id);
-        // Fetch BV request for patient initials
-        const bvRequest = await getBvRequestById(parsed.data.bvRequestId);
+      // Fetch full order details (joined with BV, provider, manufacturer, product)
+      const orderDetails = await getOrderProductById(created.id);
+      // Fetch BV request for patient initials
+      const bvRequest = await getBvRequestById(parsed.data.bvRequestId);
 
-        if (orderDetails) {
-          await sendOrderSubmissionNotification(allRecipients, {
-            orderId: created.id,
-            practiceName: orderDetails.practice || "Unknown Practice",
-            provider: orderDetails.provider || "Unknown Provider",
-            productName: orderDetails.product || "Unknown Product",
-            productCode: orderDetails.productCode || "",
-            manufacturer: orderDetails.manufacturer || "Unknown Manufacturer",
-            patientInitials: bvRequest?.initials || "N/A",
-            insurance: orderDetails.insurance || "N/A",
-            woundType: orderDetails.woundType || "N/A",
-            woundSize: orderDetails.woundSize || "N/A",
-            deliveryAddress: created.deliveryAddress ?? undefined,
-            deliveryCity: created.deliveryCity ?? undefined,
-            deliveryState: created.deliveryState ?? undefined,
-            deliveryZip: created.deliveryZip ?? undefined,
-            deliveryDate: created.deliveryDate ?? undefined,
-            contactPhone: created.contactPhone ?? undefined,
-            notes: created.notes ?? undefined,
-            createdAt: created.createdAt?.toISOString() || new Date().toISOString(),
-          });
+      if (orderDetails) {
+        const orderNotificationData = {
+          orderId: created.id,
+          practiceName: orderDetails.practice || "Unknown Practice",
+          provider: orderDetails.provider || "Unknown Provider",
+          productName: orderDetails.product || "Unknown Product",
+          productCode: orderDetails.productCode || "",
+          manufacturer: orderDetails.manufacturer || "Unknown Manufacturer",
+          patientInitials: bvRequest?.initials || "N/A",
+          insurance: orderDetails.insurance || "N/A",
+          woundType: orderDetails.woundType || "N/A",
+          woundSize: orderDetails.woundSize || "N/A",
+          deliveryAddress: created.deliveryAddress ?? undefined,
+          deliveryCity: created.deliveryCity ?? undefined,
+          deliveryState: created.deliveryState ?? undefined,
+          deliveryZip: created.deliveryZip ?? undefined,
+          deliveryDate: created.deliveryDate ?? undefined,
+          contactPhone: created.contactPhone ?? undefined,
+          notes: created.notes ?? undefined,
+          createdAt: created.createdAt?.toISOString() || new Date().toISOString(),
+        };
+
+        if (allRecipients.length > 0) {
+          await sendOrderSubmissionNotification(allRecipients, orderNotificationData);
+        } else {
+          console.warn("⚠️ No admin or clinic staff emails found for order notification");
         }
-      } else {
-        console.warn(
-          "⚠️ No admin or clinic staff emails found for order notification",
-        );
+
+        if (orderDetails.providerEmail) {
+          await sendOrderSubmissionConfirmationToProvider(orderDetails.providerEmail, orderNotificationData)
+            .catch(err => console.error("❌ Failed to send order confirmation to provider:", err));
+        }
       }
     } catch (emailError) {
       console.error("❌ Failed to send order notification email:", emailError);
@@ -327,7 +339,7 @@ export async function updateOrderProductController(
   ];
   if (
     status &&
-    notifiableStatuses.includes(status as any) &&
+    notifiableStatuses.includes(status as import("../services/sendgrid.service").OrderStatusType) &&
     fullDetail?.providerEmail &&
     fullDetail?.patientInitials &&
     fullDetail?.product
@@ -352,6 +364,20 @@ export async function deleteOrderProductController(
     return res.status(401).json({ error: "Unauthorized" });
   }
 
+  const id = getLastPathSegment(req.url);
+  if (!id) {
+    return res.status(400).json({ error: "Product order ID is required" });
+  }
+
+  if (isDemoMode()) {
+    const demoRole = res.locals.demoRole as string | undefined;
+    if (!demoRole) return res.status(403).json({ error: "Access denied" });
+    const order = await getOrderProductById(id);
+    if (!order) return res.status(404).json({ error: "Product order not found" });
+    await deleteOrderProduct(id);
+    return res.json({ success: true, message: "Product order deleted successfully" });
+  }
+
   // Check if user is admin or clinic staff
   const admin = await getAdminProfileByUserId(userId);
   const clinicStaff = admin
@@ -363,11 +389,6 @@ export async function deleteOrderProductController(
     return res
       .status(403)
       .json({ error: "Access denied" });
-  }
-
-  const id = getLastPathSegment(req.url);
-  if (!id) {
-    return res.status(400).json({ error: "Product order ID is required" });
   }
 
   // Check if order exists

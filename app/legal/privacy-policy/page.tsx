@@ -1,16 +1,19 @@
-import React from "react";
+﻿import React from "react";
 import { Metadata } from "next";
+import { DemoLegalBanner } from "@/components/demo/DemoLegalBanner";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Integrity Tissue Solution",
+  title: "Privacy Policy | Derma Route",
 };
 
 export default function PrivacyPolicyPage() {
   return (
+    <>
+      <DemoLegalBanner />
     <article className="max-w-none text-gray-700 space-y-4 [&>h2]:mt-8 [&>h2]:mb-4 [&>h2]:font-bold [&>h2]:text-2xl [&>h2]:text-gray-900 [&>h3]:mt-6 [&>h3]:mb-3 [&>h3]:font-semibold [&>h3]:text-lg [&>h3]:text-gray-800 [&>p]:leading-relaxed [&>p]:mb-4 [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-4 [&>ul>li]:mb-2">
       <div className="border-b border-gray-200 pb-6 mb-8">
         <p className="text-xs font-semibold uppercase tracking-widest text-blue-600 mb-2">
-          Integrity Tissue Solution
+          Derma Route
         </p>
         <h1 className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
           Privacy Policy
@@ -19,7 +22,7 @@ export default function PrivacyPolicyPage() {
 
       <h2>1. Introduction</h2>
       <p>
-        Integrity Tissue Solution (&ldquo;Company,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) is a specialized platform designed to
+        Derma Route (&ldquo;Company,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) is a specialized platform designed to
         streamline the ordering and reimbursement process for advanced wound care products. Our platform is
         built exclusively for clinics, podiatrists, vascular surgeons, and wound care providers (collectively,
         &ldquo;Healthcare Providers&rdquo;).
@@ -36,7 +39,7 @@ export default function PrivacyPolicyPage() {
 
       <h2>2. About Us and Governing Law</h2>
       <p>
-        Integrity Tissue Solution is headquartered and operates under the laws of the State of Georgia, United
+        Derma Route is headquartered and operates under the laws of the State of Georgia, United
         States of America. This Privacy Policy is governed by and construed in accordance with the laws of the
         State of Georgia, without regard to its conflict of law provisions, as well as applicable federal laws of the
         United States, including the Health Insurance Portability and Accountability Act of 1996 (HIPAA) and its
@@ -95,7 +98,7 @@ export default function PrivacyPolicyPage() {
 
       <h2>5. HIPAA Compliance and Protected Health Information</h2>
       <p>
-        Integrity Tissue Solution is fully committed to compliance with the Health Insurance Portability and
+        Derma Route is fully committed to compliance with the Health Insurance Portability and
         Accountability Act of 1996 (HIPAA), the Health Information Technology for Economic and Clinical
         Health Act (HITECH), and all applicable regulations promulgated thereunder, including the HIPAA
         Privacy Rule (45 C.F.R. Part 164) and the HIPAA Security Rule.
@@ -104,7 +107,7 @@ export default function PrivacyPolicyPage() {
       <h3>5.1 Our Role as a Business Associate</h3>
       <p>
         To the extent that our Platform facilitates the access, transmission, or use of Protected Health Information
-        (PHI) on behalf of covered Healthcare Providers, Integrity Tissue Solution operates as a Business
+        (PHI) on behalf of covered Healthcare Providers, Derma Route operates as a Business
         Associate as defined under HIPAA. We enter into a Business Associate Agreement (BAA) with covered
         entities as required by applicable law.
       </p>
@@ -202,7 +205,7 @@ export default function PrivacyPolicyPage() {
 
       <h3>8.1 Within Our Organization</h3>
       <p>
-        Access to your information within Integrity Tissue Solution is limited to personnel who need it to perform
+        Access to your information within Derma Route is limited to personnel who need it to perform
         their job functions and provide services to you. All such personnel are subject to confidentiality
         obligations.
       </p>
@@ -217,7 +220,7 @@ export default function PrivacyPolicyPage() {
       <h3>8.3 Protection of Rights</h3>
       <p>
         We may disclose information when we believe disclosure is necessary to protect the rights, property, or
-        safety of Integrity Tissue Solution, our users, or others, or to prevent fraud or other illegal activity.
+        safety of Derma Route, our users, or others, or to prevent fraud or other illegal activity.
       </p>
 
       <h3>8.4 Business Transfers</h3>
@@ -328,7 +331,7 @@ export default function PrivacyPolicyPage() {
         please contact our Privacy Officer:
       </p>
       <p>
-        <strong>Integrity Tissue Solution</strong><br />
+        <strong>Derma Route</strong><br />
         Privacy Officer<br />
         Georgia, United States of America<br />
         Email: <a href="mailto:will@integritytissue.com" className="text-blue-600 hover:text-blue-800">will@integritytissue.com</a>
@@ -365,8 +368,9 @@ export default function PrivacyPolicyPage() {
         Act.
       </p>
       <p className="mt-8 pt-6 border-t border-gray-200 text-sm text-gray-500 italic">
-        By using the Integrity Tissue Solution Platform, you acknowledge that you have read and understood this Privacy Policy.
+        By using the Derma Route Platform, you acknowledge that you have read and understood this Privacy Policy.
       </p>
     </article>
+    </>
   );
 }

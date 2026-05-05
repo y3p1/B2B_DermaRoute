@@ -2,9 +2,6 @@
 
 import * as React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/store/auth";
-import { apiPatch } from "@/lib/apiClient";
 import ManufacturerProofUpload from "./ManufacturerProofUpload";
 
 export type BvRow = {
@@ -26,7 +23,7 @@ export const createBvColumns = (
   onView: (id: string) => void,
   onEdit: (id: string) => void,
   onUploaded: () => void,
-  onStatusChange?: (id: string, status: "approved" | "rejected") => void,
+  _onStatusChange?: (id: string, status: "approved" | "rejected") => void,
 ): ColumnDef<BvRow, unknown>[] => [
   {
     accessorKey: "createdAt",

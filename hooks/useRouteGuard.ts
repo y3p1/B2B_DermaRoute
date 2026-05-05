@@ -4,6 +4,7 @@ import React from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuthStore } from "@/store/auth";
+import { isClientDemoMode } from "@/lib/demoMode";
 import {
   DEFAULT_AUTHENTICATED_REDIRECT,
   DEFAULT_UNAUTHENTICATED_REDIRECT,
@@ -23,11 +24,9 @@ export function useRouteGuard() {
   }, [hydrate]);
 
   React.useEffect(() => {
+    if (isClientDemoMode()) return;
+
     const { data } = supabase.auth.onAuthStateChange((event) => {
-      // TOKEN_REFRESHED fires whenever Supabase silently refreshes the JWT
-      // (e.g. when the user returns to the tab). The user is still authenticated
-      // so there is no need to re-hydrate, which would cause a loading flash
-      // that unmounts the page and resets form state.
       if (event === "TOKEN_REFRESHED") return;
       void hydrate();
     });
@@ -38,6 +37,8 @@ export function useRouteGuard() {
   }, [hydrate]);
 
   React.useEffect(() => {
+    if (isClientDemoMode()) return;
+
     const publicPath = isPublicPath(pathname);
 
     if (isLegacyAuthenticatedPath(pathname)) {
@@ -69,7 +70,9 @@ export function useRouteGuard() {
   }, [pathname, router, status]);
 
   const shouldBlockRender =
-    !isPublicPath(pathname) && (status === "idle" || status === "loading");
+    !isClientDemoMode() &&
+    !isPublicPath(pathname) &&
+    (status === "idle" || status === "loading");
 
   return {
     status,

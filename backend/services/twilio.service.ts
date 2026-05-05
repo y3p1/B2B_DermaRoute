@@ -1,5 +1,6 @@
 import twilio from "twilio";
 import { getRequiredEnv } from "../config/env";
+import { isDemoMode } from "../../lib/demoMode";
 
 let cachedClient: ReturnType<typeof twilio> | undefined;
 
@@ -14,15 +15,13 @@ function getClient() {
 }
 
 export async function sendOtpSms(phone: string): Promise<void> {
+  if (isDemoMode()) {
+    console.log("[DEMO] OTP SMS suppressed for", phone);
+    return;
+  }
+
   const client = getClient();
   const verifySid = getRequiredEnv("TWILIO_VERIFY_SID");
-
-  // Debug: Log credentials (remove after testing)
-  console.log("Twilio Debug:", {
-    accountSid: process.env.TWILIO_ACCOUNT_SID?.substring(0, 10) + "...",
-    authToken: process.env.TWILIO_AUTH_TOKEN ? "SET" : "NOT SET",
-    verifySid: verifySid.substring(0, 10) + "...",
-  });
 
   await client.verify.v2.services(verifySid).verifications.create({
     to: phone,
@@ -31,6 +30,11 @@ export async function sendOtpSms(phone: string): Promise<void> {
 }
 
 export async function verifyOtp(phone: string, code: string): Promise<boolean> {
+  if (isDemoMode()) {
+    console.log("[DEMO] OTP verify accepted for", phone, code);
+    return true;
+  }
+
   const client = getClient();
   const verifySid = getRequiredEnv("TWILIO_VERIFY_SID");
 
@@ -41,20 +45,18 @@ export async function verifyOtp(phone: string, code: string): Promise<boolean> {
   return check.status === "approved";
 }
 
-/**
- * Sends a generic SMS alert to an admin phone number
- */
 export async function sendAdminAlertSms(to: string, message: string): Promise<void> {
+  if (isDemoMode()) {
+    console.log("[DEMO] Admin alert SMS suppressed:", { to, message });
+    return;
+  }
+
   const client = getClient();
   const from = getRequiredEnv("TWILIO_PHONE_NUMBER");
 
   try {
     console.log(`[Twilio] Dispatching SMS Alert to ${to}...`);
-    await client.messages.create({
-      body: message,
-      from,
-      to,
-    });
+    await client.messages.create({ body: message, from, to });
     console.log(`[Twilio] SMS Alert dispatched successfully`);
   } catch (error) {
     console.error(`[Twilio] Failed to dispatch SMS to ${to}:`, error);

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isDemoMode } from "../../../../lib/demoMode";
 import { syncRssFeeds } from "@/backend/services/cmsPolicyUpdates.service";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +16,15 @@ export async function GET(request: Request) {
       queryKey !== process.env.CRON_SECRET
     ) {
       return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    if (isDemoMode()) {
+      return NextResponse.json({
+        success: true,
+        sourcesChecked: 0,
+        newItems: 0,
+        message: "Demo mode — CMS feed sync skipped.",
+      });
     }
 
     const result = await syncRssFeeds();

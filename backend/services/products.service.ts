@@ -1,10 +1,9 @@
 import { z } from "zod";
 import { getDb } from "./db";
 import { products } from "../../db/products";
-import { orderProducts } from "../../db/bv-products";
 import { manufacturers } from "../../db/manufacturers";
 import { woundSizes } from "../../db/bv-products";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, asc } from "drizzle-orm";
 
 export async function getProductById(id: string) {
   const db = getDb();
@@ -151,7 +150,8 @@ export async function listProducts(filters?: { commercial?: boolean; includeArch
     .from(products)
     .leftJoin(manufacturers, eq(products.manufacturerId, manufacturers.id))
     .leftJoin(woundSizes, eq(products.woundSizeId, woundSizes.id))
-    .where(conditions.length > 0 ? and(...conditions) : undefined);
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .orderBy(asc(products.createdAt), asc(products.id));
   return result;
 }
 

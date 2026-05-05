@@ -33,7 +33,9 @@ const { sendOtpSms, verifyOtp } = jest.requireMock(
   verifyOtp: jest.Mock;
 };
 
-describe("OTP endpoints", () => {
+const isDemo = process.env.DEMO_MODE === "true";
+
+(isDemo ? describe.skip : describe)("OTP endpoints", () => {
   beforeEach(() => {
     jest.resetAllMocks();
     __resetOtpAbuseGuardsForTests();

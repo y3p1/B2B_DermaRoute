@@ -1,5 +1,4 @@
 import dotenv from "dotenv";
-import { eq } from "drizzle-orm";
 
 // Load environment variables from .env.local
 process.env.DOTENV_CONFIG_QUIET ??= "true";

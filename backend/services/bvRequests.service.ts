@@ -63,7 +63,7 @@ export async function listBvRequestsForProvider(providerId: string) {
     .from(bvRequests)
     .leftJoin(providerAcct, eq(bvRequests.providerId, providerAcct.id))
     .where(eq(bvRequests.providerId, providerId))
-    .orderBy(desc(bvRequests.createdAt));
+    .orderBy(desc(bvRequests.createdAt), bvRequests.id);
 
   return rows;
 }
@@ -92,7 +92,7 @@ export async function listAllBvRequests() {
     })
     .from(bvRequests)
     .leftJoin(providerAcct, eq(bvRequests.providerId, providerAcct.id))
-    .orderBy(desc(bvRequests.createdAt));
+    .orderBy(desc(bvRequests.createdAt), bvRequests.id);
 
   return rows;
 }
@@ -315,6 +315,15 @@ export async function updateBvRequestProof(
     });
 
   return updated[0] ?? null;
+}
+
+export async function deleteBvRequest(id: string): Promise<boolean> {
+  const db = getDb();
+  const result = await db
+    .delete(bvRequests)
+    .where(eq(bvRequests.id, id))
+    .returning({ id: bvRequests.id });
+  return result.length > 0;
 }
 
 export async function verifyBvRequestProof({

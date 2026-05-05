@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useRef, useEffect } from "react";
 // Dialog imports removed
@@ -61,7 +61,7 @@ export default function SignupStep3Agreement({
         timeZone: "America/New_York",
       }),
       integritySolutionsSignature: "",
-      businessAssociateName: "Integrity Tissue Solutions",
+      businessAssociateName: "Derma Route",
       agreementStatus: "Pending", // Default status
       businessAssociateSignature: "",
       businessAssociateTitle: "",

@@ -115,7 +115,7 @@ export async function listAllOrderProducts() {
     .leftJoin(manufacturers, eq(orderProducts.manufacturerId, manufacturers.id))
     .leftJoin(products, eq(orderProducts.productId, products.id))
     .where(isNotNull(orderProducts.bvRequestId)) // Only get actual orders, not templates
-    .orderBy(desc(orderProducts.createdAt));
+    .orderBy(desc(orderProducts.createdAt), orderProducts.id);
 
   return rows;
 }
@@ -139,6 +139,7 @@ export async function getOrderProductById(id: string) {
       productCode: products.qCode,
       woundSize: bvRequests.woundSize,
       woundType: bvRequests.woundType,
+      woundLocation: bvRequests.woundLocation,
       insurance: bvRequests.insurance,
       placeOfService: bvRequests.placeOfService,
       notes: orderProducts.notes,
@@ -147,6 +148,16 @@ export async function getOrderProductById(id: string) {
       providerId: bvRequests.providerId,
       providerEmail: providerAcct.email,
       patientInitials: bvRequests.initials,
+      // BV timeline fields
+      applicationDate: bvRequests.applicationDate,
+      bvDeliveryDate: bvRequests.deliveryDate,
+      // Delivery detail fields from order
+      deliveryAddress: orderProducts.deliveryAddress,
+      deliveryCity: orderProducts.deliveryCity,
+      deliveryState: orderProducts.deliveryState,
+      deliveryZip: orderProducts.deliveryZip,
+      deliveryDate: orderProducts.deliveryDate,
+      contactPhone: orderProducts.contactPhone,
     })
     .from(orderProducts)
     .leftJoin(bvRequests, eq(orderProducts.bvRequestId, bvRequests.id))
@@ -218,7 +229,7 @@ export async function listOrderProductsForProvider(providerId: string) {
     .leftJoin(manufacturers, eq(orderProducts.manufacturerId, manufacturers.id))
     .leftJoin(products, eq(orderProducts.productId, products.id))
     .where(eq(bvRequests.providerId, providerId))
-    .orderBy(desc(orderProducts.createdAt));
+    .orderBy(desc(orderProducts.createdAt), orderProducts.id);
 
   return rows;
 }

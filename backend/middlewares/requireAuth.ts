@@ -1,12 +1,27 @@
 import type { NextFunction, Request, Response } from "../http/types";
 
 import { getSupabaseAdminClient } from "../services/supabaseAdmin";
+import {
+  isDemoMode,
+  getDemoRoleFromRequest,
+  getDemoUser,
+} from "../../lib/demoMode";
 
 export async function requireAuth(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
+  if (isDemoMode()) {
+    const role = getDemoRoleFromRequest(req);
+    const { userId, user } = getDemoUser(role);
+    res.locals.userId = userId;
+    res.locals.user = user;
+    res.locals.accessToken = "demo-token";
+    res.locals.demoRole = role;
+    return next();
+  }
+
   const header = req.headers.authorization;
   const token = header?.startsWith("Bearer ")
     ? header.slice("Bearer ".length)

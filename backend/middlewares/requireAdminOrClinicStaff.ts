@@ -5,12 +5,34 @@ import { eq } from "drizzle-orm";
 import { adminAcct } from "../../db/admin";
 import { clinicStaffAcct } from "../../db/clinic-staff";
 import { getDb } from "../services/db";
+import { isDemoMode } from "../../lib/demoMode";
 
 export async function requireAdminOrClinicStaff(
   _req: Request,
   res: Response,
   next: NextFunction,
 ) {
+  if (isDemoMode()) {
+    const role = res.locals.demoRole as string | undefined;
+    if (role === "admin") {
+      res.locals.adminAcctId = "demo-admin-acct-id";
+      res.locals.adminRole = "admin";
+      res.locals.approverUserId = res.locals.userId;
+      res.locals.approverRole = "admin";
+      return next();
+    }
+    if (role === "clinic_staff") {
+      res.locals.clinicStaffAcctId = "demo-clinic-staff-acct-id";
+      res.locals.adminRole = "clinic_staff";
+      res.locals.approverUserId = res.locals.userId;
+      res.locals.approverRole = "clinic_staff";
+      return next();
+    }
+    return res.status(403).json({
+      error: "Demo: switch to admin or clinic staff role to access this.",
+    });
+  }
+
   const userId = res.locals.userId as string | undefined;
   if (!userId) {
     return res.status(401).json({ error: "Unauthorized" });

@@ -605,8 +605,35 @@ function EditModal({ open, onClose, onSaved, token, form }: EditModalProps) {
   const [commercial, setCommercial] = React.useState<"true" | "false" | "">(
     "true",
   );
+  const [manufacturerList, setManufacturerList] = React.useState<
+    Array<{ id: string; name: string; commercial: boolean }>
+  >([]);
   const [saving, setSaving] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+
+  // Fetch manufacturers dynamically based on insurance type
+  React.useEffect(() => {
+    if (!open || !token) return;
+    const fetchManufacturers = async () => {
+      const commercialParam =
+        commercial === "true"
+          ? "true"
+          : commercial === "false"
+            ? "false"
+            : undefined;
+      const url = commercialParam
+        ? `/api/manufacturers?commercial=${commercialParam}`
+        : "/api/manufacturers";
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = await res.json();
+      if (json && Array.isArray(json.data)) {
+        setManufacturerList(json.data);
+      }
+    };
+    fetchManufacturers();
+  }, [open, token, commercial]);
 
   React.useEffect(() => {
     if (form && open) {
@@ -681,6 +708,27 @@ function EditModal({ open, onClose, onSaved, token, form }: EditModalProps) {
           />
         </div>
 
+        {/* Insurance Type (moved above Manufacturer to enable filtering) */}
+        <div>
+          <label className="block text-xs font-medium text-slate-600 mb-1">
+            Insurance Type <span className="text-red-500">*</span>
+          </label>
+          <select
+            value={commercial}
+            onChange={(e) => {
+              setCommercial(e.target.value as "true" | "false" | "");
+              setManufacturer(""); // Reset manufacturer when insurance type changes
+            }}
+            required
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="true">Commercial</option>
+            <option value="false">Non-Commercial (Medicare/Medicaid)</option>
+            <option value="">Both (applies to all)</option>
+          </select>
+        </div>
+
+        {/* Manufacturer (filtered by Insurance Type, dynamic from DB) */}
         <div>
           <label className="block text-xs font-medium text-slate-600 mb-1">
             Manufacturer <span className="text-red-500">*</span>
@@ -691,9 +739,10 @@ function EditModal({ open, onClose, onSaved, token, form }: EditModalProps) {
             required
             className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            {KNOWN_MANUFACTURERS.map((m) => (
-              <option key={m} value={m}>
-                {manufacturerLabel(m)}
+            <option value="">Select manufacturer…</option>
+            {manufacturerList.map((m) => (
+              <option key={m.id} value={m.name}>
+                {manufacturerLabel(m.name)}
               </option>
             ))}
           </select>
@@ -709,24 +758,6 @@ function EditModal({ open, onClose, onSaved, token, form }: EditModalProps) {
             rows={2}
             className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
           />
-        </div>
-
-        <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">
-            Insurance Type <span className="text-red-500">*</span>
-          </label>
-          <select
-            value={commercial}
-            onChange={(e) =>
-              setCommercial(e.target.value as "true" | "false" | "")
-            }
-            required
-            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="true">Commercial</option>
-            <option value="false">Non-Commercial (Medicare/Medicaid)</option>
-            <option value="">Both (applies to all)</option>
-          </select>
         </div>
 
         <div>

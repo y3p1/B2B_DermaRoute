@@ -1,4 +1,4 @@
-# BV Email Notification - Email Preview
+﻿# BV Email Notification - Email Preview
 
 ## Visual Mockup
 
@@ -55,7 +55,7 @@ Below is what the email notification looks like when administrators and clinic s
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
 │  ────────────────────────────────────────────────────────────│
-│                    Integrity Tissue Solutions                  │
+│                    Derma Route                  │
 │        This is an automated notification.                      │
 │            Please do not reply to this email.                  │
 │                Request ID: uuid-123-456                        │
@@ -116,7 +116,7 @@ Below is what the email notification looks like when administrators and clinic s
 
 ### Footer (Gray background)
 
-- **Company Name**: "Integrity Tissue Solutions"
+- **Company Name**: "Derma Route"
 - **Disclaimer**: "This is an automated notification"
 - **Request ID**: For reference and tracking
 
@@ -290,7 +290,7 @@ You can save the HTML to a file and open it in a browser to see exactly how it l
 
 The email notification is designed to be:
 
-- **Professional**: Clean, modern design that reflects well on Integrity Tissue Solutions
+- **Professional**: Clean, modern design that reflects well on Derma Route
 - **Informative**: All essential information at a glance
 - **Actionable**: Clear call-to-action button
 - **Secure**: HIPAA-compliant content

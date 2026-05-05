@@ -76,7 +76,10 @@ describe("POST /api/clinic-staff-signup", () => {
     });
 
     expect(res.status).toBe(201);
-    expect(json).toHaveProperty("message", "Clinic staff signup successful");
+    expect(json).toHaveProperty(
+      "message",
+      "Registration submitted. Your account is pending admin approval.",
+    );
     expect(json).toHaveProperty("user_id", "user-1");
   });
 });

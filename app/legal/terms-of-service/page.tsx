@@ -1,16 +1,19 @@
-import React from "react";
+﻿import React from "react";
 import { Metadata } from "next";
+import { DemoLegalBanner } from "@/components/demo/DemoLegalBanner";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | Integrity Tissue Solution",
+  title: "Terms of Service | Derma Route",
 };
 
 export default function TermsOfServicePage() {
   return (
+    <>
+      <DemoLegalBanner />
     <article className="max-w-none text-gray-700 space-y-4 [&>h2]:mt-8 [&>h2]:mb-4 [&>h2]:font-bold [&>h2]:text-2xl [&>h2]:text-gray-900 [&>h3]:mt-6 [&>h3]:mb-3 [&>h3]:font-semibold [&>h3]:text-lg [&>h3]:text-gray-800 [&>p]:leading-relaxed [&>p]:mb-4 [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-4 [&>ul>li]:mb-2">
       <div className="border-b border-gray-200 pb-6 mb-8">
         <p className="text-xs font-semibold uppercase tracking-widest text-blue-600 mb-2">
-          Integrity Tissue Solution
+          Derma Route
         </p>
         <h1 className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
           Terms of Service
@@ -20,7 +23,7 @@ export default function TermsOfServicePage() {
       <h2>1. Agreement to Terms</h2>
       <p>
         These Terms of Service (&ldquo;Terms&rdquo; or &ldquo;Agreement&rdquo;) constitute a legally binding agreement between
-        Integrity Tissue Solution (&ldquo;Company,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;), a business headquartered in the State of
+        Derma Route (&ldquo;Company,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;), a business headquartered in the State of
         Georgia, United States of America, and you, the authorized user (&ldquo;User,&rdquo; &ldquo;you,&rdquo; or &ldquo;your&rdquo;) of the Integrity
         Tissue Solution platform and website (collectively, the &ldquo;Platform&rdquo;).
       </p>
@@ -28,14 +31,14 @@ export default function TermsOfServicePage() {
         By accessing or using the Platform, creating an account, or clicking to accept these Terms, you represent
         that: (a) you have read, understood, and agree to be bound by these Terms; (b) you are authorized to act
         on behalf of the clinic, medical practice, or healthcare organization you represent; and (c) your
-        organization has executed a written service contract with Integrity Tissue Solution.
+        organization has executed a written service contract with Derma Route.
       </p>
       <p className="font-bold text-gray-900">
         IF YOU DO NOT AGREE TO THESE TERMS, YOU MUST NOT ACCESS OR USE THE PLATFORM.
       </p>
       <p>
         These Terms apply in addition to any separate written contract executed between your organization and
-        Integrity Tissue Solution. In the event of a conflict between these Terms and a separately executed
+        Derma Route. In the event of a conflict between these Terms and a separately executed
         contract, the separately executed contract shall govern.
       </p>
 
@@ -48,7 +51,7 @@ export default function TermsOfServicePage() {
         <li>Be a licensed healthcare provider, clinic administrator, or authorized staff member of a registered healthcare facility</li>
         <li>Represent a clinic, podiatry practice, vascular surgery practice, wound care center, or similar healthcare organization</li>
         <li>Be at least 18 years of age</li>
-        <li>Have an organization that has executed a written service contract with Integrity Tissue Solution</li>
+        <li>Have an organization that has executed a written service contract with Derma Route</li>
         <li>Maintain all applicable professional licenses and certifications required by federal and state law</li>
         <li>Comply with all applicable federal and state healthcare laws and regulations, including HIPAA</li>
       </ul>
@@ -61,7 +64,7 @@ export default function TermsOfServicePage() {
 
       <h3>3.1 Account Creation</h3>
       <p>
-        To use the Platform, your organization must first execute a written service contract with Integrity Tissue
+        To use the Platform, your organization must first execute a written service contract with Derma Route
         Solution. Following execution of that contract, authorized users may register for individual accounts. You
         agree to provide accurate, current, and complete registration information and to keep it updated at all
         times.
@@ -76,7 +79,7 @@ export default function TermsOfServicePage() {
         <li>Not permit any other individual to use your account credentials</li>
       </ul>
       <p>
-        You are fully responsible for all activities that occur under your account. Integrity Tissue Solution shall
+        You are fully responsible for all activities that occur under your account. Derma Route shall
         not be liable for any loss or damage arising from your failure to maintain account security.
       </p>
 
@@ -91,7 +94,7 @@ export default function TermsOfServicePage() {
 
       <h3>4.1 Description of Services</h3>
       <p>
-        Integrity Tissue Solution provides a specialized digital platform that facilitates the following services for
+        Derma Route provides a specialized digital platform that facilitates the following services for
         authorized Healthcare Providers:
       </p>
       <ul>
@@ -114,7 +117,7 @@ export default function TermsOfServicePage() {
       <p>
         Benefits Verification (BV) information is provided for informational purposes only and does not
         guarantee coverage, payment, or reimbursement by any payer. Insurance coverage determinations are
-        made exclusively by the applicable payer. Integrity Tissue Solution is not responsible for any denial of
+        made exclusively by the applicable payer. Derma Route is not responsible for any denial of
         coverage or reimbursement.
       </p>
 
@@ -130,7 +133,7 @@ export default function TermsOfServicePage() {
       <h3>5.1 Transaction-Based Fees</h3>
       <p>
         Use of the Platform is subject to per-order and per-transaction fees as set forth in your executed service
-        contract with Integrity Tissue Solution. By placing an order through the Platform, you authorize us to
+        contract with Derma Route. By placing an order through the Platform, you authorize us to
         charge the applicable fees in accordance with your service contract.
       </p>
 
@@ -185,7 +188,7 @@ export default function TermsOfServicePage() {
       <p>
         You may not use the Platform, or any data or information obtained through it, for any unauthorized
         commercial purpose, including reselling access, creating competing products, or sublicensing Platform
-        capabilities to third parties, without the prior express written permission of Integrity Tissue Solution. Any
+        capabilities to third parties, without the prior express written permission of Derma Route. Any
         such permission must be documented in a separate written agreement signed by an authorized
         representative of the Company.
       </p>
@@ -203,7 +206,7 @@ export default function TermsOfServicePage() {
       <h3>7.1 Ownership</h3>
       <p>
         The Platform and all of its content, features, and functionality, including software, text, graphics, logos,
-        icons, images, and workflows (collectively, &ldquo;Company IP&rdquo;), are owned exclusively by Integrity Tissue
+        icons, images, and workflows (collectively, &ldquo;Company IP&rdquo;), are owned exclusively by Derma Route
         Solution or its licensors and are protected by applicable U.S. and international intellectual property laws.
       </p>
 
@@ -224,14 +227,14 @@ export default function TermsOfServicePage() {
 
       <h3>7.4 Trademarks</h3>
       <p>
-        &ldquo;Integrity Tissue Solution&rdquo; and all related logos, product names, and service names are trademarks or
-        service marks of Integrity Tissue Solution. You may not use our trademarks without our prior written
+        &ldquo;Derma Route&rdquo; and all related logos, product names, and service names are trademarks or
+        service marks of Derma Route. You may not use our trademarks without our prior written
         consent.
       </p>
 
       <h2>8. Confidentiality</h2>
       <p>
-        In using the Platform, you may access confidential and proprietary information of Integrity Tissue
+        In using the Platform, you may access confidential and proprietary information of Derma Route
         Solution, including pricing, product information, platform workflows, business processes, and technical
         information (&ldquo;Confidential Information&rdquo;). You agree to:
       </p>
@@ -269,7 +272,7 @@ export default function TermsOfServicePage() {
       <p className="font-bold text-gray-900 text-sm">
         THE PLATFORM IS PROVIDED &ldquo;AS IS&rdquo; AND &ldquo;AS AVAILABLE&rdquo; WITHOUT WARRANTIES OF
         ANY KIND, EITHER EXPRESS OR IMPLIED. TO THE FULLEST EXTENT PERMITTED BY
-        APPLICABLE LAW, INTEGRITY TISSUE SOLUTION DISCLAIMS ALL WARRANTIES,
+        APPLICABLE LAW, DERMA ROUTE DISCLAIMS ALL WARRANTIES,
         INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
         PURPOSE, TITLE, AND NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE PLATFORM
         WILL BE UNINTERRUPTED, ERROR-FREE, OR SECURE.
@@ -277,8 +280,8 @@ export default function TermsOfServicePage() {
 
       <h3>10.2 Limitation of Liability</h3>
       <p className="font-bold text-gray-900 text-sm">
-        TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, INTEGRITY TISSUE
-        SOLUTION SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL,
+        TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, DERMA ROUTE
+        SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL,
         CONSEQUENTIAL, PUNITIVE, OR EXEMPLARY DAMAGES, INCLUDING LOSS OF REVENUE,
         PROFITS, DATA, OR BUSINESS INTERRUPTION. OUR TOTAL CUMULATIVE LIABILITY FOR
         ANY CLAIMS ARISING UNDER THESE TERMS SHALL NOT EXCEED THE TOTAL FEES PAID
@@ -287,7 +290,7 @@ export default function TermsOfServicePage() {
 
       <h3>10.3 Indemnification</h3>
       <p>
-        You agree to indemnify, defend, and hold harmless Integrity Tissue Solution and its officers, directors,
+        You agree to indemnify, defend, and hold harmless Derma Route and its officers, directors,
         employees, and agents from any claims, liabilities, damages, losses, and expenses (including reasonable
         attorneys&apos; fees) arising from: (a) your use of the Platform; (b) your violation of these Terms; (c) your
         violation of any applicable law; (d) your clinical decisions or patient care activities; or (e) any information
@@ -302,7 +305,7 @@ export default function TermsOfServicePage() {
         accordance with this Section or upon expiration or termination of your executed service contract.
       </p>
 
-      <h3>11.2 Termination by Integrity Tissue Solution</h3>
+      <h3>11.2 Termination by Derma Route</h3>
       <p>
         We may suspend or terminate your access, with or without notice depending on the circumstances, for any
         of the following reasons:
@@ -325,7 +328,7 @@ export default function TermsOfServicePage() {
       <p>
         You may terminate your account at any time by contacting us at{" "}
         <a href="mailto:will@integritytissue.com" className="text-blue-600 hover:text-blue-800">will@integritytissue.com</a>.
-        Termination of individual user accounts does not affect your organization&apos;s service contract with Integrity Tissue
+        Termination of individual user accounts does not affect your organization&apos;s service contract with Derma Route
         Solution.
       </p>
 
@@ -376,7 +379,7 @@ export default function TermsOfServicePage() {
       <h3>13.1 Entire Agreement</h3>
       <p>
         These Terms, together with your executed service contract and our Privacy Policy, constitute the entire
-        agreement between you and Integrity Tissue Solution regarding the Platform and supersede all prior
+        agreement between you and Derma Route regarding the Platform and supersede all prior
         agreements or understandings on the same subject matter.
       </p>
 
@@ -390,7 +393,7 @@ export default function TermsOfServicePage() {
       <h3>13.3 Waiver</h3>
       <p>
         Our failure to enforce any right or provision shall not constitute a waiver thereof. Any waiver must be in
-        writing and signed by an authorized representative of Integrity Tissue Solution.
+        writing and signed by an authorized representative of Derma Route.
       </p>
 
       <h3>13.4 Assignment</h3>
@@ -410,13 +413,13 @@ export default function TermsOfServicePage() {
       <h3>13.6 Relationship of the Parties</h3>
       <p>
         These Terms do not create any partnership, joint venture, employment, or agency relationship between
-        you and Integrity Tissue Solution. You are an independent entity using our Platform under license.
+        you and Derma Route. You are an independent entity using our Platform under license.
       </p>
 
       <h2>14. Contact Information</h2>
       <p>For questions, notices, or concerns regarding these Terms of Service, please contact us:</p>
       <p>
-        <strong>Integrity Tissue Solution</strong><br />
+        <strong>Derma Route</strong><br />
         Legal / Compliance Department<br />
         Georgia, United States of America<br />
         Email: <a href="mailto:will@integritytissue.com" className="text-blue-600 hover:text-blue-800">will@integritytissue.com</a>
@@ -444,5 +447,6 @@ export default function TermsOfServicePage() {
         UNDERSTOOD, AND AGREE TO BE BOUND BY THESE TERMS OF SERVICE.
       </p>
     </article>
+    </>
   );
 }

@@ -10,7 +10,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
   FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
@@ -22,6 +21,7 @@ import { supabase } from "@/lib/supabaseClient";
 import VerifySignIn from "./VerifySignIn";
 import IntegrityTissueLogo from "@/components/IntegrityTissueLogo";
 import { ApiError, apiPost } from "@/lib/apiClient";
+import { isClientDemoMode } from "@/lib/demoMode";
 import { useAuthStore } from "@/store/auth";
 import { ALLOW_INTERNATIONAL_PHONE } from "@/lib/featureFlags";
 import {
@@ -83,7 +83,7 @@ export default function AuthComponent() {
   useEffect(() => {
     const roleParam = searchParams.get("role");
     if (roleParam === "provider" || roleParam === "clinic_staff") {
-      setSelectedRole(roleParam as any);
+      setSelectedRole(roleParam);
       setStage("enterPhone");
     }
   }, [searchParams]);
@@ -143,6 +143,13 @@ export default function AuthComponent() {
   // No longer need formatPhoneNumber, handled by PhoneInput
 
   const handleSendCode = async (values: z.infer<typeof phoneSchema>) => {
+    if (isClientDemoMode()) {
+      setError({
+        title: "Demo mode",
+        description: "Sign-in is illustrative only. Use the role switcher in the banner to explore the portal.",
+      });
+      return;
+    }
     setIsSubmitting(true);
     setError(null);
     try {

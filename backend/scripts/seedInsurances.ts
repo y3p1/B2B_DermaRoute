@@ -112,7 +112,7 @@ const INSURANCE_NAMES: string[] = [
   "Wellmark",
 ];
 
-async function seedInsurances() {
+export async function seedInsurances() {
   const db = getDb();
   let inserted = 0;
   let skipped = 0;
@@ -142,10 +142,13 @@ async function seedInsurances() {
   console.log(
     `\nDone. Inserted: ${inserted}, Already existed (skipped): ${skipped}`,
   );
-  await closeDb();
 }
 
-seedInsurances().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (require.main === module) {
+  seedInsurances()
+    .then(() => closeDb())
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
+}

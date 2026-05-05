@@ -6,7 +6,6 @@ import {
 import { corsMiddleware } from "../../../../backend/middlewares/cors";
 import { errorHandler } from "../../../../backend/middlewares/errorHandler";
 import { requireAuth } from "../../../../backend/middlewares/requireAuth";
-import { requireAdminOrClinicStaff } from "../../../../backend/middlewares/requireAdminOrClinicStaff";
 import { rateLimit } from "../../../../backend/middlewares/rateLimit";
 import { getAllowedOrigins } from "../../../../backend/config/env";
 import { runServerPipeline } from "../../../../backend/serverPipeline";

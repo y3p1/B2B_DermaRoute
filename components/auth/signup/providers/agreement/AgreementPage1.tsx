@@ -1,6 +1,5 @@
-import React from "react";
+﻿import React from "react";
 import { Input } from "@/components/ui/input";
-import IntegrityTissueLogo from "@/components/IntegrityTissueLogo";
 
 interface AgreementPage1Props {
   coveredEntityValue: string;
@@ -23,7 +22,7 @@ export default function AgreementPage1({
             className="inline-block w-64 h-7 px-2 bg-blue-50 border-blue-300 align-baseline"
             placeholder="Enter Covered Entity"
           />{" "}
-          (&quot;Covered Entity&quot;) and Integrity Tissue Solutions
+          (&quot;Covered Entity&quot;) and Derma Route
           (&quot;Business Associate&quot;), each individually a
           &quot;Party&quot; and together the &quot;Parties.&quot;
         </p>

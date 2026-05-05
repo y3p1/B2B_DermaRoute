@@ -1,3 +1,5 @@
+import { isClientDemoMode, DEMO_ROLE_COOKIE } from "@/lib/demoMode";
+
 export class ApiError extends Error {
   status: number;
   data?: unknown;
@@ -29,6 +31,22 @@ async function parseJsonSafe(res: Response): Promise<unknown> {
   }
 }
 
+function getDemoCookieRole(): string {
+  if (typeof document === "undefined") return "provider";
+  const match = document.cookie.split(";").find((c) =>
+    c.trim().startsWith(`${DEMO_ROLE_COOKIE}=`),
+  );
+  return match ? decodeURIComponent(match.trim().slice(DEMO_ROLE_COOKIE.length + 1)) : "provider";
+}
+
+function demoHeaders(): Record<string, string> {
+  if (!isClientDemoMode()) return {};
+  return {
+    Authorization: "Bearer demo-token",
+    "X-Demo-Role": getDemoCookieRole(),
+  };
+}
+
 type RequestOptions = {
   token?: string;
 };
@@ -40,7 +58,8 @@ export async function apiGet<TResponse>(
   const res = await fetch(path, {
     method: "GET",
     headers: {
-      ...(options.token ? { Authorization: `Bearer ${options.token}` } : null),
+      ...demoHeaders(),
+      ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
     },
   });
 
@@ -67,7 +86,8 @@ export async function apiPost<TResponse, TBody extends Json>(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      ...(options.token ? { Authorization: `Bearer ${options.token}` } : null),
+      ...demoHeaders(),
+      ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
     },
     body: JSON.stringify(body),
   });
@@ -95,7 +115,8 @@ export async function apiPatch<TResponse, TBody extends Json>(
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
-      ...(options.token ? { Authorization: `Bearer ${options.token}` } : null),
+      ...demoHeaders(),
+      ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
     },
     body: JSON.stringify(body),
   });
@@ -121,7 +142,8 @@ export async function apiDelete<TResponse>(
   const res = await fetch(path, {
     method: "DELETE",
     headers: {
-      ...(options.token ? { Authorization: `Bearer ${options.token}` } : null),
+      ...demoHeaders(),
+      ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
     },
   });
 

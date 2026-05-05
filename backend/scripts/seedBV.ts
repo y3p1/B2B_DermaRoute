@@ -6,131 +6,129 @@ dotenv.config({ path: ".env.local" });
 import { getDb, closeDb } from "../services/db";
 import { woundSizes, orderProducts, manufacturers } from "../../db/schema";
 
-async function main() {
+const woundSeed = [
+  {
+    key: "disc_6mm",
+    label: "6mm Disc (0.283 cm²)",
+    area: 0.283,
+    metadata: { type: "disc", diameter_mm: 6 },
+  },
+  {
+    key: "disc_12mm",
+    label: "12mm Disc (1.131 cm²)",
+    area: 1.131,
+    metadata: { type: "disc", diameter_mm: 12 },
+  },
+  {
+    key: "disc_15mm",
+    label: "15mm Disc (1.767 cm²)",
+    area: 1.767,
+    metadata: { type: "disc", diameter_mm: 15 },
+  },
+  {
+    key: "disc_16mm",
+    label: "16mm Disc (2.011 cm²)",
+    area: 2.011,
+    metadata: { type: "disc", diameter_mm: 16 },
+  },
+  {
+    key: "sq_1x1",
+    label: "1x1 cm (1 cm²)",
+    area: 1,
+    metadata: { w: 1, h: 1 },
+  },
+  {
+    key: "sq_1_5x1_5",
+    label: "1.5x1.5 cm (2.25 cm²)",
+    area: 2.25,
+    metadata: { w: 1.5, h: 1.5 },
+  },
+  {
+    key: "sq_1_5x2",
+    label: "1.5x2 cm (3 cm²)",
+    area: 3,
+    metadata: { w: 1.5, h: 2 },
+  },
+  {
+    key: "sq_2x2",
+    label: "2x2 cm (4 cm²)",
+    area: 4,
+    metadata: { w: 2, h: 2 },
+  },
+  {
+    key: "sq_2x3",
+    label: "2x3 cm (6 cm²)",
+    area: 6,
+    metadata: { w: 2, h: 3 },
+  },
+  {
+    key: "sq_2x4",
+    label: "2x4 cm (8 cm²)",
+    area: 8,
+    metadata: { w: 2, h: 4 },
+  },
+  {
+    key: "sq_3x3",
+    label: "3x3 cm (9 cm²)",
+    area: 9,
+    metadata: { w: 3, h: 3 },
+  },
+  {
+    key: "sq_3x3_5",
+    label: "3x3.5 cm (10.5 cm²)",
+    area: 10.5,
+    metadata: { w: 3, h: 3.5 },
+  },
+  {
+    key: "sq_3x4",
+    label: "3x4 cm (12 cm²)",
+    area: 12,
+    metadata: { w: 3, h: 4 },
+  },
+  {
+    key: "sq_4x4",
+    label: "4x4 cm (16 cm²)",
+    area: 16,
+    metadata: { w: 4, h: 4 },
+  },
+  {
+    key: "sq_4x6",
+    label: "4x6 cm (24 cm²)",
+    area: 24,
+    metadata: { w: 4, h: 6 },
+  },
+  {
+    key: "sq_4x8",
+    label: "4x8 cm (32 cm²)",
+    area: 32,
+    metadata: { w: 4, h: 8 },
+  },
+  {
+    key: "sq_5x5",
+    label: "5x5 cm (25 cm²)",
+    area: 25,
+    metadata: { w: 5, h: 5 },
+  },
+  {
+    key: "sq_6x8",
+    label: "6x8 cm (48 cm²)",
+    area: 48,
+    metadata: { w: 6, h: 8 },
+  },
+  {
+    key: "sq_7x7",
+    label: "7x7 cm (49 cm²)",
+    area: 49,
+    metadata: { w: 7, h: 7 },
+  },
+];
+
+export async function seedWoundSizes(): Promise<number> {
   const db = getDb();
-
-  console.log("Seeding wound sizes...");
-
-  const woundSeed = [
-    {
-      key: "disc_6mm",
-      label: "6mm Disc (0.283 cm²)",
-      area: 0.283,
-      metadata: { type: "disc", diameter_mm: 6 },
-    },
-    {
-      key: "disc_12mm",
-      label: "12mm Disc (1.131 cm²)",
-      area: 1.131,
-      metadata: { type: "disc", diameter_mm: 12 },
-    },
-    {
-      key: "disc_15mm",
-      label: "15mm Disc (1.767 cm²)",
-      area: 1.767,
-      metadata: { type: "disc", diameter_mm: 15 },
-    },
-    {
-      key: "disc_16mm",
-      label: "16mm Disc (2.011 cm²)",
-      area: 2.011,
-      metadata: { type: "disc", diameter_mm: 16 },
-    },
-    {
-      key: "sq_1x1",
-      label: "1x1 cm (1 cm²)",
-      area: 1,
-      metadata: { w: 1, h: 1 },
-    },
-    {
-      key: "sq_1_5x1_5",
-      label: "1.5x1.5 cm (2.25 cm²)",
-      area: 2.25,
-      metadata: { w: 1.5, h: 1.5 },
-    },
-    {
-      key: "sq_1_5x2",
-      label: "1.5x2 cm (3 cm²)",
-      area: 3,
-      metadata: { w: 1.5, h: 2 },
-    },
-    {
-      key: "sq_2x2",
-      label: "2x2 cm (4 cm²)",
-      area: 4,
-      metadata: { w: 2, h: 2 },
-    },
-    {
-      key: "sq_2x3",
-      label: "2x3 cm (6 cm²)",
-      area: 6,
-      metadata: { w: 2, h: 3 },
-    },
-    {
-      key: "sq_2x4",
-      label: "2x4 cm (8 cm²)",
-      area: 8,
-      metadata: { w: 2, h: 4 },
-    },
-    {
-      key: "sq_3x3",
-      label: "3x3 cm (9 cm²)",
-      area: 9,
-      metadata: { w: 3, h: 3 },
-    },
-    {
-      key: "sq_3x3_5",
-      label: "3x3.5 cm (10.5 cm²)",
-      area: 10.5,
-      metadata: { w: 3, h: 3.5 },
-    },
-    {
-      key: "sq_3x4",
-      label: "3x4 cm (12 cm²)",
-      area: 12,
-      metadata: { w: 3, h: 4 },
-    },
-    {
-      key: "sq_4x4",
-      label: "4x4 cm (16 cm²)",
-      area: 16,
-      metadata: { w: 4, h: 4 },
-    },
-    {
-      key: "sq_4x6",
-      label: "4x6 cm (24 cm²)",
-      area: 24,
-      metadata: { w: 4, h: 6 },
-    },
-    {
-      key: "sq_4x8",
-      label: "4x8 cm (32 cm²)",
-      area: 32,
-      metadata: { w: 4, h: 8 },
-    },
-    {
-      key: "sq_5x5",
-      label: "5x5 cm (25 cm²)",
-      area: 25,
-      metadata: { w: 5, h: 5 },
-    },
-    {
-      key: "sq_6x8",
-      label: "6x8 cm (48 cm²)",
-      area: 48,
-      metadata: { w: 6, h: 8 },
-    },
-    {
-      key: "sq_7x7",
-      label: "7x7 cm (49 cm²)",
-      area: 49,
-      metadata: { w: 7, h: 7 },
-    },
-  ];
+  let inserted = 0;
 
   for (const w of woundSeed) {
-    // Upsert: insert or update wound size by unique `key`.
-    await db
+    const result = await db
       .insert(woundSizes)
       .values({
         key: w.key,
@@ -139,8 +137,19 @@ async function main() {
         metadata: w.metadata,
         createdAt: new Date(),
       })
-      .onConflictDoNothing();
+      .onConflictDoNothing()
+      .returning({ id: woundSizes.id });
+    if (result.length > 0) inserted++;
   }
+
+  return inserted;
+}
+
+async function main() {
+  const db = getDb();
+
+  console.log("Seeding wound sizes...");
+  await seedWoundSizes();
 
   // Fetch all wound size UUIDs by key
   const woundRows = await db
@@ -214,16 +223,18 @@ async function main() {
   console.log("BV seed complete.");
 }
 
-main()
-  .catch((err) => {
-    console.error("Failed to seed BV data:", err);
-    process.exitCode = 1;
-  })
-  .finally(async () => {
-    try {
-      await closeDb();
-    } catch {
-      // ignore
-    }
-    process.exit(process.exitCode ?? 0);
-  });
+if (require.main === module) {
+  main()
+    .catch((err) => {
+      console.error("Failed to seed BV data:", err);
+      process.exitCode = 1;
+    })
+    .finally(async () => {
+      try {
+        await closeDb();
+      } catch {
+        // ignore
+      }
+      process.exit(process.exitCode ?? 0);
+    });
+}

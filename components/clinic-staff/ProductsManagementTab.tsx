@@ -553,6 +553,10 @@ export function ProductsManagementTab() {
             Next
           </button>
         </div>
+
+        <p className="text-xs text-muted-foreground mt-1 mb-2">
+          <span className="font-medium">Note:</span> Every click of delete removes &ldquo;one&rdquo; record that corresponds to the current chosen wound size in the dropdown. If you wish to remove multiple records, you can opt to remove multiple sizes in the edit product modal and corresponding records will be removed at once.
+        </p>
       </div>
 
       {modalOpen && (
@@ -668,7 +672,7 @@ function ProductFormModal({
     costPerGraft: product?.costPerGraft ?? "",
     estAoc100: product?.estAoc100 ?? "",
     estAoc80: product?.estAoc80 ?? "",
-    commission: product?.commission ?? "",
+    commission: product?.commission ?? "1",
     autoCalc: true, // Auto-calculation on by default per user request
     description: product?.description ?? "",
     quarter: product?.quarter ?? 1,
@@ -698,26 +702,25 @@ function ProductFormModal({
         const commNum = parseFloat(next.commission);
         const unitSize = parseFloat(next.unitSize);
         const payRateCm2 = parseFloat(next.payRatePerCm2);
-        
+
         if (!isNaN(payRateCm2)) {
-          if (!isNaN(commNum)) {
-            next.costPerCm2 = (payRateCm2 * commNum).toFixed(2);
-          }
+          // If commission present use formula; otherwise cost = pay rate (no commission case)
+          const costCm2 = !isNaN(commNum) ? payRateCm2 * commNum : payRateCm2;
+          next.costPerCm2 = costCm2.toFixed(2);
+
           if (!isNaN(unitSize)) {
             const payRateGraft = payRateCm2 * unitSize;
             next.payRatePerGraft = payRateGraft.toFixed(2);
-            
-            if (!isNaN(commNum)) {
-              const costGraft = parseFloat(next.costPerCm2) * unitSize;
-              next.costPerGraft = costGraft.toFixed(2);
-              
-              next.estAoc100 = (payRateGraft - costGraft).toFixed(2);
-              next.estAoc80 = ((payRateGraft * 0.8) - costGraft).toFixed(2);
-            }
+
+            const costGraft = costCm2 * unitSize;
+            next.costPerGraft = costGraft.toFixed(2);
+
+            next.estAoc100 = Math.max(0, payRateGraft - costGraft).toFixed(2);
+            next.estAoc80 = Math.max(0, (payRateGraft * 0.8) - costGraft).toFixed(2);
           }
         }
       }
-      
+
       return next;
     });
   };
@@ -1040,7 +1043,7 @@ function ProductFormModal({
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                       formData.autoCalc ? "bg-blue-600" : "bg-gray-300"
                     }`}
-                    onClick={() => updateField("autoCalc", (!formData.autoCalc) as any)}
+                    onClick={() => setFormData((prev) => ({ ...prev, autoCalc: !prev.autoCalc }))}
                   >
                     <span
                       className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
@@ -1060,7 +1063,7 @@ function ProductFormModal({
                     type="text"
                     value={formData.commission}
                     onChange={(e) => updateField("commission", e.target.value)}
-                    placeholder="0.6"
+                    placeholder="e.g. 0.6 — enter 1 if no commission"
                     className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-50"
                   />
                   <p className="text-xs text-gray-500 mt-1">
@@ -1223,7 +1226,7 @@ function ProductEditModal({
         costPerGraft: v.costPerGraft ?? "",
         estAoc100: v.estAoc100 ?? "",
         estAoc80: v.estAoc80 ?? "",
-        commission: v.commission ?? "",
+        commission: (v.commission && parseFloat(v.commission) !== 0) ? v.commission : "1",
         autoCalc: true, // Universally enabled by default
         description: v.description ?? "",
       };
@@ -1234,39 +1237,35 @@ function ProductEditModal({
   const currentData = perSizeData[activeVariant.id] ?? {
     unitSize: "", payRatePerCm2: "", costPerCm2: "",
     payRatePerGraft: "", costPerGraft: "", estAoc100: "", estAoc80: "",
-    commission: "", autoCalc: false, description: "",
+    commission: "1", autoCalc: false, description: "",
   };
 
   const updateField = (field: string, value: string) => {
     setPerSizeData((prev) => {
       const current = prev[activeVariant.id];
       const next = { ...current, [field]: value };
-      
-      // Auto-calc logic if enabled and a relevant field changes
+
       if (next.autoCalc && (field === "unitSize" || field === "payRatePerCm2" || field === "commission")) {
         const commNum = parseFloat(next.commission);
         const unitSize = parseFloat(next.unitSize);
         const payRateCm2 = parseFloat(next.payRatePerCm2);
-        
-        if (!isNaN(payRateCm2)) {
-          if (!isNaN(commNum)) {
-            next.costPerCm2 = (payRateCm2 * commNum).toFixed(2);
-          }
+
+        if (!isNaN(payRateCm2) && !isNaN(commNum)) {
+          next.costPerCm2 = (payRateCm2 * commNum).toFixed(2);
+
           if (!isNaN(unitSize)) {
             const payRateGraft = payRateCm2 * unitSize;
             next.payRatePerGraft = payRateGraft.toFixed(2);
-            
-            if (!isNaN(commNum)) {
-              const costGraft = parseFloat(next.costPerCm2) * unitSize;
-              next.costPerGraft = costGraft.toFixed(2);
-              
-              next.estAoc100 = (payRateGraft - costGraft).toFixed(2);
-              next.estAoc80 = ((payRateGraft * 0.8) - costGraft).toFixed(2);
-            }
+
+            const costGraft = parseFloat(next.costPerCm2) * unitSize;
+            next.costPerGraft = costGraft.toFixed(2);
+
+            next.estAoc100 = Math.max(0, payRateGraft - costGraft).toFixed(2);
+            next.estAoc80 = Math.max(0, (payRateGraft * 0.8) - costGraft).toFixed(2);
           }
         }
       }
-      
+
       return { ...prev, [activeVariant.id]: next };
     });
     setSaveMsg(null);
@@ -1719,7 +1718,7 @@ function ProductEditModal({
                     type="text"
                     value={currentData.commission}
                     onChange={(e) => updateField("commission", e.target.value)}
-                    placeholder="0.6"
+                    placeholder="e.g. 0.6 — enter 1 if no commission"
                     className="w-full px-3 py-2 text-sm border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-50"
                   />
                   <p className="text-xs text-gray-400 mt-1">

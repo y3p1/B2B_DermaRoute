@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-import { eq } from "drizzle-orm";
-
 import { adminAcct } from "../../db/admin";
 import { clinicStaffAcct } from "../../db/clinic-staff";
 import { getDb } from "./db";

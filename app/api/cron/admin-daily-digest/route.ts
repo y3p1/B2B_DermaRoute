@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { getAllAdminEmails } from "../../../../backend/services/adminAcct.service";
 import { getDb } from "../../../../backend/services/db";
 import { orderProducts } from "../../../../db/bv-products";
@@ -45,7 +45,7 @@ export async function GET(request: Request) {
     const subject = `Daily Digest - ${stats.total} Orders Processed`;
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-        <h2 style="color: #2563eb;">Daily Digest: Integrity Tissue</h2>
+        <h2 style="color: #2563eb;">Daily Digest: Derma Route</h2>
         <p>Here is your summary of the orders processed in the last 24 hours.</p>
         
         <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">

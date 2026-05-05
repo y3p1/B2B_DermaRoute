@@ -1,4 +1,4 @@
-import { eq, desc, sql, and } from "drizzle-orm";
+﻿import { eq, desc, and } from "drizzle-orm";
 import { getDb } from "./db";
 import { coveragePlans, policyMonitors } from "../../db/coverage-plans";
 import { insurances } from "../../db/insurances";
@@ -197,7 +197,7 @@ export async function checkPolicyUrl(monitorId: string): Promise<{
 
   try {
     const response = await fetch(monitor.monitorUrl, {
-      headers: { "User-Agent": "IntegrityTissue-PolicyMonitor/1.0" },
+      headers: { "User-Agent": "DermaRoute-PolicyMonitor/1.0" },
       signal: AbortSignal.timeout(15_000),
     });
 

@@ -7,7 +7,6 @@ import { errorHandler } from "../../../backend/middlewares/errorHandler";
 import { rateLimit } from "../../../backend/middlewares/rateLimit";
 import { getAllowedOrigins } from "../../../backend/config/env";
 import { runServerPipeline } from "../../../backend/serverPipeline";
-import { z } from "zod";
 
 const cors = corsMiddleware({ allowedOrigins: getAllowedOrigins() });
 const baseRateLimit = rateLimit({ windowMs: 60_000, max: 120 });

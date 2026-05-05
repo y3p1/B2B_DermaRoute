@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import BaaProviderViewClient from "@/components/admin/baa-providers/BaaProviderViewClient";
 
 export default async function AdminBaaProviderViewPage({
@@ -6,5 +7,9 @@ export default async function AdminBaaProviderViewPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <BaaProviderViewClient id={id} />;
+  return (
+    <Suspense>
+      <BaaProviderViewClient id={id} />
+    </Suspense>
+  );
 }

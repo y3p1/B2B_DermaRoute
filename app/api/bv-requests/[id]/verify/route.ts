@@ -13,6 +13,7 @@ import { getAdminProfileByUserId } from "../../../../../backend/services/adminAc
 import { getClinicStaffProfileByUserId } from "../../../../../backend/services/clinicStaffAcct.service";
 import { sendBvStatusNotification } from "../../../../../backend/services/sendgrid.service";
 import { NextRequest } from "next/server";
+import { isDemoMode } from "../../../../../lib/demoMode";
 
 const cors = corsMiddleware({ allowedOrigins: getAllowedOrigins() });
 const baseRateLimit = rateLimit({ windowMs: 60_000, max: 120 });
@@ -30,18 +31,6 @@ export async function PATCH(
         const userId = res.locals.userId as string | undefined;
         if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
-        // Check if user is admin or clinic staff
-        const admin = await getAdminProfileByUserId(userId);
-        const clinicStaff = admin
-          ? null
-          : await getClinicStaffProfileByUserId(userId);
-
-        if (!admin && !clinicStaff) {
-          return res.status(403).json({
-            error: "Only admin or clinic staff can verify BV requests",
-          });
-        }
-
         const body = req.body as { status?: string };
         const status = body.status;
 
@@ -51,12 +40,36 @@ export async function PATCH(
           });
         }
 
-        const verifierId = admin?.id ?? clinicStaff?.id;
-        if (!verifierId) {
-          return res.status(500).json({ error: "Failed to get verifier ID" });
-        }
+        let verifierId: string | undefined;
+        let verifierType: "admin" | "clinic_staff";
 
-        const verifierType = admin ? "admin" : "clinic_staff";
+        if (isDemoMode()) {
+          const demoRole = res.locals.demoRole as string | undefined;
+          if (demoRole !== "admin" && demoRole !== "clinic_staff") {
+            return res.status(403).json({
+              error: "Only admin or clinic staff can verify BV requests",
+            });
+          }
+          verifierId = userId;
+          verifierType = demoRole;
+        } else {
+          const admin = await getAdminProfileByUserId(userId);
+          const clinicStaff = admin
+            ? null
+            : await getClinicStaffProfileByUserId(userId);
+
+          if (!admin && !clinicStaff) {
+            return res.status(403).json({
+              error: "Only admin or clinic staff can verify BV requests",
+            });
+          }
+
+          verifierId = admin?.id ?? clinicStaff?.id;
+          if (!verifierId) {
+            return res.status(500).json({ error: "Failed to get verifier ID" });
+          }
+          verifierType = admin ? "admin" : "clinic_staff";
+        }
 
         // Fetch full BV request details before update (for notification data)
         const bvRequest = await getBvRequestById(id);

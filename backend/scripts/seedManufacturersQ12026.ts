@@ -5,7 +5,7 @@ dotenv.config({ path: ".env.local" });
 import { getDb, closeDb } from "../services/db";
 import { manufacturers } from "../../db/manufacturers";
 
-async function seedManufacturers() {
+export async function seedManufacturers() {
   const db = getDb();
 
   // Non-commercial manufacturers (Medicare / Medicaid)
@@ -40,10 +40,13 @@ async function seedManufacturers() {
   }
 
   console.log("Manufacturers seeded for Q1 2026!");
-  await closeDb();
 }
 
-seedManufacturers().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (require.main === module) {
+  seedManufacturers()
+    .then(() => closeDb())
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
+}

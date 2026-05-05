@@ -1,6 +1,6 @@
-# Phase 2: Enhanced Order Workflow (Steps 5 & 6) Release Notes
+﻿# Phase 2: Enhanced Order Workflow (Steps 5 & 6) Release Notes
 
-This document summarizes all the functional improvements, schema adjustments, and bug fixes applied to the Integrity Tissue platform during Phase 2 (Steps 5 and 6). You can use this outline to structure your commit messages and discuss the progress with your client.
+This document summarizes all the functional improvements, schema adjustments, and bug fixes applied to the Derma Route platform during Phase 2 (Steps 5 and 6). You can use this outline to structure your commit messages and discuss the progress with your client.
 
 ---
 

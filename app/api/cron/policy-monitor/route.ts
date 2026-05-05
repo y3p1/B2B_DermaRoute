@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isDemoMode } from "../../../../lib/demoMode";
 import { checkAllPolicyMonitors } from "@/backend/services/coveragePlans.service";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +16,16 @@ export async function GET(request: Request) {
       queryKey !== process.env.CRON_SECRET
     ) {
       return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    if (isDemoMode()) {
+      return NextResponse.json({
+        success: true,
+        checked: 0,
+        changed: 0,
+        errors: 0,
+        message: "Demo mode — policy monitor skipped.",
+      });
     }
 
     const result = await checkAllPolicyMonitors();

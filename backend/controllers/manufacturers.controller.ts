@@ -8,6 +8,7 @@ import {
   createManufacturerSchema,
   updateManufacturerSchema,
 } from "../services/manufacturers.service";
+import { isHttpError } from "../utils/httpError";
 
 export async function listManufacturersController(req: Request, res: Response) {
   try {
@@ -123,8 +124,9 @@ export async function deleteManufacturerController(
 
     return res.json({ success: true, data: manufacturer });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Failed to delete manufacturer";
-    return res.status(500).json({ success: false, error: message });
+    if (isHttpError(error)) {
+      return res.status(error.status).json({ success: false, error: error.message });
+    }
+    return res.status(500).json({ success: false, error: "Failed to delete manufacturer" });
   }
 }

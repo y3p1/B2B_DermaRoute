@@ -42,12 +42,15 @@ export function Step2PatientDelivery({
     defaultValues: defaultValues || {},
   });
 
-  // Reset form when defaultValues change (for edit mode)
+  // Reset form when defaultValues change (for edit mode).
+  // Stringified compare avoids resetting when parent re-renders pass a new object identity.
+  const defaultValuesKey = defaultValues ? JSON.stringify(defaultValues) : "";
   React.useEffect(() => {
     if (defaultValues) {
       form.reset(defaultValues);
     }
-  }, [JSON.stringify(defaultValues)]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultValuesKey]);
 
   function onSubmit(values: PatientDeliveryForm) {
     onNext(values);

@@ -1,4 +1,5 @@
-import sgMail, { MailDataRequired } from "@sendgrid/mail";
+﻿import sgMail, { MailDataRequired } from "@sendgrid/mail";
+import { isDemoMode } from "../../lib/demoMode";
 
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 
@@ -17,6 +18,11 @@ export interface SendEmailParams {
 }
 
 export async function sendEmail(params: SendEmailParams) {
+  if (isDemoMode()) {
+    console.log("[DEMO] Email suppressed:", { to: params.to, subject: params.subject });
+    return { success: true, messageId: "demo-noop", statusCode: 202 };
+  }
+
   if (!SENDGRID_API_KEY) {
     throw new Error("SendGrid API key is not configured");
   }
@@ -58,11 +64,11 @@ export async function sendEmail(params: SendEmailParams) {
 export async function sendTestEmail(to: string) {
   return sendEmail({
     to,
-    subject: "Test Email from Integrity Tissue",
+    subject: "Test Email from Derma Route",
     text: "This is a test email sent via SendGrid API.",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h1 style="color: #2563eb;">Test Email from Integrity Tissue</h1>
+        <h1 style="color: #2563eb;">Test Email from Derma Route</h1>
         <p style="font-size: 16px; line-height: 1.6; color: #334155;">
           This is a test email sent via SendGrid API to verify your email integration is working correctly.
         </p>
@@ -95,16 +101,35 @@ export async function sendBatchEmail(
   console.log("📬 [sendBatchEmail] Recipients:", params.recipients);
   console.log("📬 [sendBatchEmail] Subject:", params.subject);
 
+  if (isDemoMode()) {
+    console.log("[DEMO] Batch email suppressed:", { recipients: params.recipients.length, subject: params.subject });
+    return { success: true, sent: 0, messageId: "demo-noop", statusCode: 202 };
+  }
+
   if (!SENDGRID_API_KEY) {
     console.error("❌ [sendBatchEmail] SendGrid API key is not configured");
     throw new Error("SendGrid API key is not configured");
   }
 
-  const { recipients, subject, text, html, from } = params;
+  const { recipients: rawRecipients, subject, text, html, from } = params;
+
+  // Filter out invalid email addresses to prevent SendGrid 400 errors
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const recipients = rawRecipients.filter((email) => {
+    const isValid = emailRegex.test(email);
+    if (!isValid) {
+      console.warn(`⚠️ [sendBatchEmail] Skipping invalid email address: "${email}"`);
+    }
+    return isValid;
+  });
 
   if (recipients.length === 0) {
-    console.warn("⚠️ [sendBatchEmail] No recipients provided for batch email");
+    console.warn("⚠️ [sendBatchEmail] No valid recipients after filtering for batch email");
     return { success: true, sent: 0 };
+  }
+
+  if (recipients.length !== rawRecipients.length) {
+    console.log(`📬 [sendBatchEmail] Filtered ${rawRecipients.length - recipients.length} invalid email(s), proceeding with ${recipients.length} valid recipient(s)`);
   }
 
   // SendGrid recommends sending to multiple recipients using the 'to' array
@@ -305,7 +330,7 @@ export async function sendBvRequestNotification(
         </div>
 
         <div class="footer">
-          <p><strong>Integrity Tissue Solutions</strong></p>
+          <p><strong>Derma Route</strong></p>
           <p>This is an automated notification. Please do not reply to this email.</p>
           <p>Request ID: ${data.bvRequestId}</p>
           <p style="margin-top: 12px; font-size: 12px; color: #9ca3af;">Confidential & HIPAA Compliant Communication</p>
@@ -344,7 +369,7 @@ ${process.env.APP_URL || "http://localhost:3000"}/dashboard
 Request ID: ${data.bvRequestId}
 
 ---
-Integrity Tissue Solutions
+Derma Route
 This is an automated notification.
   `;
 
@@ -513,7 +538,7 @@ export async function sendBvStatusNotification(
         </div>
 
         <div class="footer">
-          <p><strong>Integrity Tissue Solutions</strong></p>
+          <p><strong>Derma Route</strong></p>
           <p>This is an automated notification. Please do not reply to this email.</p>
           <p>Request ID: ${data.bvRequestId}</p>
           <p style="margin-top: 12px; font-size: 12px; color: #9ca3af;">Confidential & HIPAA Compliant Communication</p>
@@ -544,7 +569,7 @@ ${process.env.APP_URL || "http://localhost:3000"}/dashboard
 Request ID: ${data.bvRequestId}
 
 ---
-Integrity Tissue Solutions
+Derma Route
 This is an automated notification.
   `;
 
@@ -729,7 +754,7 @@ export async function sendProviderAccountCreatedNotification(
         </div>
 
         <div class="footer">
-          <p><strong>Integrity Tissue Solutions</strong></p>
+          <p><strong>Derma Route</strong></p>
           <p>This is an automated notification. Please do not reply to this email.</p>
           ${data.providerAcctId ? `<p>Provider Account ID: ${data.providerAcctId}</p>` : ""}
           <p>User ID: ${data.providerUserId}</p>
@@ -758,7 +783,7 @@ ${dashboardLink}
 ${data.providerAcctId ? `Provider Account ID: ${data.providerAcctId}\n` : ""}User ID: ${data.providerUserId}
 
 ---
-Integrity Tissue Solutions
+Derma Route
 This is an automated notification.
   `;
 
@@ -920,7 +945,7 @@ export async function sendBaaStatusNotificationToProvider(
         </div>
 
         <div class="footer">
-          <p><strong>Integrity Tissue Solutions</strong></p>
+          <p><strong>Derma Route</strong></p>
           <p>This is an automated notification. Please do not reply to this email.</p>
           <p>Agreement ID: ${data.baaId}</p>
           <p style="margin-top: 12px; font-size: 12px; color: #9ca3af;">Confidential & HIPAA Compliant Communication</p>
@@ -948,7 +973,7 @@ ${process.env.APP_URL || "http://localhost:3000"}/dashboard
 Agreement ID: ${data.baaId}
 
 ---
-Integrity Tissue Solutions
+Derma Route
 This is an automated notification.
   `;
 
@@ -1093,7 +1118,7 @@ export async function sendBaaAgreementNotification(
         </div>
 
         <div class="footer">
-          <p><strong>Integrity Tissue Solutions</strong></p>
+          <p><strong>Derma Route</strong></p>
           <p>This is an automated notification. Please do not reply to this email.</p>
           <p>Agreement ID: ${data.baaId}</p>
           <p style="margin-top: 12px; font-size: 12px; color: #9ca3af;">Confidential & HIPAA Compliant Communication</p>
@@ -1126,7 +1151,7 @@ ${process.env.APP_URL || "http://localhost:3000"}${data.dashboardUrl}
 Agreement ID: ${data.baaId}
 
 ---
-Integrity Tissue Solutions
+Derma Route
 This is an automated notification.
   `;
 
@@ -1321,7 +1346,7 @@ export async function sendOrderSubmissionNotification(
         </div>
 
         <div class="footer">
-          <p><strong>Integrity Tissue Solutions</strong></p>
+          <p><strong>Derma Route</strong></p>
           <p>This is an automated notification. Please do not reply to this email.</p>
           <p>Order ID: ${data.orderId}</p>
           <p style="margin-top: 12px; font-size: 12px; color: #9ca3af;">Confidential & HIPAA Compliant Communication</p>
@@ -1361,12 +1386,200 @@ ${process.env.APP_URL || "http://localhost:3000"}/dashboard
 Order ID: ${data.orderId}
 
 ---
-Integrity Tissue Solutions
+Derma Route
 This is an automated notification.
   `;
 
   return sendBatchEmail({
     recipients,
+    subject,
+    html,
+    text,
+  });
+}
+
+/**
+ * Send order submission confirmation email to the provider when their order is placed.
+ */
+export async function sendOrderSubmissionConfirmationToProvider(
+  recipientEmail: string,
+  data: OrderSubmissionNotificationData,
+) {
+  const subject = `Order Received - Patient ${data.patientInitials} | ${data.productName}`;
+
+  const deliveryAddressFull = [
+    data.deliveryAddress,
+    data.deliveryCity,
+    data.deliveryState ? `${data.deliveryState} ${data.deliveryZip || ""}`.trim() : data.deliveryZip,
+  ]
+    .filter(Boolean)
+    .join(", ") || "Not provided";
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #1e3a5f 0%, #3B82F6 100%); padding: 40px 24px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.5px; }
+        .header p { color: #bfdbfe; margin: 8px 0 0 0; font-size: 14px; }
+        .content { padding: 40px 32px; }
+        .alert-box { background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%); border-left: 4px solid #3B82F6; padding: 20px; margin-bottom: 32px; border-radius: 8px; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1); }
+        .alert-box p { margin: 0; color: #1e3a5f; font-weight: 500; font-size: 15px; line-height: 1.6; }
+        .section { margin-bottom: 32px; }
+        .section-title { font-size: 18px; font-weight: 700; color: #1f2937; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 3px solid #3B82F6; }
+        .info-card { background-color: #fafafa; border-radius: 8px; padding: 20px; margin-bottom: 16px; border: 1px solid #e5e7eb; }
+        .info-row { display: flex; padding: 12px 0; border-bottom: 1px solid #e5e7eb; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { font-weight: 600; color: #6b7280; font-size: 14px; min-width: 140px; }
+        .info-value { color: #1f2937; font-size: 14px; flex: 1; }
+        .info-value strong { color: #1e3a5f; font-size: 15px; }
+        .button-container { text-align: center; margin: 40px 0; }
+        .button { display: inline-block; background: linear-gradient(135deg, #3B82F6 0%, #2563eb 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3); }
+        .highlight-box { background: linear-gradient(135deg, #fef3c7 0%, #fef9e7 100%); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin-top: 32px; }
+        .highlight-box p { margin: 0; color: #92400e; font-size: 14px; line-height: 1.6; }
+        .highlight-box strong { color: #78350f; }
+        .footer { background-color: #fafafa; padding: 32px 24px; text-align: center; border-top: 2px solid #e5e7eb; }
+        .footer p { margin: 6px 0; color: #6b7280; font-size: 13px; }
+        .footer strong { color: #1f2937; font-size: 15px; }
+        .divider { height: 2px; background: linear-gradient(90deg, transparent, #e5e7eb, transparent); margin: 32px 0; }
+        @media only screen and (max-width: 600px) {
+          .content { padding: 24px 20px; }
+          .header { padding: 32px 20px; }
+          .info-row { flex-direction: column; }
+          .info-label { margin-bottom: 4px; }
+          .button { padding: 14px 32px; font-size: 15px; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>Order Received ✅</h1>
+          <p>Your product order has been submitted successfully</p>
+        </div>
+
+        <div class="content">
+          <div class="alert-box">
+            <p>Your <strong>Product Order</strong> has been received and is currently being reviewed by our team. You will receive another notification once the status changes.</p>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Order Details</div>
+            <div class="info-card">
+              <div class="info-row">
+                <div class="info-label">Patient Initials</div>
+                <div class="info-value"><strong>${data.patientInitials}</strong></div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Product</div>
+                <div class="info-value">${data.productName}${data.productCode ? ` (${data.productCode})` : ""}</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Manufacturer</div>
+                <div class="info-value">${data.manufacturer}</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Insurance</div>
+                <div class="info-value">${data.insurance}</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Wound Type</div>
+                <div class="info-value">${data.woundType}</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Wound Size</div>
+                <div class="info-value">${data.woundSize}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Delivery Information</div>
+            <div class="info-card">
+              <div class="info-row">
+                <div class="info-label">Delivery Address</div>
+                <div class="info-value">${deliveryAddressFull}</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Delivery Date</div>
+                <div class="info-value">${data.deliveryDate || "Not specified"}</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Contact Phone</div>
+                <div class="info-value">${data.contactPhone || "Not provided"}</div>
+              </div>
+              ${data.notes ? `
+              <div class="info-row">
+                <div class="info-label">Notes</div>
+                <div class="info-value">${data.notes}</div>
+              </div>
+              ` : ""}
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="button-container">
+            <a href="${process.env.APP_URL || "http://localhost:3000"}/dashboard" class="button" style="color: #ffffff !important; text-decoration: none;">
+              View My Dashboard
+            </a>
+          </div>
+
+          <div class="highlight-box">
+            <p>
+              <strong>What's next?</strong> Our team will review your order and update the status. You will receive an email notification for each status update (approved, shipped, completed, etc.).
+            </p>
+          </div>
+        </div>
+
+        <div class="footer">
+          <p><strong>Derma Route</strong></p>
+          <p>This is an automated notification. Please do not reply to this email.</p>
+          <p>Order ID: ${data.orderId}</p>
+          <p style="margin-top: 12px; font-size: 12px; color: #9ca3af;">Confidential & HIPAA Compliant Communication</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const text = `
+Order Received
+
+Your Product Order has been received and is currently being reviewed by our team.
+
+Order Details:
+- Patient Initials: ${data.patientInitials}
+- Product: ${data.productName}${data.productCode ? ` (${data.productCode})` : ""}
+- Manufacturer: ${data.manufacturer}
+- Insurance: ${data.insurance}
+- Wound Type: ${data.woundType}
+- Wound Size: ${data.woundSize}
+
+Delivery Information:
+- Address: ${deliveryAddressFull}
+- Delivery Date: ${data.deliveryDate || "Not specified"}
+- Contact Phone: ${data.contactPhone || "Not provided"}${data.notes ? `\n- Notes: ${data.notes}` : ""}
+
+You will receive another email notification once the order status is updated.
+
+View your dashboard:
+${process.env.APP_URL || "http://localhost:3000"}/dashboard
+
+Order ID: ${data.orderId}
+
+---
+Derma Route
+This is an automated notification.
+  `;
+
+  return sendEmail({
+    to: recipientEmail,
     subject,
     html,
     text,
@@ -1543,7 +1756,7 @@ export async function sendOrderStatusNotificationToProvider(
         </div>
 
         <div class="footer">
-          <p><strong>Integrity Tissue Solutions</strong></p>
+          <p><strong>Derma Route</strong></p>
           <p>This is an automated notification. Please do not reply to this email.</p>
           <p>Order ID: ${data.orderId}</p>
         </div>
@@ -1568,7 +1781,7 @@ ${process.env.APP_URL || "http://localhost:3000"}/dashboard
 Order ID: ${data.orderId}
 
 ---
-Integrity Tissue Solutions
+Derma Route
 This is an automated notification.
   `;
 
@@ -1655,7 +1868,7 @@ export async function sendPendingItsRepNotification(
         </div>
 
         <div class="footer">
-          <p><strong>Integrity Tissue Solutions</strong></p>
+          <p><strong>Derma Route</strong></p>
           <p>This is an automated notification. Please do not reply to this email.</p>
         </div>
       </div>
@@ -1677,7 +1890,7 @@ Please log in to review and approve:
 ${process.env.APP_URL || "http://localhost:3000"}/admin?tab=its_representatives
 
 ---
-Integrity Tissue Solutions
+Derma Route
 This is an automated notification.
   `;
 

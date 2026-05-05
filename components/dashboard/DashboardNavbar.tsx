@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { LogOut, Menu, Settings, User, Save, Loader2 } from "lucide-react";
+import { LogOut, Menu, Settings, User, Save, Loader2, RefreshCw } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +22,7 @@ import {
 import IntegrityTissueLogo from "../IntegrityTissueLogo";
 import { useAuthStore } from "@/store/auth";
 import { apiPatch } from "@/lib/apiClient";
+import { isClientDemoMode, DEMO_ROLE_COOKIE, type DemoRole } from "@/lib/demoMode";
 
 interface DashboardNavbarProps {
   onMenuToggle?: () => void;
@@ -50,6 +51,12 @@ const fieldLabels: Record<keyof ProviderFormData, string> = {
   taxId: "Tax ID (EIN)",
   groupNpi: "Group NPI",
 };
+
+function switchDemoRole(role: DemoRole) {
+  document.cookie = `${DEMO_ROLE_COOKIE}=${role}; path=/; max-age=86400; samesite=lax`;
+  const dest = role === "admin" ? "/admin" : role === "clinic_staff" ? "/clinic-staff" : "/";
+  window.location.href = dest;
+}
 
 const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
   const router = useRouter();
@@ -173,6 +180,25 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
+            {isClientDemoMode() && (
+              <>
+                <DropdownMenuLabel>Switch Demo Role</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer" onClick={() => switchDemoRole("provider")}>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Provider
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => switchDemoRole("clinic_staff")}>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Clinic Staff
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => switchDemoRole("admin")}>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Admin
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </>
+            )}
             <DropdownMenuItem
               className="text-red-500 hover:text-red-600 focus:text-red-600 cursor-pointer"
               onClick={async () => {

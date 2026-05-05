@@ -1,4 +1,4 @@
-# Integrity Tissue API Documentation
+﻿# Derma Route API Documentation
 
 This file documents the main API endpoints exposed by Next.js route handlers under `app/api/*`.
 

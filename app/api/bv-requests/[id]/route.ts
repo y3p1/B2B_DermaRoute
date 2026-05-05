@@ -9,12 +9,13 @@ import {
   getBvRequestForProvider,
   getBvRequestById,
   updateBvRequest,
+  deleteBvRequest,
   createBvRequestSchema,
-  verifyBvRequest,
 } from "../../../../backend/services/bvRequests.service";
 import { getAdminProfileByUserId } from "../../../../backend/services/adminAcct.service";
 import { getClinicStaffProfileByUserId } from "../../../../backend/services/clinicStaffAcct.service";
 import { NextRequest } from "next/server";
+import { isDemoMode } from "../../../../lib/demoMode";
 
 const cors = corsMiddleware({ allowedOrigins: getAllowedOrigins() });
 const baseRateLimit = rateLimit({ windowMs: 60_000, max: 120 });
@@ -54,6 +55,57 @@ export async function GET(
         if (!found) return res.status(404).json({ error: "Not found" });
 
         return res.json({ success: true, data: found });
+      } catch (err) {
+        return next(err);
+      }
+    },
+    errorHandler,
+  });
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+
+  return runServerPipeline(request, {
+    middlewares: [cors, baseRateLimit, requireAuth],
+    handler: async (req, res, next) => {
+      try {
+        const userId = res.locals.userId as string | undefined;
+        if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+        if (isDemoMode()) {
+          const demoRole = res.locals.demoRole as string | undefined;
+          if (!demoRole) return res.status(403).json({ error: "Access denied" });
+          const deleted = await deleteBvRequest(id);
+          if (!deleted) return res.status(404).json({ error: "Not found" });
+          return res.json({ success: true });
+        }
+
+        const admin = await getAdminProfileByUserId(userId);
+        const clinicStaff = admin
+          ? null
+          : await getClinicStaffProfileByUserId(userId);
+
+        // Admins and clinic staff can delete any BV request
+        if (admin || clinicStaff) {
+          const deleted = await deleteBvRequest(id);
+          if (!deleted) return res.status(404).json({ error: "Not found" });
+          return res.json({ success: true });
+        }
+
+        // Providers can only delete their own BV requests
+        const profile = await getProviderProfileByUserId(userId);
+        if (!profile)
+          return res.status(403).json({ error: "No provider profile found" });
+
+        const existing = await getBvRequestForProvider(profile.id, id);
+        if (!existing) return res.status(404).json({ error: "Not found" });
+
+        await deleteBvRequest(id);
+        return res.json({ success: true });
       } catch (err) {
         return next(err);
       }
