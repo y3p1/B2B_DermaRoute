@@ -715,8 +715,8 @@ function ProductFormModal({
             const costGraft = costCm2 * unitSize;
             next.costPerGraft = costGraft.toFixed(2);
 
-            next.estAoc100 = Math.max(0, payRateGraft - costGraft).toFixed(2);
-            next.estAoc80 = Math.max(0, (payRateGraft * 0.8) - costGraft).toFixed(2);
+            next.estAoc100 = (payRateGraft - costGraft).toFixed(2);
+            next.estAoc80 = ((payRateGraft * 0.8) - costGraft).toFixed(2);
           }
         }
       }
@@ -1260,8 +1260,8 @@ function ProductEditModal({
             const costGraft = parseFloat(next.costPerCm2) * unitSize;
             next.costPerGraft = costGraft.toFixed(2);
 
-            next.estAoc100 = Math.max(0, payRateGraft - costGraft).toFixed(2);
-            next.estAoc80 = Math.max(0, (payRateGraft * 0.8) - costGraft).toFixed(2);
+            next.estAoc100 = (payRateGraft - costGraft).toFixed(2);
+            next.estAoc80 = ((payRateGraft * 0.8) - costGraft).toFixed(2);
           }
         }
       }
