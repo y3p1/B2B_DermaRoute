@@ -14,17 +14,30 @@ export async function requireAdminOrClinicStaff(
 ) {
   if (isDemoMode()) {
     const role = res.locals.demoRole as string | undefined;
-    if (role === "admin") {
-      res.locals.adminAcctId = "demo-admin-acct-id";
+    const userId = res.locals.userId as string | undefined;
+    if (role === "admin" && userId) {
+      const db = getDb();
+      const rows = await db
+        .select({ id: adminAcct.id })
+        .from(adminAcct)
+        .where(eq(adminAcct.userId, userId))
+        .limit(1);
+      res.locals.adminAcctId = rows[0]?.id;
       res.locals.adminRole = "admin";
-      res.locals.approverUserId = res.locals.userId;
+      res.locals.approverUserId = userId;
       res.locals.approverRole = "admin";
       return next();
     }
-    if (role === "clinic_staff") {
-      res.locals.clinicStaffAcctId = "demo-clinic-staff-acct-id";
+    if (role === "clinic_staff" && userId) {
+      const db = getDb();
+      const rows = await db
+        .select({ id: clinicStaffAcct.id })
+        .from(clinicStaffAcct)
+        .where(eq(clinicStaffAcct.userId, userId))
+        .limit(1);
+      res.locals.clinicStaffAcctId = rows[0]?.id;
       res.locals.adminRole = "clinic_staff";
-      res.locals.approverUserId = res.locals.userId;
+      res.locals.approverUserId = userId;
       res.locals.approverRole = "clinic_staff";
       return next();
     }

@@ -6,15 +6,15 @@ import { useAuthStore } from "@/store/auth";
 
 type ReorderRow = {
   initials: string;
-  clinicName: string;
+  clinicName: string | null;
   providerId: string;
   lastApplicationDate: string;
   daysSince: number;
   totalApplications: number;
   productNames: string[];
   healingStatus: "on_track" | "due" | "overdue";
-  providerEmail?: string;
-  providerPhone?: string;
+  providerEmail?: string | null;
+  providerPhone?: string | null;
 };
 
 type ReorderTrackingTabProps = {
@@ -36,6 +36,7 @@ export function ReorderTrackingTab({ role }: ReorderTrackingTabProps) {
   const [editingThreshold, setEditingThreshold] = React.useState(false);
   const [thresholdInput, setThresholdInput] = React.useState("");
   const [savingThreshold, setSavingThreshold] = React.useState(false);
+  const [saveThresholdError, setSaveThresholdError] = React.useState<string | null>(null);
   const [contactRowId, setContactRowId] = React.useState<string | null>(null);
 
   const refreshData = React.useCallback(async () => {
@@ -78,8 +79,9 @@ export function ReorderTrackingTab({ role }: ReorderTrackingTabProps) {
     const val = parseInt(thresholdInput, 10);
     if (isNaN(val) || val < 1) return;
     setSavingThreshold(true);
+    setSaveThresholdError(null);
     try {
-      await fetch("/api/threshold-settings", {
+      const res = await fetch("/api/threshold-settings", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -90,11 +92,19 @@ export function ReorderTrackingTab({ role }: ReorderTrackingTabProps) {
           value: String(val),
         }),
       });
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        throw new Error(
+          (json as { error?: string }).error ?? `Save failed (${res.status})`,
+        );
+      }
       setThreshold(val);
       setEditingThreshold(false);
       void refreshData();
-    } catch {
-      // silent fail — will show stale data
+    } catch (err) {
+      setSaveThresholdError(
+        err instanceof Error ? err.message : "Failed to save threshold",
+      );
     } finally {
       setSavingThreshold(false);
     }
@@ -106,7 +116,7 @@ export function ReorderTrackingTab({ role }: ReorderTrackingTabProps) {
     const q = searchQuery.toLowerCase();
     return (
       r.initials.toLowerCase().includes(q) ||
-      r.clinicName.toLowerCase().includes(q)
+      (r.clinicName ?? "").toLowerCase().includes(q)
     );
   });
 
@@ -150,7 +160,11 @@ export function ReorderTrackingTab({ role }: ReorderTrackingTabProps) {
   return (
     <div className="space-y-4">
       {/* Threshold config bar */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex items-center justify-between gap-4 flex-wrap">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col gap-2">
+        {saveThresholdError && (
+          <p className="text-xs text-red-600">{saveThresholdError}</p>
+        )}
+        <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-2 text-sm text-slate-600">
           <span className="font-medium">Re-Order Threshold:</span>
           {editingThreshold ? (
@@ -204,6 +218,7 @@ export function ReorderTrackingTab({ role }: ReorderTrackingTabProps) {
           Patients are flagged as &quot;due&quot; after {threshold} days,
           &quot;overdue&quot; after {Math.round(threshold * 1.5)} days
         </div>
+        </div>
       </div>
 
       {/* Main table card */}
@@ -256,7 +271,7 @@ export function ReorderTrackingTab({ role }: ReorderTrackingTabProps) {
                       <td className="py-4 px-3">
                         <div className="font-semibold">{row.initials}</div>
                         <div className="text-xs text-slate-500">
-                          {row.clinicName}
+                          {row.clinicName ?? "No provider record"}
                         </div>
                       </td>
                       <td className="py-4 px-3">{row.lastApplicationDate}</td>

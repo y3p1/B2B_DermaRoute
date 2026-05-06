@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { LogOut, Menu, Settings, User, Save, Loader2, RefreshCw } from "lucide-react";
+import { LogOut, Menu, Settings, User, Save, Loader2, RefreshCw, RotateCcw } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import IntegrityTissueLogo from "../IntegrityTissueLogo";
 import { useAuthStore } from "@/store/auth";
-import { apiPatch } from "@/lib/apiClient";
+import { apiPatch, apiPost } from "@/lib/apiClient";
 import { isClientDemoMode, DEMO_ROLE_COOKIE, type DemoRole } from "@/lib/demoMode";
 
 interface DashboardNavbarProps {
@@ -71,6 +71,9 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
   const [saving, setSaving] = React.useState(false);
   const [saveMessage, setSaveMessage] = React.useState<{ type: "success" | "error"; text: string } | null>(null);
   const [isEditing, setIsEditing] = React.useState(false);
+  const [isResetOpen, setIsResetOpen] = React.useState(false);
+  const [isResetting, setIsResetting] = React.useState(false);
+  const [resetMessage, setResetMessage] = React.useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const [form, setForm] = React.useState<ProviderFormData>({
     accountPhone: "",
@@ -127,15 +130,33 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
   };
 
   const isProvider = accountType === "provider" && provider;
+  const isAdminInDemo = isClientDemoMode() && role === "admin";
+
+  const handleResetDemo = async () => {
+    setIsResetting(true);
+    setResetMessage(null);
+    try {
+      await apiPost("/api/demo/reset", {}, { token: token || undefined });
+      setResetMessage({ type: "success", text: "Demo data reset successfully." });
+      setIsResetOpen(false);
+    } catch (err) {
+      setResetMessage({
+        type: "error",
+        text: err instanceof Error ? err.message : "Reset failed",
+      });
+    } finally {
+      setIsResetting(false);
+    }
+  };
 
   return (
     <>
-    <nav className="w-full bg-[#18192B] px-4 py-3 flex items-center justify-between sticky top-0 z-40">
+    <nav className="w-full bg-slate-50 border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
       <div className="flex items-center gap-2">
         {onMenuToggle && (
           <Button
             variant="ghost"
-            className="text-white hover:bg-[#232345] p-2 lg:hidden"
+            className="text-slate-700 hover:bg-slate-200 p-2 lg:hidden"
             size="icon"
             aria-label="Toggle menu"
             onClick={onMenuToggle}
@@ -150,11 +171,11 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="text-white hover:bg-[#232345] p-2 flex items-center gap-2"
+              className="text-slate-700 hover:bg-slate-200 p-2 flex items-center gap-2"
               aria-label="User Menu"
             >
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#2a2a4f]">
-                <Settings className="w-4 h-4 text-gray-300" />
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-200">
+                <Settings className="w-4 h-4 text-slate-600" />
               </div>
             </Button>
           </DropdownMenuTrigger>
@@ -197,6 +218,18 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
                   Admin
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                {isAdminInDemo && (
+                  <>
+                    <DropdownMenuItem
+                      className="cursor-pointer text-orange-600 focus:text-orange-700"
+                      onClick={() => setIsResetOpen(true)}
+                    >
+                      <RotateCcw className="w-4 h-4 mr-2" />
+                      Reset Demo Data
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
               </>
             )}
             <DropdownMenuItem
@@ -213,6 +246,52 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
         </DropdownMenu>
       </div>
     </nav>
+
+    <Dialog open={isResetOpen} onOpenChange={setIsResetOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Reset demo data?</DialogTitle>
+        </DialogHeader>
+        <p className="text-sm text-slate-600">
+          This will truncate all volatile demo tables and re-seed with fresh data.
+          The operation takes a few seconds and cannot be undone. User accounts are preserved.
+        </p>
+        {resetMessage && (
+          <div
+            className={`text-sm px-3 py-2 rounded-lg ${
+              resetMessage.type === "success"
+                ? "bg-green-50 text-green-700 border border-green-200"
+                : "bg-red-50 text-red-700 border border-red-200"
+            }`}
+          >
+            {resetMessage.text}
+          </div>
+        )}
+        <div className="flex justify-end gap-2 pt-2">
+          <Button
+            variant="outline"
+            onClick={() => setIsResetOpen(false)}
+            disabled={isResetting}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => void handleResetDemo()}
+            disabled={isResetting}
+          >
+            {isResetting ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Resetting…
+              </>
+            ) : (
+              "Reset"
+            )}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
 
     <Dialog open={isProfileOpen} onOpenChange={setIsProfileOpen}>
       <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">

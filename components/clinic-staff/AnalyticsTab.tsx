@@ -745,33 +745,36 @@ function ThresholdSettingsPanel({ token }: { token: string }) {
   const [saving, setSaving] = React.useState<string | null>(null);
   const [editingKey, setEditingKey] = React.useState<string | null>(null);
   const [editValue, setEditValue] = React.useState("");
+  const [saveError, setSaveError] = React.useState<string | null>(null);
 
-  React.useEffect(() => {
-    const loadAll = async () => {
-      setLoading(true);
-      const results: Record<string, string> = {};
-      for (const { key } of riskKeys) {
-        try {
-          const res = await apiGet<{ success: true; data: SettingRow }>(
-            `/api/threshold-settings?key=${key}`,
-            { token },
-          );
-          results[key] = res.data.value;
-        } catch {
-          // Key might not exist yet
-        }
+  const loadAll = React.useCallback(async () => {
+    setLoading(true);
+    const results: Record<string, string> = {};
+    for (const { key } of riskKeys) {
+      try {
+        const res = await apiGet<{ success: true; data: SettingRow }>(
+          `/api/threshold-settings?key=${key}`,
+          { token },
+        );
+        results[key] = res.data.value;
+      } catch {
+        // Key might not exist yet
       }
-      setValues(results);
-      setLoading(false);
-    };
-    void loadAll();
+    }
+    setValues(results);
+    setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
+  React.useEffect(() => {
+    void loadAll();
+  }, [loadAll]);
+
   const handleSave = async (key: string, value: string) => {
     setSaving(key);
+    setSaveError(null);
     try {
-      await fetch("/api/threshold-settings", {
+      const res = await fetch("/api/threshold-settings", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -779,10 +782,16 @@ function ThresholdSettingsPanel({ token }: { token: string }) {
         },
         body: JSON.stringify({ key, value }),
       });
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        throw new Error(
+          (json as { error?: string }).error ?? `Save failed (${res.status})`,
+        );
+      }
       setValues((prev) => ({ ...prev, [key]: value }));
       setEditingKey(null);
-    } catch {
-      // silent
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Failed to save");
     } finally {
       setSaving(null);
     }
@@ -801,6 +810,12 @@ function ThresholdSettingsPanel({ token }: { token: string }) {
       <p className="text-sm text-slate-500 mb-4">
         Configure risk scoring thresholds
       </p>
+
+      {saveError && (
+        <div className="mb-3 text-xs px-3 py-2 rounded-lg bg-red-50 text-red-700 border border-red-200">
+          {saveError}
+        </div>
+      )}
 
       {loading ? (
         <div className="text-sm text-slate-500">Loading settings...</div>

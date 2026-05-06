@@ -10,10 +10,10 @@ export type HealingStatus = "on_track" | "due" | "overdue";
 
 export type ReorderTrackingRow = {
   initials: string;
-  clinicName: string;
+  clinicName: string | null;
   providerId: string;
-  providerEmail: string;
-  providerPhone: string;
+  providerEmail: string | null;
+  providerPhone: string | null;
   lastApplicationDate: string;
   daysSince: number;
   totalApplications: number;
@@ -32,49 +32,53 @@ export async function getReorderTrackingData(): Promise<{
   const threshold = thresholdSetting ? parseInt(thresholdSetting.value, 10) : 30;
 
   // Query: join order_products + bv_requests + provider_acct + products
-  // Group by patient (initials + providerId) to aggregate data
+  // Use leftJoin for provider and products so records without linked providers still appear
   const rows = await db
     .select({
+      bvRequestId: bvRequests.id,
       initials: bvRequests.initials,
       providerId: bvRequests.providerId,
+      bvProvider: bvRequests.provider,
       providerEmail: providerAcct.email,
       providerPhone: providerAcct.accountPhone,
       clinicName: providerAcct.clinicName,
       applicationDate: bvRequests.applicationDate,
       productName: products.name,
+      productNameDenorm: orderProducts.name,
     })
     .from(orderProducts)
     .innerJoin(bvRequests, eq(orderProducts.bvRequestId, bvRequests.id))
-    .innerJoin(providerAcct, eq(bvRequests.providerId, providerAcct.id))
-    .innerJoin(products, eq(orderProducts.productId, products.id))
+    .leftJoin(providerAcct, eq(bvRequests.providerId, providerAcct.id))
+    .leftJoin(products, eq(orderProducts.productId, products.id))
     .where(isNotNull(bvRequests.initials))
     .orderBy(desc(bvRequests.applicationDate));
 
-  // Group by patient (initials + providerId)
+  // Group by patient — use providerId when available, fall back to bvRequestId
   const patientMap = new Map<
     string,
     {
       initials: string;
-      clinicName: string;
+      clinicName: string | null;
       providerId: string;
-      providerEmail: string;
-      providerPhone: string;
+      providerEmail: string | null;
+      providerPhone: string | null;
       dates: string[];
       productNames: Set<string>;
     }
   >();
 
   for (const row of rows) {
-    if (!row.initials || !row.providerId) continue;
-    const key = `${row.initials}__${row.providerId}`;
+    if (!row.initials) continue;
+    const groupId = row.providerId ?? row.bvRequestId;
+    const key = `${row.initials}__${groupId}`;
     let entry = patientMap.get(key);
     if (!entry) {
       entry = {
         initials: row.initials,
-        clinicName: row.clinicName,
-        providerId: row.providerId,
-        providerEmail: row.providerEmail,
-        providerPhone: row.providerPhone,
+        clinicName: row.clinicName ?? row.bvProvider ?? null,
+        providerId: groupId,
+        providerEmail: row.providerEmail ?? null,
+        providerPhone: row.providerPhone ?? null,
         dates: [],
         productNames: new Set(),
       };
@@ -83,8 +87,9 @@ export async function getReorderTrackingData(): Promise<{
     if (row.applicationDate) {
       entry.dates.push(row.applicationDate);
     }
-    if (row.productName) {
-      entry.productNames.add(row.productName);
+    const name = row.productName ?? row.productNameDenorm ?? null;
+    if (name) {
+      entry.productNames.add(name);
     }
   }
 

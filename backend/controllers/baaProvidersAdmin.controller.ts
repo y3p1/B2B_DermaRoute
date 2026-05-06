@@ -106,16 +106,23 @@ export async function updateBaaProviderAdminController(
       .json({ error: "Validation failed", details: parsed.error.flatten() });
   }
 
-  const updated = await updateBusinessAssociateSignature({
-    baaId: id,
-    approverUserId,
-    approverRole,
-    adminAcctId: approverRole === "admin" ? adminAcctId : undefined,
-    businessAssociateName: parsed.data.businessAssociateName,
-    businessAssociateTitle: parsed.data.businessAssociateTitle,
-    businessAssociateDate: parsed.data.businessAssociateDate,
-    businessAssociateSignatureDataUrl: parsed.data.businessAssociateSignature,
-  });
+  let updated;
+  try {
+    updated = await updateBusinessAssociateSignature({
+      baaId: id,
+      approverUserId,
+      approverRole,
+      adminAcctId: approverRole === "admin" ? adminAcctId : undefined,
+      businessAssociateName: parsed.data.businessAssociateName,
+      businessAssociateTitle: parsed.data.businessAssociateTitle,
+      businessAssociateDate: parsed.data.businessAssociateDate,
+      businessAssociateSignatureDataUrl: parsed.data.businessAssociateSignature,
+    });
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Failed to save BAA signature";
+    return res.status(500).json({ error: message });
+  }
 
   if (!updated) return res.status(404).json({ error: "Not found" });
 

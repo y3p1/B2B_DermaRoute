@@ -8,6 +8,7 @@ import { bvRequests } from "../../db/bv-requests";
 import { products } from "../../db/products";
 import { manufacturers } from "../../db/manufacturers";
 import { providerAcct } from "../../db/provider";
+import { scoreOrder } from "./riskScoring.service";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -79,7 +80,8 @@ export async function getOrdersMissingOutcomes(): Promise<
       initials: bvRequests.initials,
       woundType: bvRequests.woundType,
       woundSize: bvRequests.woundSize,
-      product: products.name,
+      productJoined: products.name,
+      productDenorm: orderProducts.name,
       manufacturer: manufacturers.name,
     })
     .from(orderProducts)
@@ -103,7 +105,7 @@ export async function getOrdersMissingOutcomes(): Promise<
     initials: r.initials,
     woundType: r.woundType,
     woundSize: r.woundSize,
-    product: r.product ?? null,
+    product: r.productJoined ?? r.productDenorm ?? null,
     manufacturer: r.manufacturer ?? null,
   }));
 }
@@ -144,6 +146,30 @@ export async function logOutcome(
     })
     .returning();
 
+  // If not healed, score the BV and add the order to the active risk queue
+  if (!input.healed && bvRequestId) {
+    const [bvRow] = await db
+      .select({
+        a1cPercent: bvRequests.a1cPercent,
+        diabetic: bvRequests.diabetic,
+        woundSize: bvRequests.woundSize,
+        infected: bvRequests.infected,
+        tunneling: bvRequests.tunneling,
+        woundType: bvRequests.woundType,
+      })
+      .from(bvRequests)
+      .where(eq(bvRequests.id, bvRequestId))
+      .limit(1);
+
+    if (bvRow) {
+      const risk = await scoreOrder(bvRow);
+      await db
+        .update(orderProducts)
+        .set({ riskScore: risk.score, riskTier: risk.tier, updatedAt: new Date() })
+        .where(eq(orderProducts.id, input.orderProductId));
+    }
+  }
+
   return created;
 }
 
@@ -156,9 +182,11 @@ export async function getSuccessRate(
 ): Promise<SuccessRateResult> {
   const db = getDb();
 
-  // Build the query — join outcomes with orders and BV requests
+  // Build the query — join outcomes with orders and BV requests.
+  // Wound types may be stored as either "Diabetic foot ulcer" (provider form)
+  // or "diabetic_foot_ulcer" (legacy/demo seed); normalize both sides.
   const conditions = [
-    sql`LOWER(${bvRequests.woundType}) = LOWER(${woundType})`,
+    sql`LOWER(REPLACE(${bvRequests.woundType}, '_', ' ')) = LOWER(REPLACE(${woundType}, '_', ' '))`,
   ];
   if (manufacturerId) {
     conditions.push(
@@ -174,11 +202,11 @@ export async function getSuccessRate(
       healedCount: sql<number>`count(*) FILTER (WHERE ${orderOutcomes.healed} = true)::int`,
     })
     .from(orderOutcomes)
-    .innerJoin(
+    .innerJoin(bvRequests, eq(orderOutcomes.bvRequestId, bvRequests.id))
+    .leftJoin(
       orderProducts,
       eq(orderOutcomes.orderProductId, orderProducts.id),
     )
-    .innerJoin(bvRequests, eq(orderProducts.bvRequestId, bvRequests.id))
     .where(whereClause);
 
   const totalCount = stats?.totalCount ?? 0;

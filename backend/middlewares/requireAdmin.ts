@@ -17,7 +17,16 @@ export async function requireAdmin(
         .status(403)
         .json({ error: "Demo: switch to admin role to access this." });
     }
-    res.locals.adminAcctId = "demo-admin-acct-id";
+    const userId = res.locals.userId as string | undefined;
+    if (userId) {
+      const db = getDb();
+      const rows = await db
+        .select({ id: adminAcct.id })
+        .from(adminAcct)
+        .where(eq(adminAcct.userId, userId))
+        .limit(1);
+      res.locals.adminAcctId = rows[0]?.id;
+    }
     res.locals.adminRole = "admin";
     return next();
   }
