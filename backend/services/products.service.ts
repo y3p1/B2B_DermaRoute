@@ -72,7 +72,7 @@ const numericStringSchema = z.string()
   .optional()
   .nullable()
   .refine(
-    (val) => !val || /^\d+(\.\d{1,2})?$/.test(val),
+    (val) => !val || /^-?\d+(\.\d{1,2})?$/.test(val),
     { message: "Only numbers with up to 2 decimal places are allowed (e.g., 127.14)" },
   );
 
