@@ -86,7 +86,7 @@ SendGrid-powered workflow notifications for account events, BV status updates, a
 |---|---|---|
 | Provider | `/auth` | Phone OTP (Twilio) |
 | Clinic Staff | `/auth` | Phone OTP (Twilio) |
-| Admin | `/admin/signin` | Email + Password (Supabase) |
+| Admin | `/admin/signin` | Phone OTP (Twilio) |
 
 ---
 
