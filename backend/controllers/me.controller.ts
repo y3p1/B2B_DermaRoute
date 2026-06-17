@@ -7,6 +7,7 @@ import {
   updateProviderProfile,
   updateProviderProfileSchema,
 } from "../services/providerAcct.service";
+import { getEnabledTracks } from "../services/tracks.service";
 
 export async function meController(_req: Request, res: Response) {
   const user = res.locals.user as
@@ -47,6 +48,8 @@ export async function meController(_req: Request, res: Response) {
       }
       : null;
 
+  const enabledTracks = provider ? await getEnabledTracks(provider.id) : [];
+
   return res.json({
     success: true,
     data: {
@@ -60,6 +63,7 @@ export async function meController(_req: Request, res: Response) {
       role,
       provider,
       admin: adminLike,
+      enabledTracks,
     },
   });
 }

@@ -7,6 +7,8 @@ import {
   type DemoRole,
 } from "@/lib/demoMode";
 
+export type TrackKey = "wound_care" | "lymphedema" | "ocular";
+
 type MeResponse = {
   success: true;
   data: {
@@ -18,6 +20,7 @@ type MeResponse = {
     };
     accountType: "provider" | "admin";
     role: string;
+    enabledTracks: TrackKey[];
     provider: {
       id: string;
       accountPhone: string;
@@ -68,6 +71,7 @@ interface AuthState {
   admin: MeResponse["data"]["admin"] | null;
   role: string | null;
   accountType: MeResponse["data"]["accountType"] | null;
+  enabledTracks: TrackKey[];
   error: string | null;
 
   setJwt: (jwt: string | null) => void;
@@ -78,6 +82,7 @@ interface AuthState {
     admin: MeResponse["data"]["admin"];
     role: string;
     accountType: MeResponse["data"]["accountType"];
+    enabledTracks: TrackKey[];
   }) => void;
   clear: () => void;
 
@@ -94,10 +99,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   admin: null,
   role: null,
   accountType: null,
+  enabledTracks: [],
   error: null,
 
   setJwt: (jwt) => set({ jwt }),
-  setAuthenticated: ({ jwt, user, provider, admin, role, accountType }) =>
+  setAuthenticated: ({ jwt, user, provider, admin, role, accountType, enabledTracks }) =>
     set({
       status: "authenticated",
       jwt,
@@ -106,6 +112,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       admin,
       role,
       accountType,
+      enabledTracks,
       error: null,
     }),
   clear: () =>
@@ -117,6 +124,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       admin: null,
       role: null,
       accountType: null,
+      enabledTracks: [],
       error: null,
     }),
 
@@ -137,6 +145,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           admin: me.data.admin,
           role: me.data.role,
           accountType: me.data.accountType,
+          enabledTracks: me.data.enabledTracks ?? [],
           error: null,
         });
       } catch {
@@ -148,6 +157,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           admin: null,
           role: null,
           accountType: null,
+          enabledTracks: [],
           error: null,
         });
       }
@@ -172,6 +182,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         admin: null,
         role: null,
         accountType: null,
+        enabledTracks: [],
       });
       return;
     }
@@ -187,6 +198,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         admin: null,
         role: null,
         accountType: null,
+        enabledTracks: [],
         error: null,
       });
       return;
@@ -203,6 +215,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         admin: me.data.admin,
         role: me.data.role,
         accountType: me.data.accountType,
+        enabledTracks: me.data.enabledTracks ?? [],
         error: null,
       });
     } catch (e) {
@@ -215,6 +228,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           admin: null,
           role: null,
           accountType: null,
+          enabledTracks: [],
           error: null,
         });
         return;
@@ -230,6 +244,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         admin: null,
         role: null,
         accountType: null,
+        enabledTracks: [],
       });
     }
   },
@@ -246,6 +261,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       admin: null,
       role: null,
       accountType: null,
+      enabledTracks: [],
       error: null,
     });
 
@@ -267,6 +283,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       admin: null,
       role: null,
       accountType: null,
+      enabledTracks: [],
       error: null,
     });
   },
