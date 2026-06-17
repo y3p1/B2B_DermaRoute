@@ -24,6 +24,10 @@ type BvRequest = {
   icd10: string | null;
   applicationDate: string | null;
   deliveryDate: string | null;
+  deliveryAddress: string | null;
+  deliveryCity: string | null;
+  deliveryState: string | null;
+  deliveryZip: string | null;
   initials: string | null;
   status: string;
   createdAt: string | null;
@@ -499,6 +503,25 @@ export default function ProductOrderModal({
                         </Label>
                         <div className="text-sm text-gray-900 px-3 py-2 bg-white rounded-md border border-gray-200">
                           {selectedBvRequest.deliveryDate}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Delivery Address */}
+                    {selectedBvRequest.deliveryAddress && (
+                      <div className="space-y-1 md:col-span-2">
+                        <Label className="text-xs font-medium text-gray-600">
+                          Delivery Address
+                        </Label>
+                        <div className="text-sm text-gray-900 px-3 py-2 bg-white rounded-md border border-gray-200">
+                          {[
+                            selectedBvRequest.deliveryAddress,
+                            selectedBvRequest.deliveryCity,
+                            selectedBvRequest.deliveryState,
+                            selectedBvRequest.deliveryZip,
+                          ]
+                            .filter(Boolean)
+                            .join(", ")}
                         </div>
                       </div>
                     )}

@@ -21,6 +21,10 @@ export const patientDeliverySchema = z.object({
   initials: z.string().min(1, "Patient initials required"),
   applicationDate: z.string().min(1, "Required"),
   deliveryDate: z.string().min(1, "Required"),
+  deliveryAddress: z.string().min(1, "Street address required"),
+  deliveryCity: z.string().min(1, "City required"),
+  deliveryState: z.string().length(2, "2-letter state code required"),
+  deliveryZip: z.string().min(5, "Zip code required").max(10),
   instructions: z.string().optional(),
 });
 
@@ -39,7 +43,17 @@ export function Step2PatientDelivery({
 }: Step2PatientDeliveryProps) {
   const form = useForm<PatientDeliveryForm>({
     resolver: zodResolver(patientDeliverySchema),
-    defaultValues: defaultValues || {},
+    defaultValues: {
+      initials: "",
+      applicationDate: "",
+      deliveryDate: "",
+      deliveryAddress: "",
+      deliveryCity: "",
+      deliveryState: "",
+      deliveryZip: "",
+      instructions: "",
+      ...defaultValues,
+    },
   });
 
   // Reset form when defaultValues change (for edit mode).
@@ -108,6 +122,70 @@ export function Step2PatientDelivery({
                   <FormLabel>Preferred delivery date</FormLabel>
                   <FormControl>
                     <Input {...field} type="date" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <FormField
+            name="deliveryAddress"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Street Address *</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="123 Main St, Suite 4B" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <FormField
+              name="deliveryCity"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>City *</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Miami" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="deliveryState"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>State *</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="FL"
+                      maxLength={2}
+                      onChange={(e) => field.onChange(e.target.value.toUpperCase().slice(0, 2))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="deliveryZip"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Zip Code *</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="33101"
+                      maxLength={10}
+                      onChange={(e) => field.onChange(e.target.value.slice(0, 10))}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -17,8 +17,6 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  SelectGroup,
-  SelectLabel,
 } from "@/components/ui/select";
 import { useAuthStore } from "@/store/auth";
 import { apiGet, apiPost } from "@/lib/apiClient";
@@ -37,6 +35,10 @@ type BvRequest = {
   icd10: string | null;
   applicationDate: string | null;
   deliveryDate: string | null;
+  deliveryAddress: string | null;
+  deliveryCity: string | null;
+  deliveryState: string | null;
+  deliveryZip: string | null;
   initials: string | null;
   status: string;
   proofStatus: string | null;
@@ -89,9 +91,6 @@ export default function EnhancedOrderModal({
   // Recommended manufacturer name (from insurance routing)
   const [recommendedMfg, setRecommendedMfg] = React.useState<string | null>(null);
 
-  // Wound sizes for dropdown
-  type WoundSizeOption = { key: string; label: string; category?: string };
-  const [woundSizeOptions, setWoundSizeOptions] = React.useState<WoundSizeOption[]>([]);
 
   // Form State
   const [formData, setFormData] = React.useState({
@@ -124,10 +123,9 @@ export default function EnhancedOrderModal({
     setLoading(true);
     setError(null);
     try {
-      const [bvRes, insRes, wsRes] = await Promise.all([
+      const [bvRes, insRes] = await Promise.all([
         apiGet<{ success: true; data: BvRequest[] }>("/api/bv-requests", { token: token ?? undefined }),
         apiGet<{ success: true; data: Insurance[] }>("/api/insurances", { token: token ?? undefined }),
-        apiGet<{ success: true; data: WoundSizeOption[] }>("/api/bv/wound-sizes", { token: token ?? undefined }),
       ]);
 
       // Filter for Approved + Proof Verified
@@ -137,7 +135,6 @@ export default function EnhancedOrderModal({
 
       setBvRequests(eligible);
       setInsurances(insRes.data || []);
-      setWoundSizeOptions(wsRes.data || []);
     } catch (err) {
       console.error("[OrderWizard] Initial data fetch failed:", err);
       setError("Failed to load initial order records. Please try again later.");
@@ -236,8 +233,11 @@ export default function EnhancedOrderModal({
         woundType: bv.woundType ?? "",
         woundSize: bv.woundSize ?? "",
         woundLocation: bv.woundLocation ?? "",
-        // Pre-fill delivery date from BV if available
         deliveryDate: bv.deliveryDate ?? prev.deliveryDate,
+        deliveryAddress: bv.deliveryAddress ?? prev.deliveryAddress,
+        deliveryCity: bv.deliveryCity ?? prev.deliveryCity,
+        deliveryState: bv.deliveryState ?? prev.deliveryState,
+        deliveryZip: bv.deliveryZip ?? prev.deliveryZip,
       }));
       void fetchStep1ProductData(bv);
     }
@@ -404,42 +404,12 @@ export default function EnhancedOrderModal({
                       </div>
                       <div className="space-y-1.5">
                         <Label className="text-xs font-bold text-blue-700 uppercase tracking-wider">Wound Size</Label>
-                        {(() => {
-                          const discSizes = woundSizeOptions.filter((w) => w.category === "disc");
-                          const rectSizes = woundSizeOptions.filter((w) => w.category !== "disc");
-                          return (
-                            <Select
-                              value={formData.woundSize}
-                              onValueChange={val => setFormData(f => ({ ...f, woundSize: val }))}
-                            >
-                              <SelectTrigger className="bg-white h-10">
-                                <SelectValue placeholder="Select wound size..." />
-                              </SelectTrigger>
-                              <SelectContent className="max-h-[60vh] overflow-auto">
-                                {discSizes.length > 0 && (
-                                  <SelectGroup>
-                                    <SelectLabel>Discs (Round)</SelectLabel>
-                                    {discSizes.map((w) => (
-                                      <SelectItem key={w.key} value={w.key}>
-                                        {w.label}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectGroup>
-                                )}
-                                {rectSizes.length > 0 && (
-                                  <SelectGroup>
-                                    <SelectLabel>Square &amp; Rectangular</SelectLabel>
-                                    {rectSizes.map((w) => (
-                                      <SelectItem key={w.key} value={w.key}>
-                                        {w.label}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectGroup>
-                                )}
-                              </SelectContent>
-                            </Select>
-                          );
-                        })()}
+                        <Input
+                          value={formData.woundSize}
+                          onChange={e => setFormData(f => ({ ...f, woundSize: e.target.value }))}
+                          placeholder='e.g., "4x4 cm", "16 cm² disc"'
+                          className="bg-white"
+                        />
                       </div>
                     </div>
                   </div>

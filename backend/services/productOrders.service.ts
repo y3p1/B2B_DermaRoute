@@ -99,6 +99,7 @@ export async function listAllOrderProducts() {
       createdAt: orderProducts.createdAt,
       status: orderProducts.status,
       bvRequestId: orderProducts.bvRequestId,
+      providerId: bvRequests.providerId,
       practice: providerAcct.clinicName,
       manufacturer: manufacturers.name,
       product: products.name,

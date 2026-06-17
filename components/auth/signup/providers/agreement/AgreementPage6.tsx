@@ -41,6 +41,8 @@ export default function AgreementPage6(props: AgreementPage6Props) {
     onSubmit,
   } = props;
 
+  const [disclaimerAcknowledged, setDisclaimerAcknowledged] = React.useState(false);
+
   useEffect(() => {
     form.setValue(
       "coveredEntityDate",
@@ -381,6 +383,30 @@ export default function AgreementPage6(props: AgreementPage6Props) {
                   </span>
                 </div>
               </div>
+              <div className="mt-4 col-span-2">
+                <div className="bg-amber-50 border border-amber-300 rounded-lg p-4 space-y-3">
+                  <p className="font-bold text-amber-900 text-sm">
+                    Important Notice Regarding Business Associate Agreements (BAA)
+                  </p>
+                  <p className="text-sm text-amber-800">
+                    This Business Associate Agreement is entered into solely between you (the Covered Entity) and Integrity Tissue Solutions. It does not cover any third-party vendors, manufacturers, or service partners involved in your care workflow.
+                  </p>
+                  <p className="text-sm text-amber-800">
+                    Certain vendors and manufacturers we work with may require you to sign a separate BAA directly with them. Please ensure you have reviewed and satisfied any such requirements with each applicable party before sharing protected health information with them.
+                  </p>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={disclaimerAcknowledged}
+                      onChange={(e) => setDisclaimerAcknowledged(e.target.checked)}
+                      className="w-4 h-4 accent-amber-600"
+                    />
+                    <span className="text-sm font-medium text-amber-900">
+                      I understand and wish to proceed
+                    </span>
+                  </label>
+                </div>
+              </div>
               <div className="mt-6 flex gap-4 col-span-2">
                 <Button
                   type="button"
@@ -392,11 +418,11 @@ export default function AgreementPage6(props: AgreementPage6Props) {
                 <Button
                   type="submit"
                   className={`flex-1 text-base py-3 rounded-lg ${
-                    form.formState.isValid
+                    form.formState.isValid && disclaimerAcknowledged
                       ? "bg-blue-600 hover:bg-blue-700 text-white"
                       : "bg-gray-300 text-gray-800"
                   }`}
-                  disabled={!form.formState.isValid}
+                  disabled={!form.formState.isValid || !disclaimerAcknowledged}
                 >
                   Agree and Continue
                 </Button>

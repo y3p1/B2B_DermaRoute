@@ -241,6 +241,18 @@ export function Step3Recommendation({
         initials: String(formData.initials ?? ""),
         applicationDate: String(formData.applicationDate ?? ""),
         deliveryDate: String(formData.deliveryDate ?? ""),
+        deliveryAddress: formData.deliveryAddress
+          ? String(formData.deliveryAddress)
+          : undefined,
+        deliveryCity: formData.deliveryCity
+          ? String(formData.deliveryCity)
+          : undefined,
+        deliveryState: formData.deliveryState
+          ? String(formData.deliveryState)
+          : undefined,
+        deliveryZip: formData.deliveryZip
+          ? String(formData.deliveryZip)
+          : undefined,
         instructions: formData.instructions
           ? String(formData.instructions)
           : undefined,

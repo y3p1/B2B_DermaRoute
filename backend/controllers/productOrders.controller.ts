@@ -1,5 +1,9 @@
 import type { Request, Response } from "../http/types";
 import { isDemoMode } from "../../lib/demoMode";
+import {
+  isProviderAssignedToRep,
+  getAssignedProviderIds,
+} from "../services/providerAdmin.service";
 
 import {
   createOrderProduct,
@@ -49,8 +53,20 @@ export async function listOrderProductsController(
     ? null
     : await getClinicStaffProfileByUserId(userId);
 
-  if (admin || clinicStaff) {
+  if (admin) {
     const rows = await listAllOrderProducts();
+    return res.json({ success: true, data: rows });
+  }
+
+  if (clinicStaff) {
+    const rows = await listAllOrderProducts();
+    if (!isDemoMode()) {
+      const assignedIds = await getAssignedProviderIds(clinicStaff.id);
+      const filtered = rows.filter(
+        (r) => r.providerId && assignedIds.includes(r.providerId),
+      );
+      return res.json({ success: true, data: filtered });
+    }
     return res.json({ success: true, data: rows });
   }
 
@@ -96,6 +112,18 @@ export async function createOrderProductController(
     return res
       .status(400)
       .json({ error: "Validation failed", details: parsed.error.flatten() });
+  }
+
+  // Clinic staff rep territory check: BV must belong to an assigned provider
+  if (clinicStaff && !isDemoMode()) {
+    const bvRequest = await getBvRequestById(parsed.data.bvRequestId);
+    if (!bvRequest?.providerId) {
+      return res.status(400).json({ error: "BV request has no associated provider" });
+    }
+    const allowed = await isProviderAssignedToRep(bvRequest.providerId, clinicStaff.id);
+    if (!allowed) {
+      return res.status(403).json({ error: "Provider not assigned to your territory" });
+    }
   }
 
   // Provider-specific validation: BV must belong to provider and be approved
@@ -273,6 +301,11 @@ export async function getOrderProductController(req: Request, res: Response) {
     return res.status(403).json({ error: "You do not have permission to access this order" });
   }
 
+  if (clinicStaff && !isDemoMode() && order.providerId) {
+    const allowed = await isProviderAssignedToRep(order.providerId, clinicStaff.id);
+    if (!allowed) return res.status(403).json({ error: "Access denied" });
+  }
+
   return res.json({ success: true, data: order });
 }
 
@@ -318,6 +351,11 @@ export async function updateOrderProductController(
   const orderForChecking = await getOrderProductById(id);
   if (provider && orderForChecking?.providerId !== provider.id) {
     return res.status(403).json({ error: "You do not have permission to access this order" });
+  }
+
+  if (clinicStaff && !isDemoMode() && orderForChecking?.providerId) {
+    const allowed = await isProviderAssignedToRep(orderForChecking.providerId, clinicStaff.id);
+    if (!allowed) return res.status(403).json({ error: "Access denied" });
   }
 
   const { status, notes, manufacturerId, productId } = body;

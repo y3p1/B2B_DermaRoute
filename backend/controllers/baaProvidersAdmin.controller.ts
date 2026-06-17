@@ -11,6 +11,11 @@ import {
 import { getAdminProfileByUserId } from "../services/adminAcct.service";
 import { getClinicStaffProfileByUserId } from "../services/clinicStaffAcct.service";
 import { getProviderProfileByUserId } from "../services/bvRequests.service";
+import {
+  getAssignedProviderIds,
+  isProviderAssignedToRep,
+} from "../services/providerAdmin.service";
+import { isDemoMode } from "../../lib/demoMode";
 
 function getLastPathSegment(pathname: string): string | null {
   const parts = (pathname || "").split("/").filter(Boolean);
@@ -33,8 +38,18 @@ export async function listBaaProvidersAdminController(
     ? null
     : await getClinicStaffProfileByUserId(userId);
 
-  if (admin || clinicStaff) {
+  if (admin) {
     const rows = await listBaaProvidersForAdmin();
+    return res.json({ success: true, data: rows });
+  }
+
+  if (clinicStaff) {
+    const rows = await listBaaProvidersForAdmin();
+    if (!isDemoMode()) {
+      const assignedIds = await getAssignedProviderIds(clinicStaff.id);
+      const filtered = rows.filter((r) => assignedIds.includes(r.providerAcctId));
+      return res.json({ success: true, data: filtered });
+    }
     return res.json({ success: true, data: rows });
   }
 
@@ -61,11 +76,15 @@ export async function getBaaProviderAdminController(
   const row = await getBaaProviderForAdmin(id);
   if (!row) return res.status(404).json({ error: "Not found" });
 
-  // Admin/clinic-staff can view any record; provider can only view their own
   const admin = await getAdminProfileByUserId(userId);
   if (!admin) {
     const clinicStaff = await getClinicStaffProfileByUserId(userId);
-    if (!clinicStaff) {
+    if (clinicStaff) {
+      if (!isDemoMode()) {
+        const allowed = await isProviderAssignedToRep(row.providerAcctId, clinicStaff.id);
+        if (!allowed) return res.status(403).json({ error: "Access denied" });
+      }
+    } else {
       const provider = await getProviderProfileByUserId(userId);
       if (!provider || provider.id !== row.providerAcctId) {
         return res.status(403).json({ error: "Access denied" });

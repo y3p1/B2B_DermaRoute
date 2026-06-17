@@ -531,6 +531,7 @@ export type WoundCaseOption = {
   initials: string | null;
   clinicName: string | null;
   woundType: string | null;
+  providerId: string | null;
 };
 
 export async function listApprovedBvOptions(): Promise<WoundCaseOption[]> {
@@ -541,6 +542,7 @@ export async function listApprovedBvOptions(): Promise<WoundCaseOption[]> {
       initials: bvRequests.initials,
       clinicName: providerAcct.clinicName,
       woundType: bvRequests.woundType,
+      providerId: bvRequests.providerId,
       createdAt: bvRequests.createdAt,
     })
     .from(bvRequests)
@@ -558,6 +560,7 @@ export async function listApprovedBvOptions(): Promise<WoundCaseOption[]> {
     initials: row.initials,
     clinicName: row.clinicName,
     woundType: row.woundType,
+    providerId: row.providerId,
   }));
 }
 

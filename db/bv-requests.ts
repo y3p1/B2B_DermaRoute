@@ -20,7 +20,7 @@ export const bvRequests = pgTable("bv_requests", {
   placeOfService: varchar("place_of_service", { length: 64 }),
   insurance: varchar("insurance", { length: 64 }),
   woundType: varchar("wound_type", { length: 64 }),
-  woundSize: varchar("wound_size", { length: 32 }),
+  woundSize: varchar("wound_size", { length: 128 }),
   woundLocation: varchar("wound_location", { length: 128 }),
   icd10: varchar("icd10", { length: 32 }),
   conservativeTherapy: boolean("conservative_therapy"),
@@ -32,6 +32,10 @@ export const bvRequests = pgTable("bv_requests", {
   initials: varchar("initials", { length: 64 }),
   applicationDate: date("application_date"),
   deliveryDate: date("delivery_date"),
+  deliveryAddress: varchar("delivery_address", { length: 256 }),
+  deliveryCity: varchar("delivery_city", { length: 128 }),
+  deliveryState: varchar("delivery_state", { length: 2 }),
+  deliveryZip: varchar("delivery_zip", { length: 10 }),
   instructions: text("instructions"),
   status: varchar("status", { length: 32 }).notNull().default("pending"), // pending, downloaded, approved, rejected
   verifiedBy: uuid("verified_by"), // Can be admin_acct.id, clinic_staff_acct.id, or provider_acct.id

@@ -9,6 +9,9 @@ export const updateProviderProfileSchema = z.object({
   npiNumber: z.string().min(1).optional(),
   clinicName: z.string().min(1).optional(),
   clinicAddress: z.string().optional().nullable(),
+  clinicCity: z.string().optional().nullable(),
+  clinicState: z.string().max(2).optional().nullable(),
+  clinicZip: z.string().max(10).optional().nullable(),
   clinicPhone: z.string().optional().nullable(),
   providerSpecialty: z.string().optional().nullable(),
   taxId: z.string().optional().nullable(),
@@ -33,6 +36,9 @@ export async function updateProviderProfile(
   if (data.npiNumber !== undefined) updateSet.npiNumber = data.npiNumber;
   if (data.clinicName !== undefined) updateSet.clinicName = data.clinicName;
   if (data.clinicAddress !== undefined) updateSet.clinicAddress = data.clinicAddress;
+  if (data.clinicCity !== undefined) updateSet.clinicCity = data.clinicCity;
+  if (data.clinicState !== undefined) updateSet.clinicState = data.clinicState;
+  if (data.clinicZip !== undefined) updateSet.clinicZip = data.clinicZip;
   if (data.clinicPhone !== undefined) updateSet.clinicPhone = data.clinicPhone;
   if (data.providerSpecialty !== undefined) updateSet.providerSpecialty = data.providerSpecialty;
   if (data.taxId !== undefined) updateSet.taxId = data.taxId;
@@ -49,6 +55,9 @@ export async function updateProviderProfile(
       npiNumber: providerAcct.npiNumber,
       clinicName: providerAcct.clinicName,
       clinicAddress: providerAcct.clinicAddress,
+      clinicCity: providerAcct.clinicCity,
+      clinicState: providerAcct.clinicState,
+      clinicZip: providerAcct.clinicZip,
       clinicPhone: providerAcct.clinicPhone,
       providerSpecialty: providerAcct.providerSpecialty,
       taxId: providerAcct.taxId,

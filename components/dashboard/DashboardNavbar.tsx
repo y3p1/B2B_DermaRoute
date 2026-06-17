@@ -34,6 +34,9 @@ type ProviderFormData = {
   npiNumber: string;
   clinicName: string;
   clinicAddress: string;
+  clinicCity: string;
+  clinicState: string;
+  clinicZip: string;
   clinicPhone: string;
   providerSpecialty: string;
   taxId: string;
@@ -46,6 +49,9 @@ const fieldLabels: Record<keyof ProviderFormData, string> = {
   npiNumber: "NPI Number",
   clinicName: "Clinic / Practice Name",
   clinicAddress: "Clinic Address",
+  clinicCity: "Clinic City",
+  clinicState: "Clinic State",
+  clinicZip: "Clinic Zip Code",
   clinicPhone: "Clinic Phone Number",
   providerSpecialty: "Physician Specialty",
   taxId: "Tax ID (EIN)",
@@ -81,6 +87,9 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
     npiNumber: "",
     clinicName: "",
     clinicAddress: "",
+    clinicCity: "",
+    clinicState: "",
+    clinicZip: "",
     clinicPhone: "",
     providerSpecialty: "",
     taxId: "",
@@ -96,6 +105,9 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
         npiNumber: provider.npiNumber || "",
         clinicName: provider.clinicName || "",
         clinicAddress: provider.clinicAddress || "",
+        clinicCity: provider.clinicCity || "",
+        clinicState: provider.clinicState || "",
+        clinicZip: provider.clinicZip || "",
         clinicPhone: provider.clinicPhone || "",
         providerSpecialty: provider.providerSpecialty || "",
         taxId: provider.taxId || "",
@@ -373,6 +385,9 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
                           npiNumber: provider.npiNumber || "",
                           clinicName: provider.clinicName || "",
                           clinicAddress: provider.clinicAddress || "",
+                          clinicCity: provider.clinicCity || "",
+                          clinicState: provider.clinicState || "",
+                          clinicZip: provider.clinicZip || "",
                           clinicPhone: provider.clinicPhone || "",
                           providerSpecialty: provider.providerSpecialty || "",
                           taxId: provider.taxId || "",

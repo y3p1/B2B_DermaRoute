@@ -11,6 +11,12 @@ import {
 } from "../services/healingTracker.service";
 import { getAdminProfileByUserId } from "../services/adminAcct.service";
 import { getClinicStaffProfileByUserId } from "../services/clinicStaffAcct.service";
+import {
+  getAssignedProviderIds,
+  isProviderAssignedToRep,
+} from "../services/providerAdmin.service";
+import { isDemoMode } from "../../lib/demoMode";
+import { getBvRequestById } from "../services/bvRequests.service";
 
 type ResolvedActor =
   | { type: "admin"; id: string }
@@ -41,6 +47,17 @@ export async function listWoundCasesController(_req: Request, res: Response) {
     listApprovedBvOptions(),
   ]);
 
+  if (actor.type === "clinic_staff" && !isDemoMode()) {
+    const assignedIds = await getAssignedProviderIds(actor.id);
+    const filteredCases = cases.filter(
+      (c) => c.providerId && assignedIds.includes(c.providerId),
+    );
+    const filteredOptions = options.filter(
+      (o) => o.providerId && assignedIds.includes(o.providerId),
+    );
+    return res.json({ success: true, data: { cases: filteredCases, options: filteredOptions } });
+  }
+
   return res.json({ success: true, data: { cases, options } });
 }
 
@@ -59,6 +76,14 @@ export async function recordMeasurementController(
     return res
       .status(400)
       .json({ error: "Validation failed", details: parsed.error.flatten() });
+  }
+
+  if (actor.type === "clinic_staff" && !isDemoMode()) {
+    const bv = await getBvRequestById(parsed.data.bvRequestId);
+    if (bv?.providerId) {
+      const allowed = await isProviderAssignedToRep(bv.providerId, actor.id);
+      if (!allowed) return res.status(403).json({ error: "Provider not assigned to your territory" });
+    }
   }
 
   try {
@@ -88,6 +113,14 @@ export async function measurementHistoryController(
     return res.status(400).json({ error: "BV request ID is required" });
   }
 
+  if (actor.type === "clinic_staff" && !isDemoMode()) {
+    const bv = await getBvRequestById(bvRequestId);
+    if (bv?.providerId) {
+      const allowed = await isProviderAssignedToRep(bv.providerId, actor.id);
+      if (!allowed) return res.status(403).json({ error: "Provider not assigned to your territory" });
+    }
+  }
+
   const data = await getMeasurementHistory(bvRequestId);
   return res.json({ success: true, data });
 }
@@ -109,6 +142,14 @@ export async function alternativeProductsController(
     return res.status(400).json({ error: "BV request ID is required" });
   }
 
+  if (actor.type === "clinic_staff" && !isDemoMode()) {
+    const bv = await getBvRequestById(bvRequestId);
+    if (bv?.providerId) {
+      const allowed = await isProviderAssignedToRep(bv.providerId, actor.id);
+      if (!allowed) return res.status(403).json({ error: "Provider not assigned to your territory" });
+    }
+  }
+
   const data = await getAlternativeProducts(bvRequestId);
   return res.json({ success: true, data });
 }
@@ -128,6 +169,14 @@ export async function deleteWoundCaseController(
   const bvRequestId = idIndex >= 0 ? segments[idIndex + 1] : null;
   if (!bvRequestId) {
     return res.status(400).json({ error: "BV request ID is required" });
+  }
+
+  if (actor.type === "clinic_staff" && !isDemoMode()) {
+    const bv = await getBvRequestById(bvRequestId);
+    if (bv?.providerId) {
+      const allowed = await isProviderAssignedToRep(bv.providerId, actor.id);
+      if (!allowed) return res.status(403).json({ error: "Provider not assigned to your territory" });
+    }
   }
 
   try {

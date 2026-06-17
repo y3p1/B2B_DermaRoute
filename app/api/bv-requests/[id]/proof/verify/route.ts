@@ -6,6 +6,7 @@ import { getAllowedOrigins } from "@/backend/config/env";
 import { runServerPipeline } from "@/backend/serverPipeline";
 import {
   verifyBvRequestProof,
+  getBvRequestById,
 } from "@/backend/services/bvRequests.service";
 import {
   getAdminProfileByUserId,
@@ -13,6 +14,8 @@ import {
 import {
   getClinicStaffProfileByUserId,
 } from "@/backend/services/clinicStaffAcct.service";
+import { isProviderAssignedToRep } from "@/backend/services/providerAdmin.service";
+import { isDemoMode } from "@/lib/demoMode";
 import { NextRequest } from "next/server";
 
 const cors = corsMiddleware({ allowedOrigins: getAllowedOrigins() });
@@ -39,6 +42,17 @@ export async function PATCH(
 
         if (!admin && !clinicStaff) {
           return res.status(403).json({ error: "Forbidden: Admins or Clinic Staff only" });
+        }
+
+        // Clinic staff rep territory check
+        if (clinicStaff && !isDemoMode()) {
+          const bv = await getBvRequestById(id);
+          if (bv?.providerId) {
+            const allowed = await isProviderAssignedToRep(bv.providerId, clinicStaff.id);
+            if (!allowed) {
+              return res.status(403).json({ error: "Provider not assigned to your territory" });
+            }
+          }
         }
 
         const { status } = req.body as { status?: "verified" | "rejected" };

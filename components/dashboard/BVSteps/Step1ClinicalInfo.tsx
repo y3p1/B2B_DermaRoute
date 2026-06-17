@@ -21,8 +21,6 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-  SelectGroup,
-  SelectLabel,
 } from "@/components/ui/select";
 import { useAuthStore } from "@/store/auth";
 
@@ -91,9 +89,6 @@ export function Step1ClinicalInfo({
   const [insurancesList, setInsurancesList] = useState<
     Array<{ id: string; name: string; commercial: boolean }>
   >([]);
-  const [woundSizesList, setWoundSizesList] = useState<
-    Array<{ key: string; label: string; category?: string }>
-  >([]);
   // ICD-10 will be entered as a single comma-separated text field
 
   // load providers on mount
@@ -155,39 +150,6 @@ export function Step1ClinicalInfo({
     })();
   }, [token]);
 
-  // load wound sizes on mount
-  useEffect(() => {
-    void (async () => {
-      try {
-        const res = await fetch("/api/bv/wound-sizes");
-        const body = await res.json();
-        if (body && Array.isArray(body.data)) {
-          const mapped = Array.isArray(body.data)
-            ? body.data.map((r: unknown) => {
-                const it = r as { key?: string; label?: string; category?: string };
-                return { key: it.key, label: it.label, category: it.category } as {
-                  key: string;
-                  label: string;
-                  category?: string;
-                };
-              })
-            : [];
-          // Deduplicate by `key` to avoid duplicate React keys causing warnings
-          const seen = new Set<string>();
-          const unique: Array<{ key: string; label: string }> = [];
-          for (const w of mapped) {
-            if (!w || !w.key) continue;
-            if (seen.has(w.key)) continue;
-            seen.add(w.key);
-            unique.push(w);
-          }
-          setWoundSizesList(unique);
-        }
-      } catch {
-        // fallback to nothing
-      }
-    })();
-  }, []);
 
   function onSubmit(values: ClinicalInfoForm) {
     // Attach the commercial flag from the selected insurance so Step 3 can filter products
@@ -357,49 +319,22 @@ export function Step1ClinicalInfo({
             <FormField
               name="woundSize"
               control={form.control}
-              render={({ field }) => {
-                const discSizes = woundSizesList.filter((w) => w.category === "disc");
-                const rectSizes = woundSizesList.filter((w) => w.category !== "disc");
-                return (
-                  <FormItem>
-                    <FormLabel>Wound Size *</FormLabel>
-                    <FormControl>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select wound size..." />
-                        </SelectTrigger>
-                        <SelectContent className="max-h-[60vh] overflow-auto">
-                          {discSizes.length > 0 && (
-                            <SelectGroup>
-                              <SelectLabel>Discs (Round)</SelectLabel>
-                              {discSizes.map((w) => (
-                                <SelectItem key={w.key} value={w.key}>
-                                  {w.label}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          )}
-                          {rectSizes.length > 0 && (
-                            <SelectGroup>
-                              <SelectLabel>Square &amp; Rectangular</SelectLabel>
-                              {rectSizes.map((w) => (
-                                <SelectItem key={w.key} value={w.key}>
-                                  {w.label}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                );
-              }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Wound Size *</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      value={field.value ?? ""}
+                      placeholder='e.g., "4x4 cm", "16 cm² disc", "2.5 x 3 cm"'
+                    />
+                  </FormControl>
+                  <div className="text-xs text-muted-foreground">
+                    Enter the wound size dimensions (e.g., &quot;4x4 cm&quot;, &quot;16 cm² disc&quot;, &quot;2.5 x 3 cm&quot;)
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

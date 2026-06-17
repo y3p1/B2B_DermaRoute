@@ -14,6 +14,7 @@ import {
 } from "../../../../backend/services/bvRequests.service";
 import { getAdminProfileByUserId } from "../../../../backend/services/adminAcct.service";
 import { getClinicStaffProfileByUserId } from "../../../../backend/services/clinicStaffAcct.service";
+import { isProviderAssignedToRep } from "../../../../backend/services/providerAdmin.service";
 import { NextRequest } from "next/server";
 import { isDemoMode } from "../../../../lib/demoMode";
 
@@ -39,10 +40,22 @@ export async function GET(
           ? null
           : await getClinicStaffProfileByUserId(userId);
 
-        // If admin or clinic staff, get any BV request by ID
-        if (admin || clinicStaff) {
+        // Admins can access any BV request
+        if (admin) {
           const found = await getBvRequestById(id);
           if (!found) return res.status(404).json({ error: "Not found" });
+          return res.json({ success: true, data: found });
+        }
+
+        // Clinic staff can only access BV requests for assigned providers
+        if (clinicStaff) {
+          const found = await getBvRequestById(id);
+          if (!found) return res.status(404).json({ error: "Not found" });
+          const allowed = await isProviderAssignedToRep(
+            found.providerId ?? "",
+            clinicStaff.id,
+          );
+          if (!allowed) return res.status(403).json({ error: "Access denied" });
           return res.json({ success: true, data: found });
         }
 

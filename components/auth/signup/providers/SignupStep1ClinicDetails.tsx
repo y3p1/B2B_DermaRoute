@@ -113,6 +113,9 @@ const clinicDetailsSchema = z.object({
     .regex(/^\d{10}$/, "NPI number must be exactly 10 digits"),
   clinicName: z.string().min(2, "Clinic/Practice name is required"),
   clinicAddress: z.string().optional(),
+  clinicCity: z.string().min(1, "City is required"),
+  clinicState: z.string().length(2, "Enter 2-letter state code (e.g. FL)"),
+  clinicZip: z.string().min(5, "Zip code required").max(10),
   clinicPhone: z
     .string()
     .optional()
@@ -159,6 +162,9 @@ function SignupStep1ClinicDetails(props: SignupStep1Props) {
       npiNumber: "",
       clinicName: "",
       clinicAddress: "",
+      clinicCity: "",
+      clinicState: "",
+      clinicZip: "",
       clinicPhone: "",
       providerSpecialty: "",
       taxId: "",
@@ -360,6 +366,74 @@ function SignupStep1ClinicDetails(props: SignupStep1Props) {
                 </FormItem>
               )}
             />
+            {/* Clinic City / State / Zip */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <FormField
+                control={form.control}
+                name="clinicCity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-black flex items-center gap-1">
+                      City <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Miami"
+                        className="bg-gray-100 border-gray-300 text-black"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="clinicState"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-black flex items-center gap-1">
+                      State <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="FL"
+                        maxLength={2}
+                        className="bg-gray-100 border-gray-300 text-black"
+                        onChange={(e) =>
+                          field.onChange(e.target.value.toUpperCase().slice(0, 2))
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="clinicZip"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-black flex items-center gap-1">
+                      Zip Code <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="33101"
+                        maxLength={10}
+                        className="bg-gray-100 border-gray-300 text-black"
+                        onChange={(e) =>
+                          field.onChange(e.target.value.slice(0, 10))
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             {/* Clinic Phone Number (optional) */}
             <FormField
               control={form.control}

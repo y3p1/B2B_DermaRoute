@@ -11,6 +11,7 @@ import {
 } from "../../../../../backend/services/bvRequests.service";
 import { getAdminProfileByUserId } from "../../../../../backend/services/adminAcct.service";
 import { getClinicStaffProfileByUserId } from "../../../../../backend/services/clinicStaffAcct.service";
+import { isProviderAssignedToRep } from "../../../../../backend/services/providerAdmin.service";
 import { sendBvStatusNotification } from "../../../../../backend/services/sendgrid.service";
 import { NextRequest } from "next/server";
 import { isDemoMode } from "../../../../../lib/demoMode";
@@ -69,6 +70,17 @@ export async function PATCH(
             return res.status(500).json({ error: "Failed to get verifier ID" });
           }
           verifierType = admin ? "admin" : "clinic_staff";
+
+          // Clinic staff rep territory check
+          if (clinicStaff) {
+            const bv = await getBvRequestById(id);
+            if (bv?.providerId) {
+              const allowed = await isProviderAssignedToRep(bv.providerId, clinicStaff.id);
+              if (!allowed) {
+                return res.status(403).json({ error: "Provider not assigned to your territory" });
+              }
+            }
+          }
         }
 
         // Fetch full BV request details before update (for notification data)

@@ -188,6 +188,9 @@ export const clinicDetailsSchema = z.object({
   npiNumber: z.preprocess(emptyStringToUndefined, npiSchema),
   clinicName: z.string().trim().min(2, "Clinic/Practice name is required"),
   clinicAddress: optionalMin(5, "Clinic address must be at least 5 characters"),
+  clinicCity: z.preprocess(emptyStringToUndefined, z.string().min(1).optional()),
+  clinicState: z.preprocess(emptyStringToUndefined, z.string().length(2).optional()),
+  clinicZip: z.preprocess(emptyStringToUndefined, z.string().min(5).max(10).optional()),
   clinicPhone: z.preprocess((value) => {
     const maybe = emptyStringToUndefined(value);
     if (maybe === undefined) return undefined;

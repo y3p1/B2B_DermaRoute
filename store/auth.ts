@@ -25,6 +25,9 @@ type MeResponse = {
       npiNumber: string;
       clinicName: string;
       clinicAddress: string | null;
+      clinicCity: string | null;
+      clinicState: string | null;
+      clinicZip: string | null;
       clinicPhone: string | null;
       providerSpecialty: string | null;
       taxId: string | null;
