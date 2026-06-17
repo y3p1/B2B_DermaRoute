@@ -135,6 +135,35 @@ export async function apiPatch<TResponse, TBody extends Json>(
   return data as TResponse;
 }
 
+export async function apiPut<TResponse, TBody extends Json>(
+  path: string,
+  body: TBody,
+  options: RequestOptions = {},
+): Promise<TResponse> {
+  const res = await fetch(path, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...demoHeaders(),
+      ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = await parseJsonSafe(res);
+
+  if (!res.ok) {
+    const message =
+      (typeof data === "object" && data && "error" in data
+        ? String((data as { error?: unknown }).error)
+        : undefined) || `Request failed (${res.status})`;
+
+    throw new ApiError(message, res.status, data);
+  }
+
+  return data as TResponse;
+}
+
 export async function apiDelete<TResponse>(
   path: string,
   options: RequestOptions = {},

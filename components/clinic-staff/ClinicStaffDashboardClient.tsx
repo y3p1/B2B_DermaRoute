@@ -19,6 +19,8 @@ import {
   ScrollText,
   Shield,
   Users,
+  Layers,
+  Settings,
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth";
@@ -39,6 +41,8 @@ import { AnalyticsTab } from "@/components/clinic-staff/AnalyticsTab";
 import { AuditLogsTab } from "@/components/clinic-staff/AuditLogsTab";
 import { PolicyTrackerTab } from "@/components/clinic-staff/PolicyTrackerTab";
 import { ItsRepresentativesTab } from "@/components/clinic-staff/ItsRepresentativesTab";
+import { PracticeTracksTab } from "@/components/clinic-staff/PracticeTracksTab";
+import { SystemSettingsTab } from "@/components/clinic-staff/SystemSettingsTab";
 import ProductOrderDataTable from "@/components/dashboard/ProductOrderDataTable";
 import EnhancedOrderModal from "@/components/dashboard/EnhancedOrderModal";
 import ViewProductOrderModal from "@/components/dashboard/ViewProductOrderModal";
@@ -58,7 +62,9 @@ type TabKey =
   | "analytics"
   | "audit_logs"
   | "policy_tracker"
-  | "its_representatives";
+  | "its_representatives"
+  | "practice_tracks"
+  | "system_settings";
 
 type BvRequestRow = {
   id: string;
@@ -219,7 +225,9 @@ export default function ClinicStaffDashboardClient({
       requestedTab === "analytics" ||
       requestedTab === "audit_logs" ||
       requestedTab === "policy_tracker" ||
-      requestedTab === "its_representatives"
+      requestedTab === "its_representatives" ||
+      requestedTab === "practice_tracks" ||
+      requestedTab === "system_settings"
     ) {
       setTab(requestedTab);
     }
@@ -393,6 +401,16 @@ export default function ClinicStaffDashboardClient({
         key: "its_representatives" as TabKey,
         label: "ITS Representatives",
         icon: <Users className="w-5 h-5" />,
+      },
+      {
+        key: "practice_tracks" as TabKey,
+        label: "Practice Tracks",
+        icon: <Layers className="w-5 h-5" />,
+      },
+      {
+        key: "system_settings" as TabKey,
+        label: "System Settings",
+        icon: <Settings className="w-5 h-5" />,
       },
     ] : []),
   ];
@@ -925,6 +943,10 @@ export default function ClinicStaffDashboardClient({
             {tab === "policy_tracker" ? <PolicyTrackerTab /> : null}
 
             {tab === "its_representatives" ? <ItsRepresentativesTab /> : null}
+
+            {tab === "practice_tracks" ? <PracticeTracksTab /> : null}
+
+            {tab === "system_settings" ? <SystemSettingsTab /> : null}
           </div>
         </main>
       </div>
