@@ -6,9 +6,9 @@ import { supabase } from "@/lib/supabaseClient";
 import { useAuthStore } from "@/store/auth";
 import { isClientDemoMode } from "@/lib/demoMode";
 import {
-  DEFAULT_AUTHENTICATED_REDIRECT,
   DEFAULT_UNAUTHENTICATED_REDIRECT,
-  isLegacyAuthenticatedPath,
+  getAuthenticatedRedirect,
+  isOpenPath,
   isPublicPath,
 } from "@/lib/routeGuard";
 
@@ -40,11 +40,7 @@ export function useRouteGuard() {
     if (isClientDemoMode()) return;
 
     const publicPath = isPublicPath(pathname);
-
-    if (isLegacyAuthenticatedPath(pathname)) {
-      router.replace(DEFAULT_AUTHENTICATED_REDIRECT);
-      return;
-    }
+    const openPath = isOpenPath(pathname);
 
     if (status === "unauthenticated" && !publicPath) {
       const next = pathname ? `?next=${encodeURIComponent(pathname)}` : "";
@@ -57,15 +53,20 @@ export function useRouteGuard() {
     }
 
     if (status === "authenticated" && pathname.startsWith("/admin")) {
-      const accountType = useAuthStore.getState().accountType;
+      const { accountType } = useAuthStore.getState();
       if (accountType !== "admin") {
         router.replace("/");
         return;
       }
     }
 
-    if (status === "authenticated" && publicPath) {
-      router.replace(DEFAULT_AUTHENTICATED_REDIRECT);
+    // Open paths (/ and /no-tracks) are accessible to authenticated users — no redirect.
+    // Other public paths (like /auth, /signup) redirect authenticated users to their destination.
+    if (status === "authenticated" && publicPath && !openPath) {
+      const { enabledTracks, accountType, role } = useAuthStore.getState();
+      router.replace(
+        getAuthenticatedRedirect(enabledTracks, accountType ?? "", role ?? ""),
+      );
     }
   }, [pathname, router, status]);
 
