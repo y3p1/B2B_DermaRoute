@@ -47,8 +47,10 @@ export function LandingPage() {
   const enabledTracks = useAuthStore((s) => s.enabledTracks);
   const accountType = useAuthStore((s) => s.accountType);
 
-  const isAuthenticated = status === "authenticated";
   const isDemo = isClientDemoMode();
+  // In demo mode the viewer is always "in" — treat as authenticated for UI so
+  // the heading doesn't flash "Provider Portal" before hydrate completes.
+  const isAuthenticated = status === "authenticated" || isDemo;
 
   function isEnabled(track: TrackKey): boolean {
     if (isDemo) return true;
@@ -57,6 +59,12 @@ export function LandingPage() {
   }
 
   function handleServiceClick(service: ServiceCard) {
+    // Demo: all tracks enabled, no auth gate. Avoids race where a click during
+    // hydration (status still "loading") routes to /auth → /demo.
+    if (isDemo) {
+      router.push(service.href);
+      return;
+    }
     if (!isAuthenticated) {
       router.push("/auth");
       return;
