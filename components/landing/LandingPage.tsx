@@ -20,7 +20,7 @@ const SERVICES: ServiceCard[] = [
     label: "Tissue Products & PRP (Biologics)",
     description:
       "Submit benefit verifications, track wound healing, and manage product orders for wound care patients.",
-    href: "/dashboard",
+    href: "/wound-care/dashboard",
     icon: Activity,
   },
   {
@@ -28,7 +28,7 @@ const SERVICES: ServiceCard[] = [
     label: "Ocular Products",
     description:
       "Submit orders for amniotic membrane grafts and other ocular surface products.",
-    href: "/ocular",
+    href: "/ocular/dashboard",
     icon: Eye,
   },
   {
@@ -36,7 +36,7 @@ const SERVICES: ServiceCard[] = [
     label: "Medical Devices / Equipment",
     description:
       "AIROS Compression Pump & Garment Ordering",
-    href: "/dashboard",
+    href: "/medical-devices/dashboard",
     icon: Wind,
   },
 ];

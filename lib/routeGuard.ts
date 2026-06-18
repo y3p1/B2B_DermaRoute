@@ -35,9 +35,10 @@ export function getAuthenticatedRedirect(
   if (accountType === "admin") return "/admin";
   if (role === "clinic_staff") return "/clinic-staff";
   if (enabledTracks.length === 0) return "/no-tracks";
-  if (enabledTracks.includes("wound_care") || enabledTracks.includes("lymphedema"))
-    return "/dashboard";
-  if (enabledTracks.includes("ocular"))
-    return "/ocular/dashboard";
+  if (enabledTracks.length === 1) {
+    if (enabledTracks[0] === "wound_care") return "/wound-care/dashboard";
+    if (enabledTracks[0] === "lymphedema") return "/medical-devices/dashboard";
+    if (enabledTracks[0] === "ocular") return "/ocular/dashboard";
+  }
   return "/";
 }
