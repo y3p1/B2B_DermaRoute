@@ -117,7 +117,7 @@ export default function MedicalDevicesDashboardPage() {
         <div className="bg-purple-600 rounded-xl p-6 text-white flex flex-col justify-between">
           <div>
             <h2 className="font-bold text-lg">Order AIROS Equipment</h2>
-            <p className="text-purple-200 text-sm mt-1">
+            <p className="text-purple-100 text-sm mt-1">
               3-step form — patient info, device selection, review.
             </p>
           </div>

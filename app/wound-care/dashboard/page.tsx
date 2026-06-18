@@ -110,7 +110,7 @@ export default function WoundCareDashboardPage() {
         <div className="bg-emerald-600 rounded-xl p-6 text-white flex flex-col justify-between">
           <div>
             <h2 className="font-bold text-lg">Submit a BV Request</h2>
-            <p className="text-emerald-200 text-sm mt-1">
+            <p className="text-emerald-100 text-sm mt-1">
               Single-page form — takes under 3 minutes.
             </p>
           </div>
