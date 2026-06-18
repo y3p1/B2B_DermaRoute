@@ -47,12 +47,14 @@ import { PracticeTracksTab } from "@/components/clinic-staff/PracticeTracksTab";
 import { SystemSettingsTab } from "@/components/clinic-staff/SystemSettingsTab";
 import { LymphedemaOrdersTab } from "@/components/clinic-staff/LymphedemaOrdersTab";
 import { OcularOrdersTab } from "@/components/clinic-staff/OcularOrdersTab";
+import { AllSubmissionsTab } from "@/components/clinic-staff/AllSubmissionsTab";
 import ProductOrderDataTable from "@/components/dashboard/ProductOrderDataTable";
 import EnhancedOrderModal from "@/components/dashboard/EnhancedOrderModal";
 import ViewProductOrderModal from "@/components/dashboard/ViewProductOrderModal";
 import type { ProductOrderRow } from "@/components/dashboard/productOrderColumns";
 
 type TabKey =
+  | "all_submissions"
   | "product_orders"
   | "bv_requests"
   | "reorder_log"
@@ -164,7 +166,8 @@ export default function ClinicStaffDashboardClient({
   const role = useAuthStore((s) => s.role);
   const token = useAuthStore((s) => s.jwt);
 
-  const [tab, setTab] = React.useState<TabKey>("product_orders");
+  const [tab, setTab] = React.useState<TabKey>("all_submissions");
+  const [woundSubTab, setWoundSubTab] = React.useState<"orders" | "catalog">("orders");
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [bvRequests, setBvRequests] = React.useState<BvRequestRow[]>([]);
   const [bvLoading, setBvLoading] = React.useState(false);
@@ -218,6 +221,7 @@ export default function ClinicStaffDashboardClient({
   React.useEffect(() => {
     const requestedTab = searchParams.get("tab");
     if (
+      requestedTab === "all_submissions" ||
       requestedTab === "product_orders" ||
       requestedTab === "bv_requests" ||
       requestedTab === "reorder_log" ||
@@ -338,16 +342,21 @@ export default function ClinicStaffDashboardClient({
 
   const navItems = [
     {
-      key: "product_orders" as TabKey,
-      label: "Product Orders",
-      icon: <Package className="w-5 h-5" />,
-      badge: productOrders.length,
+      key: "all_submissions" as TabKey,
+      label: "All Submissions",
+      icon: <ClipboardCheck className="w-5 h-5" />,
     },
     {
       key: "bv_requests" as TabKey,
       label: "BV Requests",
       icon: <ClipboardCheck className="w-5 h-5" />,
       badge: bvRequests.filter((r) => r.status === "pending").length,
+    },
+    {
+      key: "product_orders" as TabKey,
+      label: "Wound Care Products",
+      icon: <Package className="w-5 h-5" />,
+      badge: productOrders.length,
     },
     {
       key: "reorder_log" as TabKey,
@@ -375,11 +384,6 @@ export default function ClinicStaffDashboardClient({
       icon: <Eye className="w-5 h-5" />,
     },
     ...(role === "admin" ? [
-      {
-        key: "products" as TabKey,
-        label: "Products Management",
-        icon: <Box className="w-5 h-5" />,
-      },
       {
         key: "manufacturers" as TabKey,
         label: "Manufacturers",
@@ -561,15 +565,17 @@ export default function ClinicStaffDashboardClient({
             </div>
 
             {/* Tab content */}
+            {tab === "all_submissions" ? <AllSubmissionsTab /> : null}
+
             {tab === "product_orders" ? (
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
                 <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                   <div>
                     <div className="text-base font-semibold text-[#18192B]">
-                      Product Orders
+                      Wound Care Products
                     </div>
                     <div className="text-sm text-slate-500">
-                      Manage product orders linked to approved BV requests
+                      Product orders and catalog for wound care
                     </div>
                   </div>
                   <div className="flex flex-col gap-2 sm:flex-row sm:gap-2 sm:shrink-0">
@@ -607,20 +613,43 @@ export default function ClinicStaffDashboardClient({
                   </div>
                 </div>
 
-                {productOrdersError && (
-                  <div className="bg-red-50 rounded-lg p-3 text-sm text-red-600 mb-4 border border-red-100">
-                    {productOrdersError}
+                {/* Pill toggle — admin sees Orders + Product Catalog; clinic_staff sees Orders only */}
+                {role === "admin" && (
+                  <div className="flex gap-1 mb-4 bg-slate-100 rounded-lg p-1 w-fit">
+                    <button
+                      onClick={() => setWoundSubTab("orders")}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${woundSubTab === "orders" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                    >
+                      Orders
+                    </button>
+                    <button
+                      onClick={() => setWoundSubTab("catalog")}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${woundSubTab === "catalog" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                    >
+                      Product Catalog
+                    </button>
                   </div>
                 )}
 
-                <ProductOrderDataTable
-                  rows={productOrders}
-                  loading={productOrdersLoading}
-                  onView={(id) => {
-                    setSelectedProductOrderId(id);
-                    setViewProductOrderModalOpen(true);
-                  }}
-                />
+                {woundSubTab === "catalog" && role === "admin" ? (
+                  <ProductsManagementTab />
+                ) : (
+                  <>
+                    {productOrdersError && (
+                      <div className="bg-red-50 rounded-lg p-3 text-sm text-red-600 mb-4 border border-red-100">
+                        {productOrdersError}
+                      </div>
+                    )}
+                    <ProductOrderDataTable
+                      rows={productOrders}
+                      loading={productOrdersLoading}
+                      onView={(id) => {
+                        setSelectedProductOrderId(id);
+                        setViewProductOrderModalOpen(true);
+                      }}
+                    />
+                  </>
+                )}
               </div>
             ) : null}
 

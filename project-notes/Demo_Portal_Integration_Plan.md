@@ -241,18 +241,18 @@ All 6 tables created via direct SQL script (`scripts/apply-phase1-schema.ts`) �
 
 ---
 
-## Phase 4 — Cross-Module Features ⬜
+## Phase 4 — Cross-Module Features ✅
 
-### 4.1 — All Submissions Unified Tab ⬜
+### 4.1 — All Submissions Unified Tab ✅
 
-- ⬜ `components/clinic-staff/AllSubmissionsTab.tsx` — parallel fetch BV + Medical Devices + Ocular, type badge, type/status filter, "View tab →" per row
-- ⬜ Wire as first nav item in `ClinicStaffDashboardClient.tsx`
+- ✅ `components/clinic-staff/AllSubmissionsTab.tsx` — parallel fetch BV + Medical Devices + Ocular, type badge, type/status filter, "View tab →" per row
+- ✅ Wired as first nav item in `ClinicStaffDashboardClient.tsx`; default tab on load
 
-### 4.2 — Wound Care Tab Unification ⬜
+### 4.2 — Wound Care Tab Unification ✅
 
-- ⬜ Rename "Product Orders" sidebar item → "Wound Care Products"
-- ⬜ Add Orders / Product Catalog pill toggle inside that tab
-- ⬜ Remove separate "Products" sidebar item (catalog moved inside Wound Care tab)
+- ✅ Renamed "Product Orders" sidebar item → "Wound Care Products"
+- ✅ Added Orders / Product Catalog pill toggle (admin-only) inside Wound Care Products tab
+- ✅ Removed "Products Management" from sidebar nav (catalog accessible via pill toggle)
 
 ### 4.3 — Unified Order Status Enum ✅
 
@@ -300,7 +300,7 @@ Already implemented: all three order types use `pending | approved | shipped | c
 | 2.3 — Rep/Admin Tab | ✅ Done | `LymphedemaOrdersTab` wired into clinic-staff dashboard |
 | 2.4 — Lymphedema Product Catalog | ⬜ Not started | |
 | 3 — Ocular Module | ✅ Done | Backend, pages (dashboard/product-info/orders/new/detail), admin tab, route redirect |
-| 4 — Cross-Module Features | ⬜ Not started | All Submissions tab, wound care tab unification |
+| 4 — Cross-Module Features | ✅ Done | All Submissions tab, wound care tab unification |
 | 5 — Demo Seeding | ⬜ Not started | System settings, practice tracks, product catalogs, order seeds, resetDemo |
 
-**Next up:** Phase 4 (cross-module: All Submissions tab, Wound Care tab unification), then Phase 5 (demo seeding). Phase 0.5 and 0.6 deferred.
+**Next up:** Phase 5 (demo seeding — system settings, practice tracks, product catalogs, order seeds, resetDemo update). Phase 0.5 and 0.6 deferred.
