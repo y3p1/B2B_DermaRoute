@@ -4,6 +4,7 @@ import { useEffect, useRef, useCallback } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
 import { isPublicPath } from "@/lib/routeGuard";
+import { isClientDemoMode } from "@/lib/demoMode";
 
 const TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
 const THROTTLE_MS = 60 * 1000; // 1 minute
@@ -40,6 +41,9 @@ export function useInactivityTimeout() {
   }, [resetTimer]);
 
   useEffect(() => {
+    // Demo mode: never auto-logout. logout() would bounce the viewer to /demo,
+    // which looks like a spurious redirect mid-session.
+    if (isClientDemoMode()) return;
     if (status !== "authenticated" || isPublicPath(pathname)) return;
 
     const events = [
