@@ -22,6 +22,7 @@ import {
   Layers,
   Settings,
   Wind,
+  Eye,
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth";
@@ -45,6 +46,7 @@ import { ItsRepresentativesTab } from "@/components/clinic-staff/ItsRepresentati
 import { PracticeTracksTab } from "@/components/clinic-staff/PracticeTracksTab";
 import { SystemSettingsTab } from "@/components/clinic-staff/SystemSettingsTab";
 import { LymphedemaOrdersTab } from "@/components/clinic-staff/LymphedemaOrdersTab";
+import { OcularOrdersTab } from "@/components/clinic-staff/OcularOrdersTab";
 import ProductOrderDataTable from "@/components/dashboard/ProductOrderDataTable";
 import EnhancedOrderModal from "@/components/dashboard/EnhancedOrderModal";
 import ViewProductOrderModal from "@/components/dashboard/ViewProductOrderModal";
@@ -57,6 +59,7 @@ type TabKey =
   | "healing_tracker"
   | "baa_agreements"
   | "lymphedema_orders"
+  | "ocular_orders"
   | "products"
   | "manufacturers"
   | "insurances"
@@ -230,6 +233,7 @@ export default function ClinicStaffDashboardClient({
       requestedTab === "policy_tracker" ||
       requestedTab === "its_representatives" ||
       requestedTab === "lymphedema_orders" ||
+      requestedTab === "ocular_orders" ||
       requestedTab === "practice_tracks" ||
       requestedTab === "system_settings"
     ) {
@@ -364,6 +368,11 @@ export default function ClinicStaffDashboardClient({
       key: "lymphedema_orders" as TabKey,
       label: "Medical Devices / Equipment",
       icon: <Wind className="w-5 h-5" />,
+    },
+    {
+      key: "ocular_orders" as TabKey,
+      label: "Ocular Orders",
+      icon: <Eye className="w-5 h-5" />,
     },
     ...(role === "admin" ? [
       {
@@ -954,6 +963,8 @@ export default function ClinicStaffDashboardClient({
             {tab === "its_representatives" ? <ItsRepresentativesTab /> : null}
 
             {tab === "lymphedema_orders" ? <LymphedemaOrdersTab /> : null}
+
+            {tab === "ocular_orders" ? <OcularOrdersTab /> : null}
 
             {tab === "practice_tracks" ? <PracticeTracksTab /> : null}
 

@@ -29,13 +29,13 @@ These apply throughout every phase below:
 
 These are foundational changes that must land before any new module code.
 
-### 0.1 — Wound Size Input: Manual Only ⬜
+### 0.1 — Wound Size Input: Manual Only ✅
 
 **Files to modify:**
 - `components/dashboard/BVSteps/Step1ClinicalInfo.tsx` — remove dropdown/manual toggle, `woundSizeInputMode` state, `woundSizesList` state, wound-sizes fetch; replace with single `<Input>` field + helper text
 - `db/bv-requests.ts` — widen `woundSize` from `varchar(32)` to `varchar(128)`
 
-### 0.2 — BV Delivery Address Fields ⬜
+### 0.2 — BV Delivery Address Fields ✅
 
 **DB:**
 - `db/bv-requests.ts` — add nullable columns: `delivery_address varchar(256)`, `delivery_city varchar(128)`, `delivery_state varchar(2)`, `delivery_zip varchar(10)`
@@ -66,7 +66,7 @@ Display labels only. DB enum keys unchanged.
 - `components/clinic-staff/SystemSettingsTab.tsx` — rename "Lymphedema Order Submission Email" → "Medical Devices / Equipment Order Submission Email"
 - `app/page.tsx` — update page metadata description
 
-### 0.4 — BAA Vendor Disclaimer ⬜
+### 0.4 — BAA Vendor Disclaimer ✅
 
 **File:** `components/auth/signup/providers/agreement/AgreementPage6.tsx`
 - Add `disclaimerAcknowledged` boolean state
@@ -74,7 +74,7 @@ Display labels only. DB enum keys unchanged.
 - Disable "Agree and Continue" until form valid AND checkbox checked
 - No backend changes
 
-### 0.5 — Rep Territory / Account Assignment Security ⬜
+### 0.5 — Rep Territory / Account Assignment Security 🔄
 
 **Backend — helper functions:**
 - `backend/services/providerAdmin.service.ts` — add `isProviderAssignedToRep(providerId, repId)` and `getAssignedProviderIds(repId)`
@@ -106,7 +106,7 @@ Display labels only. DB enum keys unchanged.
 **Bug fix (pre-existing):**
 - `components/clinic-staff/ProviderAccountsTab.tsx` — fix "Unterminated regexp literal" in `{isAdmin && <td>...</td>}` → add parentheses
 
-### 0.6 — Provider Clinic Address Fields ⬜
+### 0.6 — Provider Clinic Address Fields 🔄
 
 **DB:**
 - `db/provider.ts` — add nullable columns: `clinic_city text`, `clinic_state text`, `clinic_zip text`
@@ -204,32 +204,32 @@ All 6 tables created via direct SQL script (`scripts/apply-phase1-schema.ts`) �
 
 ---
 
-## Phase 3 — Ocular Module ⬜
+## Phase 3 — Ocular Module ✅
 
-### 3.1 — Backend ⬜
+### 3.1 — Backend ✅
 
-- ⬜ `backend/services/ocular.service.ts`
-- ⬜ `backend/controllers/ocular.controller.ts`
-- ⬜ `app/api/ocular/orders/route.ts` (GET, POST)
-- ⬜ `app/api/ocular/orders/[id]/route.ts` (GET, PATCH)
-- ⬜ `sendOcularOrderNotification` in `backend/services/sendgrid.service.ts`
+- ✅ `backend/services/ocular.service.ts`
+- ✅ `backend/controllers/ocular.controller.ts`
+- ✅ `app/api/ocular/orders/route.ts` (GET, POST)
+- ✅ `app/api/ocular/orders/[id]/route.ts` (GET, PATCH)
+- ✅ Email sent inline in controller (demo: fixed address; prod: `ocular_submission_email` system setting)
 
-### 3.2 — Ocular Layout + Navigation ⬜
+### 3.2 — Ocular Layout + Navigation ✅
 
-- ⬜ `app/ocular/layout.tsx` — sidebar nav, teal branding, auth guard (ocular track only)
+- ✅ `app/ocular/layout.tsx` — sidebar nav (Dashboard, Product Info, New Order, Order History), teal branding, auth guard
 
-### 3.3 — Ocular Pages ⬜
+### 3.3 — Ocular Pages ✅
 
-- ⬜ `app/ocular/dashboard/page.tsx`
-- ⬜ `app/ocular/product-info/page.tsx`
-- ⬜ `app/ocular/orders/new/page.tsx`
-- ⬜ `app/ocular/orders/page.tsx`
-- ⬜ `app/ocular/orders/[id]/page.tsx`
+- ✅ `app/ocular/dashboard/page.tsx`
+- ✅ `app/ocular/product-info/page.tsx`
+- ✅ `app/ocular/orders/new/page.tsx`
+- ✅ `app/ocular/orders/page.tsx`
+- ✅ `app/ocular/orders/[id]/page.tsx`
 
-### 3.4 — ITS Rep / Admin UI ⬜
+### 3.4 — ITS Rep / Admin UI ✅
 
-- ⬜ `components/clinic-staff/OcularOrdersTab.tsx`
-- ⬜ Wire into `ClinicStaffDashboardClient.tsx`
+- ✅ `components/clinic-staff/OcularOrdersTab.tsx`
+- ✅ Wired into `ClinicStaffDashboardClient.tsx` as "Ocular Orders" tab
 
 ### 3.5 — Product Catalog: Ocular ⬜
 
@@ -299,8 +299,8 @@ Already implemented: all three order types use `pending | approved | shipped | c
 | 2.2 — Provider Modal | 🔄 Partial | Modal + tab done; PDF download missing |
 | 2.3 — Rep/Admin Tab | ✅ Done | `LymphedemaOrdersTab` wired into clinic-staff dashboard |
 | 2.4 — Lymphedema Product Catalog | ⬜ Not started | |
-| 3 — Ocular Module | ⬜ Not started | Backend, pages, admin tab, product catalog |
+| 3 — Ocular Module | ✅ Done | Backend, pages (dashboard/product-info/orders/new/detail), admin tab, route redirect |
 | 4 — Cross-Module Features | ⬜ Not started | All Submissions tab, wound care tab unification |
 | 5 — Demo Seeding | ⬜ Not started | System settings, practice tracks, product catalogs, order seeds, resetDemo |
 
-**Next up:** Phase 0.1 (wound size input manual only), then 0.2 (BV delivery address fields), then 0.4 (BAA disclaimer), then Phase 3 (Ocular).
+**Next up:** Phase 4 (cross-module: All Submissions tab, Wound Care tab unification), then Phase 5 (demo seeding). Phase 0.5 and 0.6 deferred.

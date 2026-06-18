@@ -37,6 +37,7 @@ export function getAuthenticatedRedirect(
   if (enabledTracks.length === 0) return "/no-tracks";
   if (enabledTracks.includes("wound_care") || enabledTracks.includes("lymphedema"))
     return "/dashboard";
-  // ocular-only: ocular module not yet built, stay on landing page
+  if (enabledTracks.includes("ocular"))
+    return "/ocular/dashboard";
   return "/";
 }
