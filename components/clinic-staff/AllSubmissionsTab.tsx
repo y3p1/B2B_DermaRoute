@@ -20,7 +20,7 @@ type UnifiedRow = {
 
 const TYPE_META: Record<SubmissionType, { label: string; tab: string; icon: React.ReactNode; color: string }> = {
   bv_request: {
-    label: "BV Request",
+    label: "Wound Care",
     tab: "bv_requests",
     icon: <ClipboardCheck className="w-3.5 h-3.5" />,
     color: "bg-blue-100 text-blue-700",

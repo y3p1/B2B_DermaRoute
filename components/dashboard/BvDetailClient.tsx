@@ -257,7 +257,7 @@ export default function BvDetailClient({
           initialData={defaultValues}
           id={bv?.id}
           mode="edit"
-          onCreated={() => router.push("/dashboard")}
+          onCreated={() => router.push("/wound-care/orders")}
         />
       )}
 

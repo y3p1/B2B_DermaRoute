@@ -10,6 +10,7 @@ import {
 import { getProviderProfileByUserId } from "../services/bvRequests.service";
 import { getAssignedProviderIds, isProviderAssignedToRep } from "../services/providerAdmin.service";
 import { getClinicStaffProfileByUserId } from "../services/clinicStaffAcct.service";
+import { getAdminProfileByUserId } from "../services/adminAcct.service";
 import { isDemoMode } from "../../lib/demoMode";
 import { getSetting } from "../services/systemSettings.service";
 import { sendEmail } from "../services/sendgrid.service";
@@ -21,25 +22,41 @@ function getLastPathSegment(url: string): string | null {
 
 export async function listLymphedemaOrdersController(req: Request, res: Response) {
   const userId = res.locals.userId as string;
-  const role = res.locals.adminRole as string | undefined;
+  const demoRole = res.locals.demoRole as string | undefined;
 
-  if (role === "admin") {
+  if (isDemoMode()) {
+    if (demoRole === "admin" || demoRole === "clinic_staff") {
+      const orders = await getLymphedemaOrders();
+      return res.json({ success: true, data: orders });
+    }
+    const provider = await getProviderProfileByUserId(userId);
+    if (provider) {
+      const orders = await getLymphedemaOrders({ providerIds: [provider.id] });
+      return res.json({ success: true, data: orders });
+    }
+    return res.status(403).json({ error: "Forbidden" });
+  }
+
+  const adminProfile = await getAdminProfileByUserId(userId);
+  if (adminProfile) {
     const orders = await getLymphedemaOrders();
     return res.json({ success: true, data: orders });
   }
 
-  // clinic_staff / rep
   const clinicStaff = await getClinicStaffProfileByUserId(userId);
-  if (!clinicStaff) return res.status(403).json({ error: "Forbidden" });
-
-  if (!isDemoMode()) {
+  if (clinicStaff) {
     const providerIds = await getAssignedProviderIds(clinicStaff.id);
     const orders = await getLymphedemaOrders({ providerIds });
     return res.json({ success: true, data: orders });
   }
 
-  const orders = await getLymphedemaOrders();
-  return res.json({ success: true, data: orders });
+  const provider = await getProviderProfileByUserId(userId);
+  if (provider) {
+    const orders = await getLymphedemaOrders({ providerIds: [provider.id] });
+    return res.json({ success: true, data: orders });
+  }
+
+  return res.status(403).json({ error: "Forbidden" });
 }
 
 export async function createLymphedemaOrderController(req: Request, res: Response) {
@@ -91,23 +108,46 @@ export async function createLymphedemaOrderController(req: Request, res: Respons
 
 export async function getLymphedemaOrderController(req: Request, res: Response) {
   const userId = res.locals.userId as string;
-  const role = res.locals.adminRole as string | undefined;
+  const demoRole = res.locals.demoRole as string | undefined;
   const id = getLastPathSegment(req.url);
   if (!id) return res.status(400).json({ error: "id required" });
 
   const order = await getLymphedemaOrder(id);
   if (!order) return res.status(404).json({ error: "Not found" });
 
-  if (role !== "admin") {
-    const clinicStaff = await getClinicStaffProfileByUserId(userId);
-    if (!clinicStaff) return res.status(403).json({ error: "Forbidden" });
-    if (!isDemoMode() && order.providerId) {
+  if (isDemoMode()) {
+    if (demoRole === "admin" || demoRole === "clinic_staff") {
+      return res.json({ success: true, data: order });
+    }
+    const provider = await getProviderProfileByUserId(userId);
+    if (!provider) return res.status(403).json({ error: "Forbidden" });
+    if (order.providerId && order.providerId !== provider.id) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    return res.json({ success: true, data: order });
+  }
+
+  const adminProfile = await getAdminProfileByUserId(userId);
+  if (adminProfile) return res.json({ success: true, data: order });
+
+  const clinicStaff = await getClinicStaffProfileByUserId(userId);
+  if (clinicStaff) {
+    if (order.providerId) {
       const allowed = await isProviderAssignedToRep(order.providerId, clinicStaff.id);
       if (!allowed) return res.status(403).json({ error: "Forbidden" });
     }
+    return res.json({ success: true, data: order });
   }
 
-  return res.json({ success: true, data: order });
+  const provider = await getProviderProfileByUserId(userId);
+  if (provider) {
+    if (order.providerId && order.providerId !== provider.id) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    return res.json({ success: true, data: order });
+  }
+
+  return res.status(403).json({ error: "Forbidden" });
 }
 
 const updateStatusSchema = z.object({

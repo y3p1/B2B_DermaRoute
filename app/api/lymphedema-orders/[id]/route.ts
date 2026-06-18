@@ -15,7 +15,7 @@ const baseRateLimit = rateLimit({ windowMs: 60_000, max: 60 });
 
 export async function GET(request: Request) {
   return runServerPipeline(request, {
-    middlewares: [cors, baseRateLimit, requireAuth, requireAdminOrClinicStaff],
+    middlewares: [cors, baseRateLimit, requireAuth],
     handler: (req, res, next) => {
       void getLymphedemaOrderController(req, res)
         .then(() => next())

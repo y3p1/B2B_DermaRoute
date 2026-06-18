@@ -44,6 +44,41 @@ const EMPTY_FORM: FormState = {
   description: "",
 };
 
+const inputCls =
+  "w-full text-xs border border-slate-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500";
+
+function FormRow({
+  form,
+  onChange,
+}: {
+  form: FormState;
+  onChange: (k: keyof FormState, v: string) => void;
+}) {
+  return (
+    <tr className="bg-blue-50/40">
+      <td className="px-3 py-2">
+        <input className={inputCls} value={form.name} onChange={(e) => onChange("name", e.target.value)} placeholder="Name*" />
+      </td>
+      <td className="px-3 py-2">
+        <input className={inputCls} value={form.device} onChange={(e) => onChange("device", e.target.value)} placeholder="Device" />
+      </td>
+      <td className="px-3 py-2">
+        <input className={inputCls} value={form.hcpcs} onChange={(e) => onChange("hcpcs", e.target.value)} placeholder="HCPCS" />
+      </td>
+      <td className="px-3 py-2">
+        <input className={inputCls} value={form.manufacturer} onChange={(e) => onChange("manufacturer", e.target.value)} placeholder="Manufacturer" />
+      </td>
+      <td className="px-3 py-2">
+        <input className={inputCls} value={form.extremityType} onChange={(e) => onChange("extremityType", e.target.value)} placeholder="Extremity" />
+      </td>
+      <td className="px-3 py-2">
+        <input className={inputCls} value={form.description} onChange={(e) => onChange("description", e.target.value)} placeholder="Description" />
+      </td>
+      <td className="px-3 py-2" />
+    </tr>
+  );
+}
+
 export function LymphedemaProductsCatalogTab() {
   const token = useAuthStore((s) => s.jwt);
   const [products, setProducts] = React.useState<LymphedemaProduct[]>([]);
@@ -153,41 +188,6 @@ export function LymphedemaProductsCatalogTab() {
     } finally {
       setSaving(false);
     }
-  }
-
-  const inputCls =
-    "w-full text-xs border border-slate-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500";
-
-  function FormRow({
-    form,
-    onChange,
-  }: {
-    form: FormState;
-    onChange: (k: keyof FormState, v: string) => void;
-  }) {
-    return (
-      <tr className="bg-blue-50/40">
-        <td className="px-3 py-2">
-          <input className={inputCls} value={form.name} onChange={(e) => onChange("name", e.target.value)} placeholder="Name*" />
-        </td>
-        <td className="px-3 py-2">
-          <input className={inputCls} value={form.device} onChange={(e) => onChange("device", e.target.value)} placeholder="Device" />
-        </td>
-        <td className="px-3 py-2">
-          <input className={inputCls} value={form.hcpcs} onChange={(e) => onChange("hcpcs", e.target.value)} placeholder="HCPCS" />
-        </td>
-        <td className="px-3 py-2">
-          <input className={inputCls} value={form.manufacturer} onChange={(e) => onChange("manufacturer", e.target.value)} placeholder="Manufacturer" />
-        </td>
-        <td className="px-3 py-2">
-          <input className={inputCls} value={form.extremityType} onChange={(e) => onChange("extremityType", e.target.value)} placeholder="Extremity" />
-        </td>
-        <td className="px-3 py-2">
-          <input className={inputCls} value={form.description} onChange={(e) => onChange("description", e.target.value)} placeholder="Description" />
-        </td>
-        <td className="px-3 py-2" />
-      </tr>
-    );
   }
 
   return (

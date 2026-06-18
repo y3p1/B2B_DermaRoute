@@ -37,6 +37,46 @@ const VARIANT_LABELS: Record<string, string> = {
   thick: "Thick (200μm)",
 };
 
+const inputCls =
+  "w-full text-xs border border-slate-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-teal-500";
+
+function FormRow({
+  form,
+  onChange,
+}: {
+  form: FormState;
+  onChange: (k: keyof FormState, v: string) => void;
+}) {
+  return (
+    <tr className="bg-teal-50/40">
+      <td className="px-3 py-2">
+        <input className={inputCls} value={form.name} onChange={(e) => onChange("name", e.target.value)} placeholder="Name*" />
+      </td>
+      <td className="px-3 py-2">
+        <select
+          className={inputCls}
+          value={form.productVariant}
+          onChange={(e) => onChange("productVariant", e.target.value)}
+        >
+          <option value="">Select variant*</option>
+          <option value="thin">Thin (45μm)</option>
+          <option value="thick">Thick (200μm)</option>
+        </select>
+      </td>
+      <td className="px-3 py-2">
+        <input className={inputCls} value={form.sizeMm} onChange={(e) => onChange("sizeMm", e.target.value)} placeholder="Size (mm)*" type="number" min="1" />
+      </td>
+      <td className="px-3 py-2">
+        <input className={inputCls} value={form.sku} onChange={(e) => onChange("sku", e.target.value)} placeholder="SKU*" />
+      </td>
+      <td className="px-3 py-2">
+        <input className={inputCls} value={form.description} onChange={(e) => onChange("description", e.target.value)} placeholder="Description" />
+      </td>
+      <td className="px-3 py-2" />
+    </tr>
+  );
+}
+
 export function OcularProductsCatalogTab() {
   const token = useAuthStore((s) => s.jwt);
   const [products, setProducts] = React.useState<OcularProduct[]>([]);
@@ -132,46 +172,6 @@ export function OcularProductsCatalogTab() {
     } finally {
       setSaving(false);
     }
-  }
-
-  const inputCls =
-    "w-full text-xs border border-slate-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-teal-500";
-
-  function FormRow({
-    form,
-    onChange,
-  }: {
-    form: FormState;
-    onChange: (k: keyof FormState, v: string) => void;
-  }) {
-    return (
-      <tr className="bg-teal-50/40">
-        <td className="px-3 py-2">
-          <input className={inputCls} value={form.name} onChange={(e) => onChange("name", e.target.value)} placeholder="Name*" />
-        </td>
-        <td className="px-3 py-2">
-          <select
-            className={inputCls}
-            value={form.productVariant}
-            onChange={(e) => onChange("productVariant", e.target.value)}
-          >
-            <option value="">Select variant*</option>
-            <option value="thin">Thin (45μm)</option>
-            <option value="thick">Thick (200μm)</option>
-          </select>
-        </td>
-        <td className="px-3 py-2">
-          <input className={inputCls} value={form.sizeMm} onChange={(e) => onChange("sizeMm", e.target.value)} placeholder="Size (mm)*" type="number" min="1" />
-        </td>
-        <td className="px-3 py-2">
-          <input className={inputCls} value={form.sku} onChange={(e) => onChange("sku", e.target.value)} placeholder="SKU*" />
-        </td>
-        <td className="px-3 py-2">
-          <input className={inputCls} value={form.description} onChange={(e) => onChange("description", e.target.value)} placeholder="Description" />
-        </td>
-        <td className="px-3 py-2" />
-      </tr>
-    );
   }
 
   const canSaveNew =

@@ -4,6 +4,7 @@ import {
 } from "../../../backend/controllers/systemSettings.controller";
 import { corsMiddleware } from "../../../backend/middlewares/cors";
 import { errorHandler } from "../../../backend/middlewares/errorHandler";
+import { requireAuth } from "../../../backend/middlewares/requireAuth";
 import { requireAdmin } from "../../../backend/middlewares/requireAdmin";
 import { rateLimit } from "../../../backend/middlewares/rateLimit";
 import { getAllowedOrigins } from "../../../backend/config/env";
@@ -14,7 +15,7 @@ const baseRateLimit = rateLimit({ windowMs: 60_000, max: 60 });
 
 export async function GET(request: Request) {
   return runServerPipeline(request, {
-    middlewares: [cors, baseRateLimit, requireAdmin],
+    middlewares: [cors, baseRateLimit, requireAuth, requireAdmin],
     handler: (req, res, next) => {
       void listSystemSettingsController(req, res)
         .then(() => next())
@@ -26,7 +27,7 @@ export async function GET(request: Request) {
 
 export async function PUT(request: Request) {
   return runServerPipeline(request, {
-    middlewares: [cors, baseRateLimit, requireAdmin],
+    middlewares: [cors, baseRateLimit, requireAuth, requireAdmin],
     handler: (req, res, next) => {
       void upsertSystemSettingController(req, res)
         .then(() => next())

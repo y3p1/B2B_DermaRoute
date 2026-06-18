@@ -94,7 +94,7 @@ export default function BaaProviderViewPageClient({ id }: { id: string }) {
   };
 
   const onBack = () => {
-    router.push("/dashboard?tab=baa_agreements");
+    router.push("/wound-care/baa-agreements");
   };
 
   const noOp = () => {};
@@ -120,7 +120,7 @@ export default function BaaProviderViewPageClient({ id }: { id: string }) {
 
           <div className="flex justify-center gap-4 mb-4">
             <Button asChild variant="outline">
-              <Link href="/dashboard?tab=baa_agreements">
+              <Link href="/wound-care/baa-agreements">
                 Back to BAA Provider Agreements
               </Link>
             </Button>

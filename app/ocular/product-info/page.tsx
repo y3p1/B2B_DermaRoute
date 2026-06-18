@@ -2,17 +2,23 @@
 
 import * as React from "react";
 import { Eye, Microscope, BookOpen, DollarSign } from "lucide-react";
+import { apiGet } from "@/lib/apiClient";
+import { useAuthStore } from "@/store/auth";
 
-const VISIDISC_SKUS = [
-  { sku: "VS4508", variant: "Thin (45μm)", size: "8mm" },
-  { sku: "VS4510", variant: "Thin (45μm)", size: "10mm" },
-  { sku: "VS4512", variant: "Thin (45μm)", size: "12mm" },
-  { sku: "VS4515", variant: "Thin (45μm)", size: "15mm" },
-  { sku: "VS20008", variant: "Thick (200μm)", size: "8mm" },
-  { sku: "VS20010", variant: "Thick (200μm)", size: "10mm" },
-  { sku: "VS20012", variant: "Thick (200μm)", size: "12mm" },
-  { sku: "VS20015", variant: "Thick (200μm)", size: "15mm" },
-];
+type OcularProduct = {
+  id: string;
+  name: string;
+  productVariant: string;
+  sizeMm: number;
+  sku: string;
+  description: string | null;
+  archived: boolean;
+};
+
+const VARIANT_LABELS: Record<string, string> = {
+  thin: "Thin (45μm)",
+  thick: "Thick (200μm)",
+};
 
 const INDICATIONS = [
   "Persistent epithelial defects",
@@ -43,6 +49,19 @@ const ICD10_CODES = [
 ];
 
 export default function OcularProductInfoPage() {
+  const token = useAuthStore((s) => s.jwt);
+  const [products, setProducts] = React.useState<OcularProduct[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    void apiGet<{ success: true; data: OcularProduct[] }>("/api/ocular/products", {
+      token: token ?? "",
+    })
+      .then((res) => setProducts(res.data.filter((p) => !p.archived)))
+      .catch(() => undefined)
+      .finally(() => setLoading(false));
+  }, [token]);
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-10">
       {/* Header */}
@@ -94,24 +113,38 @@ export default function OcularProductInfoPage() {
 
       {/* SKU Catalog */}
       <div className="bg-white rounded-xl border border-teal-100 p-6 shadow-sm">
-        <h2 className="font-semibold text-slate-800 text-lg mb-4">Product Catalog — 8 SKUs</h2>
+        <h2 className="font-semibold text-slate-800 text-lg mb-4">
+          Product Catalog{!loading && products.length > 0 ? ` — ${products.length} SKU${products.length !== 1 ? "s" : ""}` : ""}
+        </h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-teal-50 text-teal-800">
                 <th className="text-left px-4 py-2.5 font-medium rounded-l-lg">SKU</th>
+                <th className="text-left px-4 py-2.5 font-medium">Name</th>
                 <th className="text-left px-4 py-2.5 font-medium">Variant</th>
                 <th className="text-left px-4 py-2.5 font-medium rounded-r-lg">Size</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {VISIDISC_SKUS.map((s) => (
-                <tr key={s.sku} className="hover:bg-slate-50">
-                  <td className="px-4 py-2.5 font-mono text-xs text-slate-700">{s.sku}</td>
-                  <td className="px-4 py-2.5 text-slate-600">{s.variant}</td>
-                  <td className="px-4 py-2.5 text-slate-600">{s.size}</td>
+              {loading ? (
+                <tr>
+                  <td colSpan={4} className="px-4 py-6 text-center text-sm text-slate-400">Loading…</td>
                 </tr>
-              ))}
+              ) : products.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-4 py-6 text-center text-sm text-slate-400">No products available.</td>
+                </tr>
+              ) : (
+                products.map((p) => (
+                  <tr key={p.id} className="hover:bg-slate-50">
+                    <td className="px-4 py-2.5 font-mono text-xs text-slate-700">{p.sku}</td>
+                    <td className="px-4 py-2.5 text-slate-700 font-medium">{p.name}</td>
+                    <td className="px-4 py-2.5 text-slate-600">{VARIANT_LABELS[p.productVariant] ?? p.productVariant}</td>
+                    <td className="px-4 py-2.5 text-slate-600">{p.sizeMm}mm</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
