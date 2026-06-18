@@ -16,6 +16,11 @@ import { seedDemoCmsPolicy } from "../../backend/scripts/demo/seedDemoCmsPolicy"
 import { seedDemoCoveragePlans } from "../../backend/scripts/demo/seedDemoCoveragePlans";
 import { seedDemoAuditLogs } from "../../backend/scripts/demo/seedDemoAuditLogs";
 import { seedWoundSizes } from "../../backend/scripts/seedBV";
+import { seedDemoSystemSettings } from "../../backend/scripts/demo/seedDemoSystemSettings";
+import { seedDemoPracticeTracks } from "../../backend/scripts/demo/seedDemoPracticeTracks";
+import { seedDemoProductCatalogs } from "../../backend/scripts/demo/seedDemoProductCatalogs";
+import { seedDemoLymphedemaOrders } from "../../backend/scripts/demo/seedDemoLymphedemaOrders";
+import { seedDemoOcularOrders } from "../../backend/scripts/demo/seedDemoOcularOrders";
 
 const PROD_URL_FRAGMENT = process.env.PROD_DB_URL_FRAGMENT ?? "";
 
@@ -47,7 +52,13 @@ export async function runDemoReset(): Promise<{ rowsCreated: number; tables: str
       bv_requests,
       baa_provider,
       coverage_plans,
-      cms_policy_updates
+      cms_policy_updates,
+      lymphedema_orders,
+      ocular_orders,
+      lymphedema_products,
+      ocular_products,
+      practice_tracks,
+      system_settings
     RESTART IDENTITY CASCADE
   `);
 
@@ -82,6 +93,13 @@ export async function runDemoReset(): Promise<{ rowsCreated: number; tables: str
   track("wound_measurements", await seedDemoWoundMeasurements());
   track("order_products", await seedDemoOrderProducts());
   track("audit_logs", await seedDemoAuditLogs());
+
+  // Phase 5 — new module seeds
+  track("system_settings", await seedDemoSystemSettings());
+  track("practice_tracks", await seedDemoPracticeTracks());
+  track("product_catalogs", await seedDemoProductCatalogs());
+  track("lymphedema_orders", await seedDemoLymphedemaOrders());
+  track("ocular_orders", await seedDemoOcularOrders());
 
   const elapsed = ((Date.now() - start) / 1000).toFixed(1);
   console.log(`[demo-reset] Done in ${elapsed}s. ${total} rows created.`);
