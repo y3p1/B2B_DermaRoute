@@ -22,6 +22,7 @@ import type { BVFormData } from "@/components/dashboard/BvModal";
 import ViewProductOrderModal from "@/components/dashboard/ViewProductOrderModal";
 import EnhancedOrderModal from "@/components/dashboard/EnhancedOrderModal";
 import { LymphedemaOrderModal } from "@/components/dashboard/LymphedemaOrderModal";
+import { LymphedemaOrderPdfButton } from "@/components/dashboard/LymphedemaOrderPdf";
 import type { ProductOrderRow } from "@/components/dashboard/productOrderColumns";
 
 type TabKey = "bv_requests" | "order_products" | "baa_agreements" | "lymphedema_orders";
@@ -944,6 +945,7 @@ export default function ProviderDashboardClient() {
                           <th className="px-4 py-3 font-medium text-slate-600">Device</th>
                           <th className="px-4 py-3 font-medium text-slate-600">Extremity</th>
                           <th className="px-4 py-3 font-medium text-slate-600">Status</th>
+                          <th className="px-4 py-3" />
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
@@ -967,6 +969,9 @@ export default function ProviderDashboardClient() {
                               }`}>
                                 {order.status}
                               </span>
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <LymphedemaOrderPdfButton orderId={order.id} token={token} />
                             </td>
                           </tr>
                         ))}

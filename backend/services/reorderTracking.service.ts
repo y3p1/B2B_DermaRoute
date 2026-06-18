@@ -1,4 +1,4 @@
-import { eq, desc, isNotNull } from "drizzle-orm";
+import { eq, desc, isNotNull, and } from "drizzle-orm";
 import { getDb } from "./db";
 import { orderProducts } from "../../db/bv-products";
 import { bvRequests } from "../../db/bv-requests";
@@ -21,7 +21,7 @@ export type ReorderTrackingRow = {
   healingStatus: HealingStatus;
 };
 
-export async function getReorderTrackingData(): Promise<{
+export async function getReorderTrackingData(repId?: string): Promise<{
   data: ReorderTrackingRow[];
   threshold: number;
 }> {
@@ -31,9 +31,8 @@ export async function getReorderTrackingData(): Promise<{
   const thresholdSetting = await getSettingByKey("reorder_days_threshold");
   const threshold = thresholdSetting ? parseInt(thresholdSetting.value, 10) : 30;
 
-  // Query: join order_products + bv_requests + provider_acct + products
-  // Use leftJoin for provider and products so records without linked providers still appear
-  const rows = await db
+  // When scoped to a rep, innerJoin providerAcct filtering by assignedRepId
+  const baseQuery = db
     .select({
       bvRequestId: bvRequests.id,
       initials: bvRequests.initials,
@@ -48,10 +47,23 @@ export async function getReorderTrackingData(): Promise<{
     })
     .from(orderProducts)
     .innerJoin(bvRequests, eq(orderProducts.bvRequestId, bvRequests.id))
-    .leftJoin(providerAcct, eq(bvRequests.providerId, providerAcct.id))
-    .leftJoin(products, eq(orderProducts.productId, products.id))
-    .where(isNotNull(bvRequests.initials))
-    .orderBy(desc(bvRequests.applicationDate));
+    .leftJoin(products, eq(orderProducts.productId, products.id));
+
+  const rows = repId
+    ? await baseQuery
+        .innerJoin(
+          providerAcct,
+          and(
+            eq(bvRequests.providerId, providerAcct.id),
+            eq(providerAcct.assignedRepId, repId),
+          ),
+        )
+        .where(isNotNull(bvRequests.initials))
+        .orderBy(desc(bvRequests.applicationDate))
+    : await baseQuery
+        .leftJoin(providerAcct, eq(bvRequests.providerId, providerAcct.id))
+        .where(isNotNull(bvRequests.initials))
+        .orderBy(desc(bvRequests.applicationDate));
 
   // Group by patient — use providerId when available, fall back to bvRequestId
   const patientMap = new Map<

@@ -47,15 +47,17 @@ export async function GET(
           return res.json({ success: true, data: found });
         }
 
-        // Clinic staff can only access BV requests for assigned providers
+        // Clinic staff can access BV requests; in non-demo mode, only for assigned providers
         if (clinicStaff) {
           const found = await getBvRequestById(id);
           if (!found) return res.status(404).json({ error: "Not found" });
-          const allowed = await isProviderAssignedToRep(
-            found.providerId ?? "",
-            clinicStaff.id,
-          );
-          if (!allowed) return res.status(403).json({ error: "Access denied" });
+          if (!isDemoMode()) {
+            const allowed = await isProviderAssignedToRep(
+              found.providerId ?? "",
+              clinicStaff.id,
+            );
+            if (!allowed) return res.status(403).json({ error: "Access denied" });
+          }
           return res.json({ success: true, data: found });
         }
 

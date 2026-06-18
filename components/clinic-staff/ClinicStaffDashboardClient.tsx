@@ -46,7 +46,9 @@ import { ItsRepresentativesTab } from "@/components/clinic-staff/ItsRepresentati
 import { PracticeTracksTab } from "@/components/clinic-staff/PracticeTracksTab";
 import { SystemSettingsTab } from "@/components/clinic-staff/SystemSettingsTab";
 import { LymphedemaOrdersTab } from "@/components/clinic-staff/LymphedemaOrdersTab";
+import { LymphedemaProductsCatalogTab } from "@/components/clinic-staff/LymphedemaProductsCatalogTab";
 import { OcularOrdersTab } from "@/components/clinic-staff/OcularOrdersTab";
+import { OcularProductsCatalogTab } from "@/components/clinic-staff/OcularProductsCatalogTab";
 import { AllSubmissionsTab } from "@/components/clinic-staff/AllSubmissionsTab";
 import ProductOrderDataTable from "@/components/dashboard/ProductOrderDataTable";
 import EnhancedOrderModal from "@/components/dashboard/EnhancedOrderModal";
@@ -168,6 +170,8 @@ export default function ClinicStaffDashboardClient({
 
   const [tab, setTab] = React.useState<TabKey>("all_submissions");
   const [woundSubTab, setWoundSubTab] = React.useState<"orders" | "catalog">("orders");
+  const [lymphedemaSubTab, setLymphedemaSubTab] = React.useState<"orders" | "catalog">("orders");
+  const [ocularSubTab, setOcularSubTab] = React.useState<"orders" | "catalog">("orders");
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [bvRequests, setBvRequests] = React.useState<BvRequestRow[]>([]);
   const [bvLoading, setBvLoading] = React.useState(false);
@@ -991,9 +995,57 @@ export default function ClinicStaffDashboardClient({
 
             {tab === "its_representatives" ? <ItsRepresentativesTab /> : null}
 
-            {tab === "lymphedema_orders" ? <LymphedemaOrdersTab /> : null}
+            {tab === "lymphedema_orders" ? (
+              <div className="space-y-4">
+                {role === "admin" && (
+                  <div className="flex gap-1 bg-slate-100 rounded-lg p-1 w-fit">
+                    <button
+                      onClick={() => setLymphedemaSubTab("orders")}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${lymphedemaSubTab === "orders" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                    >
+                      Orders
+                    </button>
+                    <button
+                      onClick={() => setLymphedemaSubTab("catalog")}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${lymphedemaSubTab === "catalog" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                    >
+                      Product Catalog
+                    </button>
+                  </div>
+                )}
+                {lymphedemaSubTab === "catalog" && role === "admin" ? (
+                  <LymphedemaProductsCatalogTab />
+                ) : (
+                  <LymphedemaOrdersTab />
+                )}
+              </div>
+            ) : null}
 
-            {tab === "ocular_orders" ? <OcularOrdersTab /> : null}
+            {tab === "ocular_orders" ? (
+              <div className="space-y-4">
+                {role === "admin" && (
+                  <div className="flex gap-1 bg-slate-100 rounded-lg p-1 w-fit">
+                    <button
+                      onClick={() => setOcularSubTab("orders")}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${ocularSubTab === "orders" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                    >
+                      Orders
+                    </button>
+                    <button
+                      onClick={() => setOcularSubTab("catalog")}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${ocularSubTab === "catalog" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                    >
+                      Product Catalog
+                    </button>
+                  </div>
+                )}
+                {ocularSubTab === "catalog" && role === "admin" ? (
+                  <OcularProductsCatalogTab />
+                ) : (
+                  <OcularOrdersTab />
+                )}
+              </div>
+            ) : null}
 
             {tab === "practice_tracks" ? <PracticeTracksTab /> : null}
 

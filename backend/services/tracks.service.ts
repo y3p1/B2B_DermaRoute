@@ -1,6 +1,6 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import { getDb } from "./db";
-import { practiceTracks } from "../../db/schema";
+import { practiceTracks, providerAcct } from "../../db/schema";
 
 const VALID_TRACKS = ["wound_care", "lymphedema", "ocular"] as const;
 export type TrackKey = (typeof VALID_TRACKS)[number];
@@ -25,6 +25,39 @@ export async function getTracksForAllProviders(): Promise<Record<string, TrackKe
     .select({ providerId: practiceTracks.providerId, track: practiceTracks.track })
     .from(practiceTracks)
     .where(eq(practiceTracks.enabled, true));
+
+  const map: Record<string, TrackKey[]> = {};
+  for (const row of rows) {
+    if (!row.providerId) continue;
+    if (!map[row.providerId]) map[row.providerId] = [];
+    map[row.providerId].push(row.track as TrackKey);
+  }
+  return map;
+}
+
+export async function getTracksForRepProviders(
+  repId: string,
+): Promise<Record<string, TrackKey[]>> {
+  const db = getDb();
+
+  const assignedProviders = await db
+    .select({ id: providerAcct.id })
+    .from(providerAcct)
+    .where(eq(providerAcct.assignedRepId, repId));
+
+  if (assignedProviders.length === 0) return {};
+
+  const providerIds = assignedProviders.map((p) => p.id);
+
+  const rows = await db
+    .select({ providerId: practiceTracks.providerId, track: practiceTracks.track })
+    .from(practiceTracks)
+    .where(
+      and(
+        eq(practiceTracks.enabled, true),
+        inArray(practiceTracks.providerId, providerIds),
+      ),
+    );
 
   const map: Record<string, TrackKey[]> = {};
   for (const row of rows) {
