@@ -17,27 +17,27 @@ type ServiceCard = {
 const SERVICES: ServiceCard[] = [
   {
     track: "wound_care",
-    label: "Wound Care",
+    label: "Tissue Products & PRP (Biologics)",
     description:
       "Submit benefit verifications, track wound healing, and manage product orders for wound care patients.",
     href: "/dashboard",
     icon: Activity,
   },
   {
-    track: "lymphedema",
-    label: "Compression Equipment",
-    description:
-      "Order compression garments and pneumatic compression devices for lymphedema and venous disease patients.",
-    href: "/dashboard",
-    icon: Wind,
-  },
-  {
     track: "ocular",
-    label: "Ocular Surface",
+    label: "Ocular Products",
     description:
       "Submit orders for amniotic membrane grafts and other ocular surface products.",
     href: "/ocular",
     icon: Eye,
+  },
+  {
+    track: "lymphedema",
+    label: "Medical Devices / Equipment",
+    description:
+      "AIROS Compression Pump & Garment Ordering",
+    href: "/dashboard",
+    icon: Wind,
   },
 ];
 

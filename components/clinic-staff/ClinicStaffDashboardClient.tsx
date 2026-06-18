@@ -21,6 +21,7 @@ import {
   Users,
   Layers,
   Settings,
+  Wind,
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth";
@@ -43,6 +44,7 @@ import { PolicyTrackerTab } from "@/components/clinic-staff/PolicyTrackerTab";
 import { ItsRepresentativesTab } from "@/components/clinic-staff/ItsRepresentativesTab";
 import { PracticeTracksTab } from "@/components/clinic-staff/PracticeTracksTab";
 import { SystemSettingsTab } from "@/components/clinic-staff/SystemSettingsTab";
+import { LymphedemaOrdersTab } from "@/components/clinic-staff/LymphedemaOrdersTab";
 import ProductOrderDataTable from "@/components/dashboard/ProductOrderDataTable";
 import EnhancedOrderModal from "@/components/dashboard/EnhancedOrderModal";
 import ViewProductOrderModal from "@/components/dashboard/ViewProductOrderModal";
@@ -54,6 +56,7 @@ type TabKey =
   | "reorder_log"
   | "healing_tracker"
   | "baa_agreements"
+  | "lymphedema_orders"
   | "products"
   | "manufacturers"
   | "insurances"
@@ -226,6 +229,7 @@ export default function ClinicStaffDashboardClient({
       requestedTab === "audit_logs" ||
       requestedTab === "policy_tracker" ||
       requestedTab === "its_representatives" ||
+      requestedTab === "lymphedema_orders" ||
       requestedTab === "practice_tracks" ||
       requestedTab === "system_settings"
     ) {
@@ -355,6 +359,11 @@ export default function ClinicStaffDashboardClient({
       key: "baa_agreements" as TabKey,
       label: "BAA Provider Agreements",
       icon: <FileText className="w-5 h-5" />,
+    },
+    {
+      key: "lymphedema_orders" as TabKey,
+      label: "Medical Devices / Equipment",
+      icon: <Wind className="w-5 h-5" />,
     },
     ...(role === "admin" ? [
       {
@@ -943,6 +952,8 @@ export default function ClinicStaffDashboardClient({
             {tab === "policy_tracker" ? <PolicyTrackerTab /> : null}
 
             {tab === "its_representatives" ? <ItsRepresentativesTab /> : null}
+
+            {tab === "lymphedema_orders" ? <LymphedemaOrdersTab /> : null}
 
             {tab === "practice_tracks" ? <PracticeTracksTab /> : null}
 

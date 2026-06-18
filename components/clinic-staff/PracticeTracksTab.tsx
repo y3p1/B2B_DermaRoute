@@ -8,9 +8,9 @@ import { useAuthStore } from "@/store/auth";
 type TrackKey = "wound_care" | "lymphedema" | "ocular";
 
 const TRACK_LABELS: Record<TrackKey, string> = {
-  wound_care: "Wound Care",
-  lymphedema: "Compression Equipment",
-  ocular: "Ocular Surface",
+  wound_care: "Tissue Products & PRP (Biologics)",
+  lymphedema: "Medical Devices / Equipment",
+  ocular: "Ocular Products",
 };
 
 const ALL_TRACKS: TrackKey[] = ["wound_care", "lymphedema", "ocular"];

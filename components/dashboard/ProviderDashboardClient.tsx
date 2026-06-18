@@ -8,6 +8,7 @@ import {
   FileText,
   X,
   ChevronRight,
+  Wind,
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth";
@@ -20,9 +21,20 @@ import BvDetailModal from "@/components/dashboard/BvDetailModal";
 import type { BVFormData } from "@/components/dashboard/BvModal";
 import ViewProductOrderModal from "@/components/dashboard/ViewProductOrderModal";
 import EnhancedOrderModal from "@/components/dashboard/EnhancedOrderModal";
+import { LymphedemaOrderModal } from "@/components/dashboard/LymphedemaOrderModal";
 import type { ProductOrderRow } from "@/components/dashboard/productOrderColumns";
 
-type TabKey = "bv_requests" | "order_products" | "baa_agreements";
+type TabKey = "bv_requests" | "order_products" | "baa_agreements" | "lymphedema_orders";
+
+type LymphedemaOrderRow = {
+  id: string;
+  status: string;
+  insurance: string | null;
+  device: string | null;
+  extremity: string[] | null;
+  createdAt: string | null;
+  submittedAt: string | null;
+};
 
 type BvRequestRow = {
   id: string;
@@ -115,6 +127,7 @@ export default function ProviderDashboardClient() {
   const status = useAuthStore((s) => s.status);
   const role = useAuthStore((s) => s.role);
   const token = useAuthStore((s) => s.jwt);
+  const enabledTracks = useAuthStore((s) => s.enabledTracks);
 
   const [tab, setTab] = React.useState<TabKey>("bv_requests");
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -163,6 +176,12 @@ export default function ProviderDashboardClient() {
   const [baaSearchQuery, setBaaSearchQuery] = React.useState("");
   const [baaCurrentPage, setBaaCurrentPage] = React.useState(1);
   const baaItemsPerPage = 10;
+
+  // Lymphedema Orders state
+  const [lymphedemaOrders, setLymphedemaOrders] = React.useState<LymphedemaOrderRow[]>([]);
+  const [lymphedemaLoading, setLymphedemaLoading] = React.useState(false);
+  const [lymphedemaError, setLymphedemaError] = React.useState<string | null>(null);
+  const [lymphedemaModalOpen, setLymphedemaModalOpen] = React.useState(false);
 
   const refreshBvRequests = React.useCallback(async () => {
     setBvLoading(true);
@@ -230,12 +249,30 @@ export default function ProviderDashboardClient() {
     }
   }, [token]);
 
+  const refreshLymphedemaOrders = React.useCallback(async () => {
+    setLymphedemaLoading(true);
+    setLymphedemaError(null);
+    try {
+      if (!token) { setLymphedemaError("Please sign in again."); return; }
+      const res = await apiGet<{ success: true; data: LymphedemaOrderRow[] }>(
+        "/api/lymphedema-orders",
+        { token },
+      );
+      setLymphedemaOrders(res.data);
+    } catch (err) {
+      setLymphedemaError(err instanceof Error ? err.message : "Failed to load lymphedema orders");
+    } finally {
+      setLymphedemaLoading(false);
+    }
+  }, [token]);
+
   React.useEffect(() => {
     const requestedTab = searchParams.get("tab");
     if (
       requestedTab === "bv_requests" ||
       requestedTab === "order_products" ||
-      requestedTab === "baa_agreements"
+      requestedTab === "baa_agreements" ||
+      requestedTab === "lymphedema_orders"
     ) {
       setTab(requestedTab);
     }
@@ -259,6 +296,7 @@ export default function ProviderDashboardClient() {
     void refreshBvRequests();
     void refreshProductOrders();
     void refreshBaaAgreements();
+    void refreshLymphedemaOrders();
 
     const channel = supabase
       .channel("provider-dashboard")
@@ -281,7 +319,7 @@ export default function ProviderDashboardClient() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [status, refreshBvRequests, refreshProductOrders, refreshBaaAgreements]);
+  }, [status, refreshBvRequests, refreshProductOrders, refreshBaaAgreements, refreshLymphedemaOrders]);
 
   if (status === "idle" || status === "loading") {
     return <div className="min-h-screen bg-[#F8F9FB]" />;
@@ -305,6 +343,12 @@ export default function ProviderDashboardClient() {
       label: "BAA Provider Agreements",
       icon: <FileText className="w-5 h-5" />,
     },
+    ...(enabledTracks.includes("lymphedema") ? [{
+      key: "lymphedema_orders" as TabKey,
+      label: "Medical Devices / Equipment",
+      icon: <Wind className="w-5 h-5" />,
+      badge: lymphedemaOrders.length,
+    }] : []),
   ];
 
   const activeItem = navItems.find((n) => n.key === tab);
@@ -852,6 +896,87 @@ export default function ProviderDashboardClient() {
               </div>
             ) : null}
 
+            {/* Lymphedema Orders Tab */}
+            {tab === "lymphedema_orders" ? (
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200">
+                <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+                  <div>
+                    <div className="text-base font-semibold text-[#18192B]">Medical Devices / Equipment</div>
+                    <div className="text-sm text-slate-500">Submit and track AIROS compression pump & garment orders.</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => { void refreshLymphedemaOrders(); }}
+                      disabled={lymphedemaLoading}
+                      className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 transition-colors"
+                    >
+                      Refresh
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLymphedemaModalOpen(true)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#00C48C] rounded-lg hover:bg-[#00a06c] transition-colors"
+                    >
+                      <Wind className="w-4 h-4" />
+                      New Order
+                    </button>
+                  </div>
+                </div>
+
+                {lymphedemaError && (
+                  <div className="mx-5 mt-4 bg-red-50 rounded-lg p-3 text-sm text-red-600 border border-red-100">
+                    {lymphedemaError}
+                  </div>
+                )}
+
+                {lymphedemaLoading && lymphedemaOrders.length === 0 ? (
+                  <div className="p-8 text-center text-slate-500">Loading…</div>
+                ) : lymphedemaOrders.length === 0 ? (
+                  <div className="p-8 text-center text-slate-400 text-sm">No lymphedema orders yet. Click "New Order" to submit one.</div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="bg-slate-50 border-b border-slate-200 text-left">
+                          <th className="px-4 py-3 font-medium text-slate-600">Date</th>
+                          <th className="px-4 py-3 font-medium text-slate-600">Insurance</th>
+                          <th className="px-4 py-3 font-medium text-slate-600">Device</th>
+                          <th className="px-4 py-3 font-medium text-slate-600">Extremity</th>
+                          <th className="px-4 py-3 font-medium text-slate-600">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {lymphedemaOrders.map((order) => (
+                          <tr key={order.id} className="hover:bg-slate-50 transition-colors">
+                            <td className="px-4 py-3 text-slate-500 text-xs">
+                              {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "—"}
+                            </td>
+                            <td className="px-4 py-3 text-slate-600">{order.insurance ?? "—"}</td>
+                            <td className="px-4 py-3 text-slate-600">{order.device ?? "—"}</td>
+                            <td className="px-4 py-3 text-slate-600">{order.extremity?.join(", ") ?? "—"}</td>
+                            <td className="px-4 py-3">
+                              <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium capitalize ${
+                                order.status === "approved" || order.status === "completed"
+                                  ? "bg-green-100 text-green-800"
+                                  : order.status === "shipped"
+                                    ? "bg-blue-100 text-blue-800"
+                                    : order.status === "denied" || order.status === "cancelled"
+                                      ? "bg-red-100 text-red-800"
+                                      : "bg-yellow-100 text-yellow-800"
+                              }`}>
+                                {order.status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            ) : null}
+
             {/* BAA Provider Agreements Tab */}
             {tab === "baa_agreements" ? (
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
@@ -1048,6 +1173,16 @@ export default function ProviderDashboardClient() {
         orderId={selectedProductOrderId}
         viewOnly
       />
+      {/* Lymphedema Order Modal */}
+      <LymphedemaOrderModal
+        open={lymphedemaModalOpen}
+        onOpenChange={setLymphedemaModalOpen}
+        onCreated={() => {
+          setLymphedemaModalOpen(false);
+          void refreshLymphedemaOrders();
+        }}
+      />
+
       {/* Bv Detail & Edit Modal */}
       <BvDetailModal
         open={bvDetailOpen}
