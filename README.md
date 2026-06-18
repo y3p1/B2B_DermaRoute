@@ -1,8 +1,8 @@
-# Dermaroute — Enterprise B2B Wound Care Procurement Portal
+# Dermaroute — Enterprise B2B Healthcare Procurement Portal
 
-Dermaroute is a **public demonstration and portfolio adaptation** of a privately commissioned Business-to-Business (B2B) healthcare procurement platform engineered for wound care distribution workflows.
+Dermaroute is a **public demonstration and portfolio adaptation** of a privately commissioned Business-to-Business (B2B) healthcare procurement platform engineered for multi-specialty medical distribution workflows.
 
-The system was designed to centralize provider ordering operations, automate benefits verification requests, manage medical product fulfillment, capture compliance agreements electronically, and provide administrators with operational visibility across the procurement lifecycle.
+The system centralizes provider ordering operations across three clinical service lines — wound care tissue products, lymphedema/compression devices, and ocular therapeutics — automating benefits verification, managing medical product fulfillment, capturing compliance agreements electronically, and providing administrators with operational visibility across the full procurement lifecycle.
 
 This repository exists exclusively for technical showcase, portfolio presentation, and recruiter evaluation purposes while preserving all confidential client information.
 
@@ -13,26 +13,39 @@ This repository exists exclusively for technical showcase, portfolio presentatio
 **Public Deployment:**  
 `https://derma-route.vercel.app/`
 
-> Demo environment uses fictionalized data and sanitized business records.
+> Demo environment uses fictionalized data and sanitized business records. Select a role at `/demo` to explore without credentials.
+
+---
+
+## Service Lines
+
+| Track | Dashboard | Description |
+|---|---|---|
+| Wound Care | `/wound-care/dashboard` | Tissue Products & PRP — Benefits Verification workflow |
+| Medical Devices | `/medical-devices/dashboard` | AIROS Compression Pump & Garment ordering |
+| Ocular | `/ocular/dashboard` | Ocular therapeutics ordering portal |
 
 ---
 
 ## Enterprise Capabilities
 
+### Demo Mode & Role Picker
+Gated demo experience at `/demo` — visitors select a role (provider, clinic staff, admin) without credentials. Cookie-based role state gates per-track dashboards. Inactivity auto-logout disabled in demo mode to prevent spurious redirects.
+
 ### Benefits Verification (BV) Workflow
-Multi-step BV request lifecycle from provider submission through insurance verification, admin review, and status tracking.
+Multi-step BV request lifecycle from provider submission through insurance verification, admin review, and status tracking. PDF download of verified BV forms.
 
 ### Product Order Management
-End-to-end healthcare ordering pipeline with provider requests, fulfillment coordination, and operational visibility.
+End-to-end healthcare ordering pipeline across all three service lines. Track-specific order forms with device/product selection, patient info, and review steps.
 
 ### BAA Electronic Signing
 HIPAA-style Business Associate Agreement workflow with live signature capture and PDF document generation.
 
 ### Role-Based Dashboard System
-Dedicated isolated dashboards for providers, clinic staff, and administrators with permission-based access control.
+Dedicated isolated dashboards for providers (per track), clinic staff, and administrators with permission-based access control and track-specific route guards.
 
 ### Manufacturer & Product Catalog
-Structured wound care product management with Q-codes, wound-size SKUs, and pricing workflows.
+Structured product management with Q-codes, wound-size SKUs, and pricing workflows. Clinic-staff catalog tabs per service line (Wound Care, Lymphedema, Ocular) with pill-toggle filter.
 
 ### Healing Tracker
 Wound measurement logging and healing progress monitoring over time.
@@ -55,7 +68,7 @@ SendGrid-powered workflow notifications for account events, BV status updates, a
 
 | Layer | Technology |
 |---|---|
-| Frontend | Next.js 14 (App Router), React, TypeScript |
+| Frontend | Next.js 16 (App Router, Turbopack), React, TypeScript |
 | Styling | Tailwind CSS, shadcn/ui (Radix UI) |
 | Backend/API | Next.js Route Handlers |
 | Database | Supabase PostgreSQL |
@@ -71,10 +84,11 @@ SendGrid-powered workflow notifications for account events, BV status updates, a
 
 ## Engineering Highlights
 
-- Architected a full-stack SaaS platform spanning **3 isolated user roles**, **8+ enterprise business modules**, and **10+ protected backend workflows**
+- Architected a full-stack SaaS platform spanning **3 isolated user roles**, **3 clinical service tracks**, **10+ enterprise business modules**, and **15+ protected backend workflows**
+- Built a cookie-based demo mode that bypasses authentication while preserving all per-track route guards and inactivity timeout logic
 - Integrated external services for OTP verification, transactional email delivery, and server-side document generation
-- Built secure role-based access control and protected backend API routing
-- Modeled relational healthcare procurement schemas for benefits verification, orders, manufacturers, analytics, signatures, and healing tracking
+- Implemented secure role-based access control with per-route middleware pipeline (`runServerPipeline`) bridging Next.js App Router to Express-style handler composition
+- Modeled relational healthcare procurement schemas across wound care BV requests, lymphedema orders, ocular orders, manufacturers, analytics, signatures, and healing tracking
 - Implemented asynchronous notification workflows and scheduled operational automations
 - Sanitized a confidential commissioned implementation into a publicly deployable technical showcase
 
@@ -87,6 +101,30 @@ SendGrid-powered workflow notifications for account events, BV status updates, a
 | Provider | `/auth` | Phone OTP (Twilio) |
 | Clinic Staff | `/auth` | Phone OTP (Twilio) |
 | Admin | `/admin/signin` | Email + Password (Supabase) |
+| Demo Visitor | `/demo` | No credentials — role picker |
+
+---
+
+## Route Structure
+
+```
+/demo                        Role picker (demo mode entry)
+/                            Landing page — service card selector
+/wound-care/dashboard        Wound Care provider portal
+/wound-care/orders           BV request list
+/wound-care/orders/new       Submit BV request
+/wound-care/baa-agreements   BAA signing
+/wound-care/order-products   Product ordering
+/medical-devices/dashboard   Lymphedema/compression device portal
+/medical-devices/orders      Order list
+/medical-devices/orders/new  New AIROS device order
+/ocular/dashboard            Ocular therapeutics portal
+/ocular/orders               Order list
+/ocular/orders/new           New ocular order
+/ocular/product-info         Product catalog info
+/clinic-staff                Clinic staff dashboard (all tracks)
+/admin                       Admin dashboard
+```
 
 ---
 
@@ -94,19 +132,32 @@ SendGrid-powered workflow notifications for account events, BV status updates, a
 
 ```bash
 git clone https://github.com/y3p1/B2B_DermaRoute.git
-cd dermaroute
+cd B2B_DermaRoute
 npm install
 cp .env.example .env.local
 npm run dev
 ```
 
-Additional services such as Supabase, Twilio, and SendGrid require developer-owned credentials for local execution.
+To explore without credentials, set `DEMO_MODE=true` and `NEXT_PUBLIC_DEMO_MODE=true` in `.env.local`, then navigate to `/demo`.
+
+Additional services (Supabase, Twilio, SendGrid) require developer-owned credentials for full local execution.
 
 ### Environment Variables
 
 A sample environment template is provided through `.env.example`.
 
-Sensitive production credentials and private infrastructure details are intentionally excluded from this repository.
+Key variables:
+
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | Supabase Postgres connection string |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-side Supabase admin key |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `SENDGRID_API_KEY` | Transactional email |
+| `DEMO_MODE` | Enables server-side demo routing |
+| `NEXT_PUBLIC_DEMO_MODE` | Enables client-side demo behavior |
+
+Sensitive production credentials are intentionally excluded from this repository.
 
 ---
 
@@ -136,12 +187,7 @@ The original commissioned implementation and all associated proprietary business
 
 No confidential client information, production healthcare records, protected operational data, or sensitive infrastructure assets are publicly disclosed within this repository.
 
-See:
-
-- `CLIENT_CONFIDENTIALITY.md`
-- `DEMO_DATA_NOTICE.md`
-
-for additional details.
+See `CLIENT_CONFIDENTIALITY.md` and `DEMO_DATA_NOTICE.md` for additional details.
 
 ---
 
