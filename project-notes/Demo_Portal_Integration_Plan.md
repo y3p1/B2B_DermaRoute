@@ -260,32 +260,32 @@ Already implemented: all three order types use `pending | approved | shipped | c
 
 ---
 
-## Phase 5 — Demo-Specific Seeding ⬜
+## Phase 5 — Demo-Specific Seeding ✅
 
-### 5.1 — System Settings Seed ⬜
+### 5.1 — System Settings Seed ✅
 
-- ⬜ `backend/scripts/demo/seedDemoSystemSettings.ts`
+- ✅ `backend/scripts/demo/seedDemoSystemSettings.ts` — 4 email settings (all → shawn.druzali04@gmail.com)
 
-### 5.2 — Practice Tracks Seed ⬜
+### 5.2 — Practice Tracks Seed ✅
 
-- ⬜ `backend/scripts/demo/seedDemoPracticeTracks.ts`
+- ✅ `backend/scripts/demo/seedDemoPracticeTracks.ts` — 3 practices: main provider (wound_care+lymphedema), Coastal Eye Clinic (ocular), Summit Wound Specialists (wound_care)
 
-### 5.3 — Product Catalog Seed ⬜
+### 5.3 — Product Catalog Seed ✅
 
-- ⬜ `backend/scripts/demo/seedDemoProductCatalogs.ts` — AIROS 6/8/6P + all 8 VisiDisc SKUs
+- ✅ `backend/scripts/demo/seedDemoProductCatalogs.ts` — AIROS 6/8/6P + all 8 VisiDisc SKUs (VS4508/10/12/15, VS20008/10/12/15)
 
-### 5.4 — Demo Lymphedema Orders Seed ⬜
+### 5.4 — Demo Lymphedema Orders Seed ✅
 
-- ⬜ `backend/scripts/demo/seedDemoLymphedemaOrders.ts` — 4–6 fake orders across statuses
+- ✅ `backend/scripts/demo/seedDemoLymphedemaOrders.ts` — 5 orders across pending/approved/shipped/denied/completed
 
-### 5.5 — Demo Ocular Orders Seed ⬜
+### 5.5 — Demo Ocular Orders Seed ✅
 
-- ⬜ `backend/scripts/demo/seedDemoOcularOrders.ts` — 3–5 fake orders across statuses
+- ✅ `backend/scripts/demo/seedDemoOcularOrders.ts` — 4 orders across pending/approved/shipped/completed
 
-### 5.6 — Update `resetDemo.ts` ⬜
+### 5.6 — Update `resetDemo.ts` ✅
 
-- ⬜ Add new tables to TRUNCATE block (dependency order)
-- ⬜ Import + call all new seed functions in correct order
+- ✅ TRUNCATE block: added lymphedema_orders, ocular_orders, lymphedema_products, ocular_products, practice_tracks, system_settings
+- ✅ Imports + calls all 5 new seed functions in correct order after existing seeds
 
 ---
 
@@ -301,6 +301,6 @@ Already implemented: all three order types use `pending | approved | shipped | c
 | 2.4 — Lymphedema Product Catalog | ⬜ Not started | |
 | 3 — Ocular Module | ✅ Done | Backend, pages (dashboard/product-info/orders/new/detail), admin tab, route redirect |
 | 4 — Cross-Module Features | ✅ Done | All Submissions tab, wound care tab unification |
-| 5 — Demo Seeding | ⬜ Not started | System settings, practice tracks, product catalogs, order seeds, resetDemo |
+| 5 — Demo Seeding | ✅ Done | System settings, practice tracks, product catalogs, order seeds, resetDemo updated |
 
-**Next up:** Phase 5 (demo seeding — system settings, practice tracks, product catalogs, order seeds, resetDemo update). Phase 0.5 and 0.6 deferred.
+**All phases complete.** Remaining deferred items: Phase 0.5 (rep territory security), Phase 0.6 (clinic address prefill in modals), Phase 2.2 (LymphedemaOrderPdf.tsx), Phase 2.4 (lymphedema product catalog admin tab), Phase 3.5 (ocular product catalog admin tab).
