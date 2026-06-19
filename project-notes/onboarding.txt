@@ -1,4 +1,4 @@
-﻿  Onboarding Report: Derma Route (Staging Branch)                                                                                                     
+﻿  Onboarding Report: Derma Route (Demo Branch)
                                                                                                                                                            
   ---                                                                                                                                                      
   1. Project Overview                                                                                                                                      
@@ -43,45 +43,72 @@
   │ Hooks    │ Husky + lint-staged (pre-commit)                                      │
   └──────────┴───────────────────────────────────────────────────────────────────────┘
 
-  Notable change from main: The backend migrated from a custom Express server to Next.js API routes (app/api/), with controllers/services still in a
-  backend/ folder.
+  Notable changes on Demo branch: Express→Next.js API route migration is complete. This branch adds a public demo portal (/demo), three practice-track
+  provider portals (wound-care, ocular, lymphedema), and expanded admin features (analytics, audit logs, risk scoring, CMS policy updates, coverage plans).
 
   ---
   3. Project Structure
 
   integrity-tissue/
   ├── app/                          # Next.js pages + API routes
-  │   ├── api/                      # ~35 API endpoints
+  │   ├── api/                      # 40+ API endpoints
   │   │   ├── admin-accounts/       # Admin/staff user creation
   │   │   ├── admin-signup/         # Admin signup
-  │   │   ├── clinic-staff-signup/  # Clinic staff signup
-  │   │   ├── provider-signup/      # Provider signup (was /api/provider-signup)
-  │   │   ├── send-otp/             # OTP send
-  │   │   ├── verify-otp/           # OTP verify
-  │   │   ├── me/                   # Current user profile
-  │   │   ├── bv-requests/          # BV request CRUD + verify
-  │   │   ├── bv-forms/             # BV form upload/download/manage
+  │   │   ├── analytics/            # Dashboard analytics
+  │   │   ├── audit-logs/           # Audit log CRUD
   │   │   ├── baa-providers/        # BAA agreement CRUD
-  │   │   ├── order-products/       # Product order CRUD
-  │   │   ├── products/             # Product catalog CRUD
-  │   │   ├── manufacturers/        # Manufacturer CRUD
+  │   │   ├── bv/                   # BV request CRUD + verify
+  │   │   ├── bv-forms/             # BV form upload/download/manage
+  │   │   ├── bv-requests/          # BV request CRUD (legacy/compat)
+  │   │   ├── clinic-staff-signup/  # Clinic staff signup
+  │   │   ├── cms-policy-updates/   # CMS policy update feeds
+  │   │   ├── coverage-plans/       # Coverage plan management
+  │   │   ├── cron/                 # Scheduled job triggers
+  │   │   ├── demo/                 # Demo mode helpers
+  │   │   ├── healing-tracker/      # Wound healing tracker data
+  │   │   ├── health/               # Health check
+  │   │   ├── insurance-routing/    # Insurance routing rules
   │   │   ├── insurances/           # Insurance CRUD
-  │   │   ├── wound-sizes/          # Wound size options
-  │   │   └── health/               # Health check
+  │   │   ├── lymphedema/           # Lymphedema orders/products
+  │   │   ├── lymphedema-orders/    # Lymphedema order CRUD
+  │   │   ├── manufacturers/        # Manufacturer CRUD
+  │   │   ├── me/                   # Current user profile
+  │   │   ├── ocular/               # Ocular orders/products
+  │   │   ├── order-products/       # Product order CRUD
+  │   │   ├── practice-tracks/      # Practice track config
+  │   │   ├── products/             # Product catalog CRUD
+  │   │   ├── providers/            # Provider management
+  │   │   ├── provider-signup/      # Provider signup
+  │   │   ├── reorder-tracking/     # Reorder tracking
+  │   │   ├── risk-queue/           # Risk queue management
+  │   │   ├── risk-scoring/         # Risk score calculation
+  │   │   ├── send-otp/             # OTP send
+  │   │   ├── signed-url/           # Signed URL generation
+  │   │   ├── size-optimizer/       # Wound size optimizer
+  │   │   ├── system-settings/      # System-wide settings
+  │   │   ├── threshold-settings/   # Threshold config
+  │   │   ├── verify-otp/           # OTP verify
+  │   │   └── wound-sizes/          # Wound size options
   │   ├── auth/                     # Provider sign-in
+  │   ├── demo/                     # Public demo portal (role switcher)
   │   ├── signup/                   # Provider signup (5-step wizard)
-  │   ├── dashboard/                # Provider dashboard
+  │   ├── dashboard/                # Provider dashboard (wound-care track)
+  │   ├── wound-care/               # Wound-care track portal (dashboard, orders, BAA)
+  │   ├── ocular/                   # Ocular track portal (dashboard, orders)
+  │   ├── medical-devices/          # Medical devices track portal
+  │   ├── no-tracks/                # Fallback for providers without a track
   │   ├── admin/                    # Admin pages
   │   │   ├── signin/, signup/      # Admin auth
   │   │   ├── baa-providers/        # BAA management (list/view/edit)
   │   │   └── users/new/            # Create admin users
   │   ├── clinic-staff/             # Clinic staff pages (mirrors admin)
   │   ├── baa-providers/[id]/       # Shared BAA detail view
+  │   ├── legal/                    # Legal/compliance pages
   │   └── api-documentation/        # API docs page
   │
   ├── backend/                      # Server-side logic (used by API routes)
-  │   ├── controllers/              # 16 controllers
-  │   ├── services/                 # 18+ services (DB, SendGrid, Twilio, etc.)
+  │   ├── controllers/              # 31 controllers
+  │   ├── services/                 # 37 services (DB, SendGrid, Twilio, etc.)
   │   ├── middlewares/              # Auth, CORS, rate limiting
   │   ├── utils/                    # asyncHandler, httpError
   │   └── __tests__/                # 8 test files
@@ -97,17 +124,32 @@
   │   ├── manufacturers.ts          # Manufacturers
   │   ├── insurances.ts             # Insurance types
   │   ├── baa-provider.ts           # BAA agreements
+  │   ├── order-outcomes.ts         # Product order lifecycle
+  │   ├── wound-measurements.ts     # Healing tracker data
+  │   ├── audit-logs.ts             # Audit trail
+  │   ├── coverage-plans.ts         # Coverage plan definitions
+  │   ├── cms-policy-updates.ts     # CMS policy feed
+  │   ├── insurance-routing.ts      # Insurance routing rules
+  │   ├── lymphedema-orders.ts      # Lymphedema order records
+  │   ├── lymphedema-products.ts    # Lymphedema product catalog
+  │   ├── ocular-orders.ts          # Ocular order records
+  │   ├── ocular-products.ts        # Ocular product catalog
+  │   ├── practice-tracks.ts        # Practice track config
+  │   ├── system-settings.ts        # System-wide settings
+  │   ├── threshold-settings.ts     # Threshold config
   │   └── enums.ts                  # provider_role, baa_status, approver_role
   │
   ├── components/
   │   ├── admin/                    # Admin-specific components
-  │   ├── clinic-staff/             # Clinic staff dashboard (7 tabs)
+  │   ├── clinic-staff/             # Clinic staff dashboard (7+ tabs)
   │   ├── dashboard/                # Shared: BV tables, product orders, BAA views
+  │   ├── demo/                     # Demo portal components (RoleSwitcher, banners)
+  │   ├── landing/                  # Landing page components
   │   ├── auth/signup/              # Signup flows (provider, admin, clinic-staff)
   │   └── ui/                       # shadcn/ui primitives
   │
-  ├── supabase/rls/                 # Row Level Security SQL policies (11 files)
-  ├── scripts/apply-rls-policies.sh # Auto-apply RLS after migrations
+  ├── supabase/rls/                 # Row Level Security SQL policies (20 files)
+  ├── scripts/applyRls.ts           # Auto-apply RLS after migrations (npm run db:rls)
   ├── docs/                         # Architecture & feature docs
   ├── lib/                          # API client, auth utils, feature flags
   ├── store/                        # Zustand auth store
@@ -170,10 +212,34 @@
   - Professional HTML templates
   - Batch sending to all admins/staff
 
+  Practice Tracks (Demo Branch)
+
+  - Three provider portals: wound-care, ocular, lymphedema (each with dashboard + orders)
+  - Public demo portal at /demo — role switcher, no login required
+  - Demo mode: bypasses auth gates, disables inactivity auto-logout
+  - practice_tracks config drives which portal a provider sees post-login
+  - medical-devices track and no-tracks fallback page
+
+  Analytics & Risk
+
+  - Analytics dashboard (admin)
+  - Risk scoring engine + risk queue management
+  - Reorder tracking
+  - Size optimizer (wound size recommendations)
+  - Healing tracker (wound measurements over time)
+
+  Compliance & Settings
+
+  - CMS policy update feed
+  - Coverage plan management
+  - Insurance routing rules
+  - Audit logs (full action trail)
+  - System settings + threshold settings (admin-configurable)
+
   Security
 
-  - RLS policies for all tables + storage buckets (11 SQL files)
-  - Auto-apply script after db:push
+  - RLS policies for all tables + storage buckets (20 SQL files)
+  - Auto-apply script after db:push (scripts/applyRls.ts)
   - Role-based middleware (requireAuth, requireAdminOrClinicStaff)
 
   ---
@@ -182,22 +248,15 @@
   ┌──────────────────────────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
   │           Item           │                                                         Details                                                         │
   ├──────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-  │ 66 console.log           │ Debugging logs scattered through production code — needs cleanup                                                        │
+  │ 83 console.log           │ Debugging logs scattered through production code (19 files in backend/) — needs cleanup                                 │
   │ statements               │                                                                                                                         │
   ├──────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
   │ order_products dual      │ Table serves as both product metadata templates AND order instances — confusing schema                                  │
   │ purpose                  │                                                                                                                         │
   ├──────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-  │ Env var naming           │ NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY still has NEXT_PUBLIC_ prefix in some references — this is a secret key that must │
-  │                          │  not leak to the client                                                                                                 │
-  ├──────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
   │ In-memory rate limiting  │ OTP abuse guard uses Map() — resets on deploy, doesn't work across serverless instances                                 │
   ├──────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-  │ No frontend tests        │ Only backend tests exist                                                                                                │
-  ├──────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-  │ Product Orders mock data │ Docs mention mock data in implementation — verify real data flows                                                       │
-  ├──────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-  │ No explicit TODOs        │ No TODO/FIXME comments found in code                                                                                    │
+  │ No frontend tests        │ Only backend tests exist (8 files in backend/__tests__/)                                                                │
   └──────────────────────────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 
   ---
@@ -226,13 +285,20 @@
   7. Entry Points & User Flows
 
   Provider flow:
-  /signup → clinic details → verify phone (OTP) → sign BAA agreement → confirm → auto-login → /dashboard → create BV requests
+  /signup → clinic details → verify phone (OTP) → sign BAA agreement → confirm → auto-login → track portal
+    - wound-care track: /wound-care/dashboard
+    - ocular track: /ocular/dashboard
+    - no track assigned: /no-tracks
+    - legacy/default: /dashboard
 
   Admin flow:
-  /admin/signup → verify phone → /admin dashboard → manage BV requests, BAAs, products, forms, users
+  /admin/signup → verify phone → /admin dashboard → manage BV requests, BAAs, products, forms, users, analytics, risk queue
 
   Clinic Staff flow:
   /clinic-staff/signup → verify phone → /clinic-staff dashboard → same management as admin
+
+  Demo portal flow (no login):
+  /demo → choose role (Provider / Admin / Clinic Staff) → track-specific dashboard with mock data
 
   BV Request lifecycle:
   Provider creates → admins/staff notified via email → admin verifies/approves → provider notified of status
@@ -264,9 +330,15 @@
   npm install
   # Create .env.local with vars above
   npm run db:push              # Push schema + apply RLS
-  npm run seed:all             # Seed data (manufacturers, products, insurances)
+  npm run seed:admin           # Seed admin account
+  npm run seed:manufacturers:q1
+  npm run seed:products:q1
+  npm run seed:insurances
+  npm run seed:clinic-staff
+  npm run seed:provider
+  npm run seed:demo            # Full demo data reset (Demo branch only)
   npm run dev                  # Dev server at :3000
-  npm run test                 # Run backend tests
+  npm test                     # Run backend tests
 
   ---
   9. Recommended First Steps
@@ -274,11 +346,10 @@
   1. Get credentials — You need Supabase project access, Twilio account, and SendGrid API key from whoever provisioned them. Check if there's a shared .env
    or secrets manager.
   2. Get it running — npm install, set up .env.local, npm run dev. Walk through all 3 signup flows.
-  3. Audit the service role key — Search for NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY and confirm it's never bundled client-side. Rename to
-  SUPABASE_SERVICE_ROLE_KEY if needed.
-  4. Clean up console.logs — 66 debug statements in production code. Quick grep and remove.
+  3. Try the demo portal first — /demo requires no login. Use it to walk all three provider tracks (wound-care, ocular, medical-devices) and the admin view.
+  4. Clean up console.logs — 83 debug statements across 19 backend files. Quick grep and remove before any production deploy.
   5. Understand the BV lifecycle end-to-end — Create a BV request as provider, then approve it as admin. This touches the core business logic.
-  6. Review the Supabase dashboard — Check auth settings, storage buckets, and verify RLS policies are actually applied (the SQL files define them but you
+  6. Review the Supabase dashboard — Check auth settings, storage buckets, and verify RLS policies are actually applied (20 SQL files define them but you
   need to confirm they're active).
   7. Clarify the order_products schema — Understand whether the dual-purpose design is intentional or needs refactoring.
   8. Read the docs — docs/ folder has architecture decisions, email flow diagrams, and RBAC setup notes that explain the "why" behind design choices.

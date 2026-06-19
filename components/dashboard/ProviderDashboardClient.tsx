@@ -956,7 +956,7 @@ export default function ProviderDashboardClient() {
                             </td>
                             <td className="px-4 py-3 text-slate-600">{order.insurance ?? "—"}</td>
                             <td className="px-4 py-3 text-slate-600">{order.device ?? "—"}</td>
-                            <td className="px-4 py-3 text-slate-600">{order.extremity?.join(", ") ?? "—"}</td>
+                            <td className="px-4 py-3 text-slate-600">{Array.isArray(order.extremity) ? order.extremity.join(", ") : "—"}</td>
                             <td className="px-4 py-3">
                               <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium capitalize ${
                                 order.status === "approved" || order.status === "completed"

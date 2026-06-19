@@ -1,17 +1,817 @@
 "use client";
 
 import * as React from "react";
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  Image,
+  StyleSheet,
+} from "@react-pdf/renderer";
 import { Download, Loader2 } from "lucide-react";
 import { apiGet } from "@/lib/apiClient";
+
+export type LymphedemaFormData = {
+  insurance: string;
+  placeOfService: string;
+  firstName: string;
+  lastName: string;
+  dob: string;
+  mrn: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  phone: string;
+  email: string;
+  diagnosis: string[];
+  conservativeTherapy: "yes" | "no" | "";
+  skinChanges: string[];
+  extremity: string[];
+  measurements: Record<string, string>;
+  device: string;
+  hcpcs: string;
+  deviceRecommended: boolean;
+  garmentType: string;
+  garmentStyle: string;
+  compressionLevel: string;
+  quantity: string;
+  customMade: "yes" | "no" | "";
+  manufacturerPreference: string;
+  distalPressureMmhg: string;
+  timesPerDay: string;
+  minutesPerSession: string;
+  signatureMode?: "digital" | "manual";
+  signatureDataUrl?: string;
+  physicianName?: string;
+  physicianPhone?: string;
+  physicianNpi?: string;
+};
+
+const s = StyleSheet.create({
+  page: { padding: 28, fontSize: 8, fontFamily: "Helvetica" },
+  sectionHeader: {
+    backgroundColor: "#000",
+    color: "#fff",
+    padding: "3 6",
+    fontSize: 9,
+    fontWeight: "bold",
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  subHeader: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#000",
+    borderBottomStyle: "solid",
+    fontSize: 9,
+    fontWeight: "bold",
+    marginTop: 8,
+    marginBottom: 4,
+    paddingBottom: 2,
+  },
+  row: { flexDirection: "row", alignItems: "center", marginBottom: 2 },
+  cell: { flexDirection: "row", alignItems: "center", marginRight: 12 },
+  labelText: { fontSize: 8, marginRight: 4 },
+  valueText: { fontSize: 8, fontWeight: "bold" },
+  fieldRow: { flexDirection: "row", marginBottom: 3 },
+  fieldLabel: { fontSize: 7, color: "#555", marginRight: 4 },
+  fieldValue: {
+    fontSize: 8,
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#999",
+    borderBottomStyle: "solid",
+    flex: 1,
+    paddingBottom: 1,
+    minHeight: 10,
+  },
+  checkboxOuter: {
+    width: 8,
+    height: 8,
+    borderWidth: 1,
+    borderColor: "#000",
+    borderStyle: "solid",
+    marginRight: 3,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  checkboxFill: {
+    width: 5,
+    height: 5,
+    backgroundColor: "#000",
+  },
+  radioOuter: {
+    width: 8,
+    height: 8,
+    borderWidth: 1,
+    borderColor: "#000",
+    borderStyle: "solid",
+    borderRadius: 4,
+    marginRight: 3,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  radioFill: {
+    width: 5,
+    height: 5,
+    backgroundColor: "#000",
+    borderRadius: 2.5,
+  },
+  sigBox: {
+    borderWidth: 1,
+    borderColor: "#000",
+    borderStyle: "solid",
+    height: 50,
+    marginTop: 4,
+    padding: 4,
+  },
+  footer: {
+    fontSize: 7,
+    color: "#555",
+    textAlign: "center",
+    marginTop: 12,
+    borderTopWidth: 0.5,
+    borderTopColor: "#999",
+    borderTopStyle: "solid",
+    paddingTop: 4,
+  },
+});
+
+function PdfCheckbox({
+  checked,
+  label,
+}: {
+  checked: boolean;
+  label: string;
+}) {
+  return (
+    <View style={s.cell}>
+      <View style={s.checkboxOuter}>
+        {checked && <View style={s.checkboxFill} />}
+      </View>
+      <Text style={{ fontSize: 8 }}>{label}</Text>
+    </View>
+  );
+}
+
+function PdfRadio({
+  checked,
+  label,
+}: {
+  checked: boolean;
+  label: string;
+}) {
+  return (
+    <View style={s.cell}>
+      <View style={s.radioOuter}>
+        {checked && <View style={s.radioFill} />}
+      </View>
+      <Text style={{ fontSize: 8 }}>{label}</Text>
+    </View>
+  );
+}
+
+function SectionHeader({ children }: { children: string }) {
+  return <Text style={s.sectionHeader}>{children}</Text>;
+}
+
+function SubHeader({ children }: { children: string }) {
+  return <Text style={s.subHeader}>{children}</Text>;
+}
+
+function FieldLine({
+  label,
+  value,
+  flex,
+}: {
+  label: string;
+  value?: string;
+  flex?: number;
+}) {
+  return (
+    <View style={[s.fieldRow, flex !== undefined ? { flex } : {}]}>
+      <Text style={s.fieldLabel}>{label}: </Text>
+      <Text style={s.fieldValue}>{value ?? ""}</Text>
+    </View>
+  );
+}
+
+function hasLeg(extremity: string[]): boolean {
+  return extremity.some(
+    (e) => e === "Left Leg" || e === "Right Leg" || e === "Bilateral Legs",
+  );
+}
+
+function hasArm(extremity: string[]): boolean {
+  return extremity.some((e) => e === "Left Arm" || e === "Right Arm");
+}
+
+function garmentMatches(
+  data: LymphedemaFormData,
+  category: string,
+  label: string,
+): boolean {
+  return data.garmentType === category && data.garmentStyle === label;
+}
+
+function compressionLevelMatches(
+  data: LymphedemaFormData,
+  level: string,
+): boolean {
+  const cl = data.compressionLevel.toLowerCase();
+  if (level === "CL I")
+    return cl.includes("cl1") || cl.includes("cl i") || cl.includes("20");
+  if (level === "CL II")
+    return cl.includes("clii") || cl.includes("cl ii") || cl.includes("30");
+  if (level === "CL III")
+    return cl.includes("cliii") || cl.includes("cl iii") || cl.includes("40");
+  return false;
+}
+
+export function ReMarxOrderDocument({ data }: { data: LymphedemaFormData }) {
+  const orderDate = new Date().toLocaleDateString("en-US");
+  const legSelected = hasLeg(data.extremity);
+  const armSelected = hasArm(data.extremity);
+
+  return (
+    <Document>
+      <Page size="LETTER" style={s.page}>
+        {/* 1. Header */}
+        <View style={{ marginBottom: 6 }}>
+          <Text
+            style={{
+              fontSize: 12,
+              fontWeight: "bold",
+              textAlign: "center",
+              marginBottom: 2,
+            }}
+          >
+            COMPRESSION ORDER FORM / STANDARD WRITTEN ORDER
+          </Text>
+          <Text
+            style={{ fontSize: 9, textAlign: "center", marginBottom: 1 }}
+          >
+            ReMarx Services, Inc.
+          </Text>
+          <Text
+            style={{
+              fontSize: 8,
+              textAlign: "center",
+              color: "#555",
+              marginBottom: 4,
+            }}
+          >
+            Fax: 888.673.6279
+          </Text>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "center",
+              gap: 16,
+            }}
+          >
+            <Text style={{ fontSize: 8, fontWeight: "bold", marginRight: 8 }}>
+              SELECT PRODUCT:
+            </Text>
+            <PdfCheckbox checked label="PUMP" />
+            <PdfCheckbox checked label="GARMENT" />
+          </View>
+        </View>
+
+        {/* 2. Order Information */}
+        <SectionHeader>ORDER INFORMATION</SectionHeader>
+        <View style={{ flexDirection: "row", gap: 16, marginBottom: 2 }}>
+          <FieldLine
+            label="Patient Full Name"
+            value={`${data.firstName} ${data.lastName}`}
+            flex={2}
+          />
+          <FieldLine label="Order Date" value={orderDate} flex={1} />
+        </View>
+
+        {/* 3. Compression Pump Order */}
+        <SectionHeader>COMPRESSION PUMP ORDER</SectionHeader>
+        <View style={s.row}>
+          <Text style={{ fontSize: 8, marginRight: 8 }}>
+            Contraindications present?
+          </Text>
+          <PdfRadio checked={false} label="YES" />
+          <PdfRadio checked label="NO" />
+        </View>
+
+        {/* 4. Diagnosis Code */}
+        <SubHeader>Diagnosis Code (ICD 10)</SubHeader>
+        <View style={s.row}>
+          <PdfCheckbox
+            checked={data.diagnosis.includes("i89.0")}
+            label="I89.0 — Lymphedema"
+          />
+          <PdfCheckbox
+            checked={data.diagnosis.includes("q82.0")}
+            label="Q82.0 — Hereditary Lymphedema"
+          />
+          <PdfCheckbox
+            checked={data.diagnosis.includes("i97.2")}
+            label="I97.2 — Post-mastectomy Lymphedema"
+          />
+        </View>
+
+        {/* 5. Select Pump Type */}
+        <SubHeader>Select Pump Type</SubHeader>
+        {/* E0651 */}
+        <View style={{ marginBottom: 4 }}>
+          <PdfRadio checked={data.hcpcs === "E0651"} label="E0651" />
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              marginLeft: 16,
+              marginTop: 2,
+            }}
+          >
+            <PdfCheckbox
+              checked={data.hcpcs === "E0651" && legSelected}
+              label="Full Leg"
+            />
+            <PdfCheckbox
+              checked={
+                data.hcpcs === "E0651" &&
+                data.extremity.includes("Left Leg")
+              }
+              label="Left Leg"
+            />
+            <PdfCheckbox
+              checked={
+                data.hcpcs === "E0651" &&
+                data.extremity.includes("Right Leg")
+              }
+              label="Right Leg"
+            />
+            <PdfCheckbox
+              checked={
+                data.hcpcs === "E0651" &&
+                data.extremity.includes("Bilateral Legs")
+              }
+              label="Bilateral"
+            />
+            <PdfCheckbox
+              checked={
+                data.hcpcs === "E0651" &&
+                data.extremity.includes("Left Arm")
+              }
+              label="Arm Left"
+            />
+            <PdfCheckbox
+              checked={
+                data.hcpcs === "E0651" &&
+                data.extremity.includes("Right Arm")
+              }
+              label="Arm Right"
+            />
+          </View>
+        </View>
+
+        {/* E0652 */}
+        <View style={{ marginBottom: 4 }}>
+          <PdfRadio checked={data.hcpcs === "E0652"} label="E0652" />
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              marginLeft: 16,
+              marginTop: 2,
+            }}
+          >
+            <PdfCheckbox
+              checked={data.hcpcs === "E0652" && legSelected}
+              label="Full Leg"
+            />
+            <PdfCheckbox
+              checked={
+                data.hcpcs === "E0652" &&
+                data.extremity.includes("Left Leg")
+              }
+              label="Left Leg"
+            />
+            <PdfCheckbox
+              checked={
+                data.hcpcs === "E0652" &&
+                data.extremity.includes("Right Leg")
+              }
+              label="Right Leg"
+            />
+            <PdfCheckbox
+              checked={
+                data.hcpcs === "E0652" &&
+                data.extremity.includes("Bilateral Legs")
+              }
+              label="Bilateral"
+            />
+            <PdfCheckbox
+              checked={
+                data.hcpcs === "E0652" &&
+                data.extremity.includes("Left Arm")
+              }
+              label="Arm Left"
+            />
+            <PdfCheckbox
+              checked={
+                data.hcpcs === "E0652" &&
+                data.extremity.includes("Right Arm")
+              }
+              label="Arm Right"
+            />
+            <PdfCheckbox checked={false} label="Pant System" />
+            <PdfCheckbox checked={false} label="Arm Plus Left" />
+            <PdfCheckbox checked={false} label="Arm Plus Right" />
+          </View>
+        </View>
+
+        {/* 6. Treatment Protocol */}
+        <SubHeader>Treatment Protocol</SubHeader>
+        <View style={{ marginBottom: 4 }}>
+          <Text style={{ fontSize: 7, fontWeight: "bold", marginBottom: 2 }}>
+            mmHg Distal Pressure
+          </Text>
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            {["65", "60", "55", "50", "45", "40", "35", "30"].map((v) => (
+              <PdfRadio
+                key={v}
+                checked={data.distalPressureMmhg === v}
+                label={v}
+              />
+            ))}
+          </View>
+        </View>
+        <View style={{ flexDirection: "row", gap: 24, marginBottom: 4 }}>
+          <View>
+            <Text
+              style={{ fontSize: 7, fontWeight: "bold", marginBottom: 2 }}
+            >
+              Times Per Day
+            </Text>
+            <View style={{ flexDirection: "row" }}>
+              {["1", "2", "3"].map((v) => (
+                <PdfRadio
+                  key={v}
+                  checked={data.timesPerDay === v}
+                  label={v}
+                />
+              ))}
+            </View>
+          </View>
+          <View>
+            <Text
+              style={{ fontSize: 7, fontWeight: "bold", marginBottom: 2 }}
+            >
+              Minutes Per Session
+            </Text>
+            <View style={{ flexDirection: "row" }}>
+              {["15", "30", "45", "60"].map((v) => (
+                <PdfRadio
+                  key={v}
+                  checked={data.minutesPerSession === v}
+                  label={v}
+                />
+              ))}
+            </View>
+          </View>
+        </View>
+
+        {/* 7. Garment Order */}
+        <SectionHeader>GARMENT ORDER</SectionHeader>
+        <View style={{ flexDirection: "row", gap: 24, marginBottom: 4 }}>
+          {/* Lower Extremity */}
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{ fontSize: 8, fontWeight: "bold", marginBottom: 3 }}
+            >
+              Lower Extremity
+            </Text>
+            <Text
+              style={{
+                fontSize: 7,
+                fontWeight: "bold",
+                marginBottom: 2,
+                textDecoration: "underline",
+              }}
+            >
+              Stockings
+            </Text>
+            <PdfCheckbox
+              checked={garmentMatches(data, "Stockings", "Below Knee")}
+              label="Below Knee"
+            />
+            <PdfCheckbox
+              checked={garmentMatches(data, "Stockings", "Thigh")}
+              label="Thigh"
+            />
+            <PdfCheckbox
+              checked={garmentMatches(data, "Stockings", "Pantyhose")}
+              label="Pantyhose"
+            />
+            <Text
+              style={{
+                fontSize: 7,
+                fontWeight: "bold",
+                marginBottom: 2,
+                marginTop: 4,
+                textDecoration: "underline",
+              }}
+            >
+              Garments
+            </Text>
+            <PdfCheckbox
+              checked={garmentMatches(data, "Garments", "Foot")}
+              label="Foot"
+            />
+            <PdfCheckbox
+              checked={garmentMatches(data, "Garments", "Calf")}
+              label="Calf"
+            />
+            <PdfCheckbox
+              checked={garmentMatches(data, "Garments", "Knee")}
+              label="Knee"
+            />
+            <PdfCheckbox
+              checked={garmentMatches(data, "Garments", "Thigh")}
+              label="Thigh"
+            />
+            <PdfCheckbox
+              checked={garmentMatches(data, "Garments", "Full Leg")}
+              label="Full Leg"
+            />
+            <PdfCheckbox
+              checked={
+                garmentMatches(data, "Garments", "Full Leg w/ Foot")
+              }
+              label="Full Leg w/ Foot"
+            />
+          </View>
+
+          {/* Upper Extremity */}
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{ fontSize: 8, fontWeight: "bold", marginBottom: 3 }}
+            >
+              Upper Extremity
+            </Text>
+            <Text
+              style={{
+                fontSize: 7,
+                fontWeight: "bold",
+                marginBottom: 2,
+                textDecoration: "underline",
+              }}
+            >
+              Gloves &amp; Sleeves
+            </Text>
+            <PdfCheckbox
+              checked={garmentMatches(
+                data,
+                "Gloves & Sleeves",
+                "Gauntlet",
+              )}
+              label="Gauntlet"
+            />
+            <PdfCheckbox
+              checked={garmentMatches(
+                data,
+                "Gloves & Sleeves",
+                "Glove",
+              )}
+              label="Glove"
+            />
+            <PdfCheckbox
+              checked={garmentMatches(
+                data,
+                "Gloves & Sleeves",
+                "Glove Sleeve Combo",
+              )}
+              label="Glove Sleeve Combo"
+            />
+            <PdfCheckbox
+              checked={garmentMatches(
+                data,
+                "Gloves & Sleeves",
+                "Arm Sleeve",
+              )}
+              label="Arm Sleeve"
+            />
+            <Text
+              style={{
+                fontSize: 7,
+                fontWeight: "bold",
+                marginBottom: 2,
+                marginTop: 4,
+                textDecoration: "underline",
+              }}
+            >
+              Wraps
+            </Text>
+            <PdfCheckbox
+              checked={garmentMatches(data, "Wraps", "Hand Velcro Wrap")}
+              label="Hand Velcro Wrap"
+            />
+            <PdfCheckbox
+              checked={garmentMatches(data, "Wraps", "Arm Wrap")}
+              label="Arm Wrap"
+            />
+            <Text
+              style={{
+                fontSize: 7,
+                fontWeight: "bold",
+                marginBottom: 2,
+                marginTop: 4,
+                textDecoration: "underline",
+              }}
+            >
+              Garments
+            </Text>
+            <PdfCheckbox
+              checked={garmentMatches(data, "Garments", "Glove")}
+              label="Glove"
+            />
+            <PdfCheckbox
+              checked={garmentMatches(
+                data,
+                "Garments",
+                "Fingertips to Axilla",
+              )}
+              label="Fingertips to Axilla"
+            />
+            <PdfCheckbox
+              checked={garmentMatches(
+                data,
+                "Garments",
+                "Wrist to Axilla",
+              )}
+              label="Wrist to Axilla"
+            />
+          </View>
+        </View>
+
+        {/* 8. Garment Requirements */}
+        <SubHeader>Garment Requirements</SubHeader>
+        <View style={{ marginBottom: 4 }}>
+          <Text style={{ fontSize: 7, fontWeight: "bold", marginBottom: 2 }}>
+            Compression Level
+          </Text>
+          <View style={{ flexDirection: "row" }}>
+            <PdfRadio
+              checked={compressionLevelMatches(data, "CL I")}
+              label="CL I"
+            />
+            <PdfRadio
+              checked={compressionLevelMatches(data, "CL II")}
+              label="CL II"
+            />
+            <PdfRadio
+              checked={compressionLevelMatches(data, "CL III")}
+              label="CL III"
+            />
+          </View>
+        </View>
+        <View style={{ flexDirection: "row", gap: 24, marginBottom: 4 }}>
+          <View>
+            <Text
+              style={{ fontSize: 7, fontWeight: "bold", marginBottom: 2 }}
+            >
+              Quantity per Extremity
+            </Text>
+            <View style={{ flexDirection: "row" }}>
+              {["1", "2", "3"].map((v) => (
+                <PdfRadio
+                  key={v}
+                  checked={data.quantity === v}
+                  label={v}
+                />
+              ))}
+            </View>
+          </View>
+          <View>
+            <Text
+              style={{ fontSize: 7, fontWeight: "bold", marginBottom: 2 }}
+            >
+              Custom Made
+            </Text>
+            <View style={{ flexDirection: "row" }}>
+              <PdfRadio checked={data.customMade === "no"} label="NO" />
+              <PdfRadio checked={data.customMade === "yes"} label="YES" />
+            </View>
+          </View>
+        </View>
+        <View style={{ marginBottom: 4 }}>
+          <Text style={{ fontSize: 7, fontWeight: "bold", marginBottom: 2 }}>
+            Manufacturer Preference
+          </Text>
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            {[
+              "Medi USA",
+              "BSN Jobst/Farrow",
+              "L&R",
+              "Juzo",
+              "Sigvaris",
+              "No Preference",
+            ].map((m) => (
+              <PdfRadio
+                key={m}
+                checked={data.manufacturerPreference === m}
+                label={m}
+              />
+            ))}
+          </View>
+        </View>
+
+        {/* 9. Physician Information */}
+        <SectionHeader>PHYSICIAN INFORMATION</SectionHeader>
+        <View style={{ flexDirection: "row", gap: 8, marginBottom: 4 }}>
+          <View style={{ flex: 2 }}>
+            <View style={s.fieldRow}>
+              <Text style={s.fieldLabel}>Physician Name: </Text>
+              <Text style={s.fieldValue}>
+                {data.physicianName ?? ""}
+              </Text>
+            </View>
+          </View>
+          <View style={{ flex: 1 }}>
+            <View style={s.fieldRow}>
+              <Text style={s.fieldLabel}>Phone: </Text>
+              <Text style={s.fieldValue}>
+                {data.physicianPhone ?? ""}
+              </Text>
+            </View>
+          </View>
+          <View style={{ flex: 1 }}>
+            <View style={s.fieldRow}>
+              <Text style={s.fieldLabel}>NPI: </Text>
+              <Text style={s.fieldValue}>
+                {data.physicianNpi ?? ""}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={{ flexDirection: "row", gap: 8 }}>
+          <View style={{ flex: 2 }}>
+            <Text
+              style={{ fontSize: 7, fontWeight: "bold", marginBottom: 2 }}
+            >
+              Physician Signature
+            </Text>
+            <View style={s.sigBox}>
+              {data.signatureMode === "digital" &&
+                data.signatureDataUrl && (
+                  <Image
+                    src={data.signatureDataUrl}
+                    style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                  />
+                )}
+            </View>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{ fontSize: 7, fontWeight: "bold", marginBottom: 2 }}
+            >
+              Date
+            </Text>
+            <View
+              style={[
+                s.sigBox,
+                {
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: 50,
+                },
+              ]}
+            >
+              <Text style={{ fontSize: 10 }}>{orderDate}</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Footer */}
+        <Text style={s.footer}>
+          ReMarx Services Inc. — Fax: 888.673.6279 — www.remarx.com
+        </Text>
+      </Page>
+    </Document>
+  );
+}
 
 type LymphedemaOrderForPdf = {
   id: string;
   status: string;
-  patient: { firstName?: string; lastName?: string; dob?: string; mrn?: string } | null;
+  patient: {
+    firstName?: string;
+    lastName?: string;
+    dob?: string;
+    mrn?: string;
+  } | null;
   insurance: string | null;
   placeOfService: string | null;
-  diagnosis: { primary?: string; secondary?: string } | null;
-  extremity: { side?: string; type?: string } | null;
+  diagnosis: string[] | null;
+  extremity: string[] | null;
   measurements: Record<string, string> | null;
   device: string | null;
   hcpcs: string | null;
@@ -21,200 +821,45 @@ type LymphedemaOrderForPdf = {
   quantity: number | null;
   customMade: boolean | null;
   manufacturerPreference: string | null;
+  distalPressureMmhg: number | null;
   timesPerDay: number | null;
   minutesPerSession: number | null;
   submittedAt: string | null;
   createdAt: string | null;
 };
 
-interface LymphedemaOrderPdfProps {
-  order: LymphedemaOrderForPdf;
-  clinicName?: string | null;
-}
-
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div style={{ marginBottom: 24 }}>
-      <div
-        style={{
-          fontWeight: 700,
-          fontSize: 13,
-          color: "#1e293b",
-          borderBottom: "1px solid #e2e8f0",
-          paddingBottom: 4,
-          marginBottom: 12,
-          textTransform: "uppercase",
-          letterSpacing: "0.05em",
-        }}
-      >
-        {title}
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 24px" }}>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function Field({ label, value }: { label: string; value?: string | number | null }) {
-  return (
-    <div>
-      <div style={{ fontSize: 10, color: "#94a3b8", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-        {label}
-      </div>
-      <div style={{ fontSize: 13, color: "#1e293b", marginTop: 2 }}>
-        {value ?? "—"}
-      </div>
-    </div>
-  );
-}
-
-export function LymphedemaOrderPdf({ order, clinicName }: LymphedemaOrderPdfProps) {
-  const contentRef = React.useRef<HTMLDivElement>(null);
-
-  function handlePrint() {
-    const content = contentRef.current;
-    if (!content) return;
-
-    const printWindow = window.open("", "_blank", "width=800,height=600");
-    if (!printWindow) return;
-
-    printWindow.document.write(`<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <title>Medical Device Order — ${order.id}</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1e293b; padding: 32px; }
-    @media print {
-      @page { margin: 20mm; }
-      body { padding: 0; }
-    }
-  </style>
-</head>
-<body>${content.innerHTML}</body>
-</html>`);
-
-    printWindow.document.close();
-    printWindow.focus();
-    setTimeout(() => {
-      printWindow.print();
-      printWindow.close();
-    }, 300);
-  }
-
-  const patientName =
-    [order.patient?.firstName, order.patient?.lastName].filter(Boolean).join(" ") || "—";
-  const extremityLabel =
-    order.extremity
-      ? [order.extremity.side, order.extremity.type].filter(Boolean).join(" ").replace(/\b\w/g, (c) => c.toUpperCase())
-      : null;
-  const measurementText =
-    order.measurements
-      ? Object.entries(order.measurements)
-          .map(([k, v]) => `${k}: ${v}`)
-          .join(", ")
-      : null;
-
-  return (
-    <>
-      <button
-        onClick={handlePrint}
-        className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
-      >
-        <Download className="w-3.5 h-3.5" />
-        Download PDF
-      </button>
-
-      {/* Hidden printable content */}
-      <div style={{ display: "none" }}>
-        <div ref={contentRef}>
-          {/* Header */}
-          <div style={{ marginBottom: 32 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-              <div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: "#1e293b" }}>
-                  Medical Device / Equipment Order
-                </div>
-                {clinicName && (
-                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 4 }}>{clinicName}</div>
-                )}
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 10, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  Order ID
-                </div>
-                <div style={{ fontSize: 11, fontFamily: "monospace", color: "#475569" }}>
-                  {order.id}
-                </div>
-                <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 6 }}>
-                  {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : ""}
-                </div>
-              </div>
-            </div>
-            <div
-              style={{
-                marginTop: 12,
-                display: "inline-block",
-                padding: "4px 12px",
-                borderRadius: 9999,
-                fontSize: 11,
-                fontWeight: 600,
-                textTransform: "capitalize",
-                background: order.status === "approved" ? "#dcfce7" : order.status === "denied" ? "#fee2e2" : "#fef9c3",
-                color: order.status === "approved" ? "#166534" : order.status === "denied" ? "#991b1b" : "#713f12",
-              }}
-            >
-              {order.status}
-            </div>
-          </div>
-
-          <Section title="Patient Information">
-            <Field label="Patient Name" value={patientName} />
-            <Field label="Date of Birth" value={order.patient?.dob} />
-            <Field label="MRN" value={order.patient?.mrn} />
-            <Field label="Insurance" value={order.insurance} />
-            <Field label="Place of Service" value={order.placeOfService} />
-          </Section>
-
-          <Section title="Clinical Assessment">
-            <Field label="Primary Diagnosis" value={order.diagnosis?.primary} />
-            <Field label="Secondary Diagnosis" value={order.diagnosis?.secondary} />
-            <Field label="Extremity" value={extremityLabel} />
-            <Field label="Measurements" value={measurementText} />
-          </Section>
-
-          <Section title="Device Recommendation">
-            <Field label="Device" value={order.device} />
-            <Field label="HCPCS Code" value={order.hcpcs} />
-            <Field label="Garment Type" value={order.garmentType} />
-            <Field label="Garment Style" value={order.garmentStyle} />
-            <Field label="Compression Level" value={order.compressionLevel} />
-            <Field label="Quantity" value={order.quantity} />
-            <Field label="Custom Made" value={order.customMade === true ? "Yes" : order.customMade === false ? "No" : null} />
-            <Field label="Manufacturer Preference" value={order.manufacturerPreference} />
-          </Section>
-
-          <Section title="Treatment Protocol">
-            <Field label="Times Per Day" value={order.timesPerDay} />
-            <Field label="Minutes Per Session" value={order.minutesPerSession} />
-          </Section>
-
-          <div style={{ marginTop: 40, borderTop: "1px solid #e2e8f0", paddingTop: 16, display: "flex", justifyContent: "space-between", fontSize: 10, color: "#94a3b8" }}>
-            <div>Submitted: {order.submittedAt ? new Date(order.submittedAt).toLocaleString() : "Pending"}</div>
-            <div>Generated: {new Date().toLocaleString()}</div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
+function orderToFormData(order: LymphedemaOrderForPdf): LymphedemaFormData {
+  return {
+    insurance: order.insurance ?? "",
+    placeOfService: order.placeOfService ?? "",
+    firstName: order.patient?.firstName ?? "",
+    lastName: order.patient?.lastName ?? "",
+    dob: order.patient?.dob ?? "",
+    mrn: order.patient?.mrn ?? "",
+    address: "",
+    city: "",
+    state: "",
+    zip: "",
+    phone: "",
+    email: "",
+    diagnosis: order.diagnosis ?? [],
+    conservativeTherapy: "",
+    skinChanges: [],
+    extremity: order.extremity ?? [],
+    measurements: order.measurements ?? {},
+    device: order.device ?? "",
+    hcpcs: order.hcpcs ?? "",
+    deviceRecommended: true,
+    garmentType: order.garmentType ?? "",
+    garmentStyle: order.garmentStyle ?? "",
+    compressionLevel: order.compressionLevel ?? "",
+    quantity: order.quantity != null ? String(order.quantity) : "",
+    customMade: order.customMade === true ? "yes" : order.customMade === false ? "no" : "",
+    manufacturerPreference: order.manufacturerPreference ?? "",
+    distalPressureMmhg: order.distalPressureMmhg != null ? String(order.distalPressureMmhg) : "",
+    timesPerDay: order.timesPerDay != null ? String(order.timesPerDay) : "",
+    minutesPerSession: order.minutesPerSession != null ? String(order.minutesPerSession) : "",
+  };
 }
 
 export function LymphedemaOrderPdfButton({
@@ -232,108 +877,27 @@ export function LymphedemaOrderPdfButton({
     if (!token) return;
     setLoading(true);
     try {
-      const res = await apiGet<{ success: true; data: LymphedemaOrderForPdf }>(
-        `/api/lymphedema-orders/${orderId}`,
-        { token },
-      );
+      const res = await apiGet<{
+        success: true;
+        data: LymphedemaOrderForPdf;
+      }>(`/api/lymphedema-orders/${orderId}`, { token });
       const order = res.data;
+      const formData = orderToFormData(order);
+      if (clinicName) formData.physicianName = clinicName;
 
-      const patientName =
-        [order.patient?.firstName, order.patient?.lastName]
-          .filter(Boolean)
-          .join(" ") || "—";
-      const extremityLabel = order.extremity
-        ? [order.extremity.side, order.extremity.type]
-            .filter(Boolean)
-            .join(" ")
-            .replace(/\b\w/g, (c) => c.toUpperCase())
-        : null;
-      const measurementText = order.measurements
-        ? Object.entries(order.measurements)
-            .map(([k, v]) => `${k}: ${v}`)
-            .join(", ")
-        : null;
-
-      const statusColors: Record<string, { bg: string; color: string }> = {
-        approved: { bg: "#dcfce7", color: "#166534" },
-        completed: { bg: "#dcfce7", color: "#166534" },
-        denied: { bg: "#fee2e2", color: "#991b1b" },
-        cancelled: { bg: "#fee2e2", color: "#991b1b" },
-      };
-      const sc = statusColors[order.status] ?? { bg: "#fef9c3", color: "#713f12" };
-
-      const html = `<!DOCTYPE html>
-<html><head><meta charset="utf-8"/>
-<title>Medical Device Order — ${order.id}</title>
-<style>* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color:#1e293b; padding:32px; }
-.section { margin-bottom:24px; }
-.section-title { font-weight:700; font-size:11px; color:#1e293b; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-bottom:12px; text-transform:uppercase; letter-spacing:.05em; }
-.grid { display:grid; grid-template-columns:1fr 1fr; gap:8px 24px; }
-.label { font-size:9px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:.05em; }
-.value { font-size:12px; color:#1e293b; margin-top:2px; }
-.footer { margin-top:40px; border-top:1px solid #e2e8f0; padding-top:16px; display:flex; justify-content:space-between; font-size:9px; color:#94a3b8; }
-@media print { @page { margin:20mm; } body { padding:0; } }
-</style></head><body>
-<div style="margin-bottom:32px">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start">
-    <div>
-      <div style="font-size:20px;font-weight:800">Medical Device / Equipment Order</div>
-      ${clinicName ? `<div style="font-size:13px;color:#64748b;margin-top:4px">${clinicName}</div>` : ""}
-    </div>
-    <div style="text-align:right">
-      <div style="font-size:9px;color:#94a3b8;text-transform:uppercase">Order ID</div>
-      <div style="font-size:10px;font-family:monospace;color:#475569">${order.id}</div>
-      <div style="font-size:9px;color:#94a3b8;margin-top:6px">${order.createdAt ? new Date(order.createdAt).toLocaleDateString() : ""}</div>
-    </div>
-  </div>
-  <div style="margin-top:12px;display:inline-block;padding:4px 12px;border-radius:9999px;font-size:10px;font-weight:600;text-transform:capitalize;background:${sc.bg};color:${sc.color}">${order.status}</div>
-</div>
-<div class="section"><div class="section-title">Patient Information</div>
-<div class="grid">
-<div><div class="label">Patient Name</div><div class="value">${patientName}</div></div>
-<div><div class="label">Date of Birth</div><div class="value">${order.patient?.dob ?? "—"}</div></div>
-<div><div class="label">MRN</div><div class="value">${order.patient?.mrn ?? "—"}</div></div>
-<div><div class="label">Insurance</div><div class="value">${order.insurance ?? "—"}</div></div>
-<div><div class="label">Place of Service</div><div class="value">${order.placeOfService ?? "—"}</div></div>
-</div></div>
-<div class="section"><div class="section-title">Clinical Assessment</div>
-<div class="grid">
-<div><div class="label">Primary Diagnosis</div><div class="value">${order.diagnosis?.primary ?? "—"}</div></div>
-<div><div class="label">Secondary Diagnosis</div><div class="value">${order.diagnosis?.secondary ?? "—"}</div></div>
-<div><div class="label">Extremity</div><div class="value">${extremityLabel ?? "—"}</div></div>
-<div><div class="label">Measurements</div><div class="value">${measurementText ?? "—"}</div></div>
-</div></div>
-<div class="section"><div class="section-title">Device Recommendation</div>
-<div class="grid">
-<div><div class="label">Device</div><div class="value">${order.device ?? "—"}</div></div>
-<div><div class="label">HCPCS Code</div><div class="value">${order.hcpcs ?? "—"}</div></div>
-<div><div class="label">Garment Type</div><div class="value">${order.garmentType ?? "—"}</div></div>
-<div><div class="label">Garment Style</div><div class="value">${order.garmentStyle ?? "—"}</div></div>
-<div><div class="label">Compression Level</div><div class="value">${order.compressionLevel ?? "—"}</div></div>
-<div><div class="label">Quantity</div><div class="value">${order.quantity ?? "—"}</div></div>
-<div><div class="label">Custom Made</div><div class="value">${order.customMade === true ? "Yes" : order.customMade === false ? "No" : "—"}</div></div>
-<div><div class="label">Manufacturer Preference</div><div class="value">${order.manufacturerPreference ?? "—"}</div></div>
-</div></div>
-<div class="section"><div class="section-title">Treatment Protocol</div>
-<div class="grid">
-<div><div class="label">Times Per Day</div><div class="value">${order.timesPerDay ?? "—"}</div></div>
-<div><div class="label">Minutes Per Session</div><div class="value">${order.minutesPerSession ?? "—"}</div></div>
-</div></div>
-<div class="footer">
-  <div>Submitted: ${order.submittedAt ? new Date(order.submittedAt).toLocaleString() : "Pending"}</div>
-  <div>Generated: ${new Date().toLocaleString()}</div>
-</div>
-</body></html>`;
-
-      const pw = window.open("", "_blank", "width=800,height=600");
-      if (!pw) return;
-      pw.document.write(html);
-      pw.document.close();
-      pw.focus();
-      setTimeout(() => { pw.print(); pw.close(); }, 300);
+      const { pdf } = await import("@react-pdf/renderer");
+      const blob = await pdf(<ReMarxOrderDocument data={formData} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const lastName = order.patient?.lastName ?? "Unknown";
+      const firstName = order.patient?.firstName ?? "";
+      const date = new Date().toISOString().slice(0, 10);
+      a.download = `ReMarx_Order_${lastName}_${firstName}_${date}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
     } catch (err) {
-      console.error("Failed to load order for PDF:", err);
+      console.error("Failed to generate PDF:", err);
     } finally {
       setLoading(false);
     }

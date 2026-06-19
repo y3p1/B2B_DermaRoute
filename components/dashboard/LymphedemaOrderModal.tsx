@@ -13,14 +13,75 @@ import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import NextImage from "next/image";
+
+import imgBelowKneeStockings from "@/assets/images/BelowKnee-Stockings.jpeg";
+import imgThighStockings from "@/assets/images/Thigh-Stockings.jpeg";
+import imgPantyhoseStockings from "@/assets/images/Pantyhose-Stockings.jpeg";
+import imgFootGarments from "@/assets/images/Foot-Garments.jpeg";
+import imgCalfGarments from "@/assets/images/Calf-Garments.jpeg";
+import imgKneeGarments from "@/assets/images/Knee-Garments.jpeg";
+import imgThighGarments from "@/assets/images/Thigh-Garments.jpeg";
+import imgFullLegGarments from "@/assets/images/FullLeg-Garments.jpeg";
+import imgFullLegWFootGarments from "@/assets/images/FullLegWFoot-Garments.jpeg";
+import imgGauntlet from "@/assets/images/Gauntlet-Gloves&Sleeves.jpeg";
+import imgGlove from "@/assets/images/Glove-Gloves&Sleeves.jpeg";
+import imgGloveSleeveCombo from "@/assets/images/GloveSleeveCombo-Gloves&Sleeves.jpeg";
+import imgArmSleeve from "@/assets/images/ArmSleeve-Gloves&Sleeves.jpeg";
+import imgHandVelcro from "@/assets/images/HandVelcro-Wraps.jpeg";
+import imgArmWrap from "@/assets/images/ArmWrap-Wraps.jpeg";
+import imgGloveGarments from "@/assets/images/Glove-Garments.jpeg";
+import imgFingertipstoAxilia from "@/assets/images/FingertipstoAxilia-Garments.jpeg";
+import imgWristtoAxilia from "@/assets/images/WristtoAxilia-Garments.jpeg";
+import type { StaticImageData } from "next/image";
 import { useAuthStore } from "@/store/auth";
 import { apiPost } from "@/lib/apiClient";
 import { cn } from "@/lib/utils";
 import { Check, ChevronRight, ChevronLeft, Wind } from "lucide-react";
+
+type GarmentChoice = { label: string; category: string; image: StaticImageData; value: string };
+
+const LOWER_GARMENTS: GarmentChoice[] = [
+  { label: "Below Knee", category: "Stockings", image: imgBelowKneeStockings, value: "BelowKnee-Stockings" },
+  { label: "Thigh", category: "Stockings", image: imgThighStockings, value: "Thigh-Stockings" },
+  { label: "Pantyhose", category: "Stockings", image: imgPantyhoseStockings, value: "Pantyhose-Stockings" },
+  { label: "Foot", category: "Garments", image: imgFootGarments, value: "Foot-Garments" },
+  { label: "Calf", category: "Garments", image: imgCalfGarments, value: "Calf-Garments" },
+  { label: "Knee", category: "Garments", image: imgKneeGarments, value: "Knee-Garments" },
+  { label: "Thigh", category: "Garments", image: imgThighGarments, value: "Thigh-Garments" },
+  { label: "Full Leg", category: "Garments", image: imgFullLegGarments, value: "FullLeg-Garments" },
+  { label: "Full Leg w/ Foot", category: "Garments", image: imgFullLegWFootGarments, value: "FullLegWFoot-Garments" },
+];
+
+const UPPER_GARMENTS: GarmentChoice[] = [
+  { label: "Gauntlet", category: "Gloves & Sleeves", image: imgGauntlet, value: "Gauntlet-Gloves&Sleeves" },
+  { label: "Glove", category: "Gloves & Sleeves", image: imgGlove, value: "Glove-Gloves&Sleeves" },
+  { label: "Glove Sleeve Combo", category: "Gloves & Sleeves", image: imgGloveSleeveCombo, value: "GloveSleeveCombo-Gloves&Sleeves" },
+  { label: "Arm Sleeve", category: "Gloves & Sleeves", image: imgArmSleeve, value: "ArmSleeve-Gloves&Sleeves" },
+  { label: "Hand Velcro Wrap", category: "Wraps", image: imgHandVelcro, value: "HandVelcro-Wraps" },
+  { label: "Arm Wrap", category: "Wraps", image: imgArmWrap, value: "ArmWrap-Wraps" },
+  { label: "Glove", category: "Garments", image: imgGloveGarments, value: "Glove-Garments" },
+  { label: "Fingertips to Axilla", category: "Garments", image: imgFingertipstoAxilia, value: "FingertipstoAxilia-Garments" },
+  { label: "Wrist to Axilla", category: "Garments", image: imgWristtoAxilia, value: "WristtoAxilia-Garments" },
+];
+
+function getAllGarments(): GarmentChoice[] {
+  return [...LOWER_GARMENTS, ...UPPER_GARMENTS];
+}
+
+function groupByCategory(choices: GarmentChoice[]): Record<string, GarmentChoice[]> {
+  const groups: Record<string, GarmentChoice[]> = {};
+  for (const c of choices) {
+    (groups[c.category] ??= []).push(c);
+  }
+  return groups;
+}
 
 interface LymphedemaOrderModalProps {
   open: boolean;
@@ -51,6 +112,7 @@ type FormData = {
   deviceRecommended: boolean;
   garmentType: string;
   garmentStyle: string;
+  selectedGarment: string;
   compressionLevel: string;
   quantity: string;
   customMade: "yes" | "no" | "";
@@ -83,6 +145,7 @@ const EMPTY_FORM: FormData = {
   deviceRecommended: true,
   garmentType: "",
   garmentStyle: "",
+  selectedGarment: "",
   compressionLevel: "",
   quantity: "",
   customMade: "",
@@ -179,6 +242,31 @@ export function LymphedemaOrderModal({ open, onOpenChange, onCreated }: Lymphede
 
   const hasLeg = formData.extremity.some((e) => LEG_EXTREMITIES.has(e));
   const hasArm = formData.extremity.some((e) => ARM_EXTREMITIES.has(e));
+
+  const availableGarments = React.useMemo(() => {
+    const choices: GarmentChoice[] = [];
+    if (hasLeg) choices.push(...LOWER_GARMENTS);
+    if (hasArm) choices.push(...UPPER_GARMENTS);
+    if (!hasLeg && !hasArm) choices.push(...LOWER_GARMENTS, ...UPPER_GARMENTS);
+    return choices;
+  }, [hasLeg, hasArm]);
+
+  const selectedGarmentImage = React.useMemo(() => {
+    if (!formData.selectedGarment) return null;
+    return getAllGarments().find((g) => g.value === formData.selectedGarment)?.image ?? null;
+  }, [formData.selectedGarment]);
+
+  function handleGarmentSelect(value: string) {
+    const choice = getAllGarments().find((g) => g.value === value);
+    if (choice) {
+      setFormData((prev) => ({
+        ...prev,
+        garmentType: choice.category,
+        garmentStyle: choice.label,
+        selectedGarment: value,
+      }));
+    }
+  }
 
   const step1Valid =
     formData.insurance.trim() !== "" &&
@@ -461,22 +549,32 @@ export function LymphedemaOrderModal({ open, onOpenChange, onCreated }: Lymphede
                 <div>
                   <SectionHeader>Garment Selection</SectionHeader>
                   <div className="space-y-3">
-                    <FieldRow>
-                      <Field label="Garment Type">
-                        <Select value={formData.garmentType} onValueChange={(v) => set("garmentType", v)}>
-                          <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Select…" /></SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="None">None</SelectItem>
-                            <SelectItem value="Stocking">Stocking</SelectItem>
-                            <SelectItem value="Gloves/Sleeves">Gloves/Sleeves</SelectItem>
-                            <SelectItem value="Compression Wraps">Compression Wraps</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </Field>
-                      <Field label="Garment Style">
-                        <Input className="h-9 text-sm" placeholder="e.g. Below Knee, Arm Sleeve…" value={formData.garmentStyle} onChange={(e) => set("garmentStyle", e.target.value)} />
-                      </Field>
-                    </FieldRow>
+                    <div className="flex gap-4 items-start">
+                      <div className="flex-1">
+                        <Field label="Garment">
+                          <Select value={formData.selectedGarment} onValueChange={handleGarmentSelect}>
+                            <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Select garment…" /></SelectTrigger>
+                            <SelectContent>
+                              {Object.entries(groupByCategory(availableGarments)).map(([category, choices]) => (
+                                <SelectGroup key={category}>
+                                  <SelectLabel>{category}</SelectLabel>
+                                  {choices.map((c) => (
+                                    <SelectItem key={c.value} value={c.value}>
+                                      {c.label} ({c.category})
+                                    </SelectItem>
+                                  ))}
+                                </SelectGroup>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </Field>
+                      </div>
+                      {selectedGarmentImage && (
+                        <div className="w-[120px] h-[120px] border border-slate-200 rounded-lg overflow-hidden flex items-center justify-center bg-white shrink-0">
+                          <NextImage src={selectedGarmentImage} alt={formData.garmentStyle} width={120} height={120} className="object-contain" />
+                        </div>
+                      )}
+                    </div>
                     <FieldRow>
                       <Field label="Compression Level">
                         <Select value={formData.compressionLevel} onValueChange={(v) => set("compressionLevel", v)}>
@@ -596,8 +694,7 @@ export function LymphedemaOrderModal({ open, onOpenChange, onCreated }: Lymphede
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Device & Garment</p>
                   <SummaryRow label="Device" value={`${formData.device} (${formData.hcpcs})`} />
                   <SummaryRow label="Device recommended" value={formData.deviceRecommended ? "Yes" : "Overridden by staff"} />
-                  <SummaryRow label="Garment type" value={formData.garmentType} />
-                  <SummaryRow label="Garment style" value={formData.garmentStyle} />
+                  <SummaryRow label="Garment" value={formData.garmentStyle && formData.garmentType ? `${formData.garmentStyle} (${formData.garmentType})` : formData.garmentStyle || formData.garmentType || undefined} />
                   <SummaryRow label="Compression level" value={formData.compressionLevel} />
                   <SummaryRow label="Quantity" value={formData.quantity} />
                   <SummaryRow label="Custom made" value={formData.customMade === "yes" ? "Yes" : formData.customMade === "no" ? "No" : undefined} />

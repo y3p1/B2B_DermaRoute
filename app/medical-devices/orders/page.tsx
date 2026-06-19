@@ -127,7 +127,7 @@ export default function MedicalDevicesOrdersPage() {
                   </td>
                   <td className="px-5 py-3 text-slate-600">{order.device ?? "—"}</td>
                   <td className="px-5 py-3 text-slate-600">{order.insurance ?? "—"}</td>
-                  <td className="px-5 py-3 text-slate-600 text-xs">{order.extremity?.join(", ") ?? "—"}</td>
+                  <td className="px-5 py-3 text-slate-600 text-xs">{Array.isArray(order.extremity) ? order.extremity.join(", ") : "—"}</td>
                   <td className="px-5 py-3">
                     <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium capitalize ${STATUS_COLORS[order.status] ?? "bg-slate-100 text-slate-500"}`}>
                       {order.status}

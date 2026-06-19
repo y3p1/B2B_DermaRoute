@@ -170,7 +170,7 @@ export function LymphedemaOrdersTab() {
                     <tr>
                       <td colSpan={7} className="px-6 py-4 bg-slate-50 text-xs text-slate-600 space-y-1">
                         <div className="grid grid-cols-2 gap-x-8 gap-y-1">
-                          <div><span className="font-medium">Extremity:</span> {row.extremity?.join(", ") ?? "—"}</div>
+                          <div><span className="font-medium">Extremity:</span> {Array.isArray(row.extremity) ? row.extremity.join(", ") : "—"}</div>
                           <div><span className="font-medium">Submitted:</span> {row.submittedAt ? new Date(row.submittedAt).toLocaleString() : "Pending submission"}</div>
                           <div><span className="font-medium">DOB:</span> {(row.patient as Patient | null)?.dob ?? "—"}</div>
                           <div><span className="font-medium">Order ID:</span> <span className="font-mono">{row.id}</span></div>

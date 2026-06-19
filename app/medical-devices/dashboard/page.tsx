@@ -63,7 +63,7 @@ export default function MedicalDevicesDashboardPage() {
   const extremityCounts = React.useMemo(() => {
     const counts: Record<string, number> = {};
     for (const o of orders) {
-      for (const ex of o.extremity ?? []) {
+      for (const ex of Array.isArray(o.extremity) ? o.extremity : []) {
         counts[ex] = (counts[ex] ?? 0) + 1;
       }
     }
@@ -223,7 +223,7 @@ export default function MedicalDevicesDashboardPage() {
                       </span>
                     ) : "—"}
                   </td>
-                  <td className="px-5 py-3 text-slate-600 text-xs">{order.extremity?.join(", ") ?? "—"}</td>
+                  <td className="px-5 py-3 text-slate-600 text-xs">{Array.isArray(order.extremity) ? order.extremity.join(", ") : "—"}</td>
                   <td className="px-5 py-3 text-slate-600 text-xs">{order.insurance ?? "—"}</td>
                   <td className="px-5 py-3">
                     <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium capitalize ${STATUS_COLORS[order.status] ?? "bg-slate-100 text-slate-500"}`}>

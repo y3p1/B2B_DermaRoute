@@ -124,7 +124,7 @@ export default function MedicalDevicesOrderDetailPage() {
             <Field label="Diagnosis" value={order.diagnosis?.join(", ")} />
             <Field label="Conservative Therapy" value={order.conservativeTherapyCompleted ? "Yes (≥4 weeks)" : order.conservativeTherapyCompleted === false ? "No" : null} />
             <Field label="Skin Changes" value={order.skinChanges?.join(", ")} />
-            <Field label="Extremity" value={order.extremity?.join(", ")} />
+            <Field label="Extremity" value={Array.isArray(order.extremity) ? order.extremity.join(", ") : null} />
           </div>
           {order.measurements && Object.keys(order.measurements).length > 0 && (
             <div className="mt-3">
@@ -144,8 +144,7 @@ export default function MedicalDevicesOrderDetailPage() {
             <Field label="Device" value={order.device} />
             <Field label="HCPCS Code" value={order.hcpcs} />
             <Field label="Recommended by System" value={order.deviceRecommended ? "Yes" : order.deviceRecommended === false ? "Overridden" : null} />
-            <Field label="Garment Type" value={order.garmentType} />
-            <Field label="Garment Style" value={order.garmentStyle} />
+            <Field label="Garment" value={order.garmentStyle && order.garmentType ? `${order.garmentStyle} (${order.garmentType})` : order.garmentStyle ?? order.garmentType} />
             <Field label="Compression Level" value={order.compressionLevel} />
             <Field label="Quantity" value={order.quantity} />
             <Field label="Custom Made" value={order.customMade === true ? "Yes" : order.customMade === false ? "No" : null} />
