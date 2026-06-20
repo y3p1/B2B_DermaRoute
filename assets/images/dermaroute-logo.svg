@@ -1,23 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 64" width="260" height="64">
-  <rect width="260" height="64" fill="none"/>
-  <!-- Leaf/route icon -->
-  <circle cx="16" cy="32" r="10" fill="oklch(0.55 0.14 160)" opacity="0.9"/>
-  <circle cx="16" cy="32" r="5" fill="white" opacity="0.9"/>
-  <line x1="26" y1="32" x2="36" y2="32" stroke="oklch(0.55 0.14 160)" stroke-width="2.5" stroke-linecap="round"/>
-  <!-- Wordmark -->
-  <text x="42" y="41"
-    font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
-    font-size="26"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 50" width="210" height="50">
+  <defs>
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E8724A"/>
+      <stop offset="100%" stop-color="#C5573A"/>
+    </linearGradient>
+  </defs>
+  <!-- Icon mark: rounded square with orange gradient -->
+  <rect x="0" y="5" width="40" height="40" rx="11" fill="url(#iconGrad)"/>
+  <!-- Hexagon shape (scaled to fit 40x40 icon, centered) -->
+  <path d="M20 11L27.5 16V26L20 31L12.5 26V16L20 11Z" stroke="white" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+  <!-- Cross mark inside hexagon -->
+  <path d="M14 21H26M20 15V27" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Wordmark "DermaRoute" -->
+  <text x="50" y="33"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="23"
     font-weight="700"
     letter-spacing="-0.5"
-    fill="oklch(0.20 0.06 160)">Derma<tspan fill="oklch(0.55 0.14 160)">Route</tspan>
+    fill="#1a1520">Derma<tspan fill="#E8724A">Route</tspan>
   </text>
-  <!-- Demo badge -->
-  <rect x="195" y="22" width="52" height="20" rx="4" fill="oklch(0.55 0.14 160)" opacity="0.15"/>
-  <text x="221" y="36"
-    font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
-    font-size="11"
-    font-weight="600"
-    text-anchor="middle"
-    fill="oklch(0.40 0.12 160)">DEMO</text>
 </svg>

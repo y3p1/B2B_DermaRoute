@@ -29,7 +29,7 @@ export function DemoBanner() {
         <button
           onClick={handleSwitchRole}
           className="underline font-semibold text-xs hover:opacity-80"
-          style={{ color: "oklch(0.40 0.12 160)" }}
+          style={{ color: "oklch(0.55 0.167 35)" }}
         >
           Switch role
         </button>

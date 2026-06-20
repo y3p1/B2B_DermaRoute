@@ -87,8 +87,8 @@ export function RoleSwitcher() {
             className="group flex flex-col items-center text-center gap-4 p-7 rounded-2xl border bg-white shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 focus:outline-none focus:ring-2 disabled:cursor-wait disabled:opacity-70"
             style={
               {
-                borderColor: "oklch(0.88 0.04 160)",
-                "--tw-ring-color": "oklch(0.65 0.11 160)",
+                borderColor: "oklch(0.88 0.08 35)",
+                "--tw-ring-color": "oklch(0.65 0.167 35)",
               } as React.CSSProperties
             }
           >

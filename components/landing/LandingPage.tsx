@@ -119,8 +119,8 @@ export function LandingPage() {
               ].join(" ")}
               style={
                 {
-                  borderColor: "oklch(0.88 0.04 160)",
-                  "--tw-ring-color": "oklch(0.65 0.11 160)",
+                  borderColor: "oklch(0.88 0.08 35)",
+                  "--tw-ring-color": "oklch(0.65 0.167 35)",
                 } as React.CSSProperties
               }
             >
