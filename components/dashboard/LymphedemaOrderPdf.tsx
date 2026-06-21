@@ -700,13 +700,15 @@ export function ReMarxOrderDocument({ data }: { data: LymphedemaFormData }) {
               Physician Signature
             </Text>
             <View style={s.sigBox}>
-              {data.signatureMode === "digital" &&
-                data.signatureDataUrl && (
+              {data.signatureMode === "digital" && data.signatureDataUrl && (
+                <>
+                  {/* eslint-disable-next-line jsx-a11y/alt-text */}
                   <Image
                     src={data.signatureDataUrl}
                     style={{ width: "100%", height: "100%", objectFit: "contain" }}
                   />
-                )}
+                </>
+              )}
             </View>
           </View>
           <View style={{ flex: 1 }}>

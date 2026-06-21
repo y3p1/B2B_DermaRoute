@@ -6,7 +6,6 @@ import {
   Package,
   ClipboardCheck,
   FileText,
-  Box,
   Factory,
   UserPlus,
   X,

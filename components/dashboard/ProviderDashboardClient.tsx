@@ -377,7 +377,6 @@ export default function ProviderDashboardClient() {
     return () => {
       supabase.removeChannel(channel);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, enabledTracks, refreshBvRequests, refreshProductOrders, refreshBaaAgreements, refreshLymphedemaOrders, refreshOcularOrders]);
 
   if (status === "idle" || status === "loading") {
@@ -471,8 +470,8 @@ export default function ProviderDashboardClient() {
 
     return matchesSearch && matchesDate;
   });
-  const bvTotalPages = Math.ceil(filteredBvRequests.length / bvItemsPerPage);
-  const paginatedBvRequests = filteredBvRequests.slice(
+  const _bvTotalPages = Math.ceil(filteredBvRequests.length / bvItemsPerPage);
+  const _paginatedBvRequests = filteredBvRequests.slice(
     (bvCurrentPage - 1) * bvItemsPerPage,
     bvCurrentPage * bvItemsPerPage,
   );
@@ -1000,7 +999,7 @@ export default function ProviderDashboardClient() {
                 {lymphedemaLoading && lymphedemaOrders.length === 0 ? (
                   <div className="p-8 text-center text-slate-500">Loading…</div>
                 ) : lymphedemaOrders.length === 0 ? (
-                  <div className="p-8 text-center text-slate-400 text-sm">No lymphedema orders yet. Click "New Order" to submit one.</div>
+                  <div className="p-8 text-center text-slate-400 text-sm">No lymphedema orders yet. Click &quot;New Order&quot; to submit one.</div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">

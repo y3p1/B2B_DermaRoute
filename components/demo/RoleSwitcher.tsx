@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import { Stethoscope, ClipboardList, Shield, Wind, Eye, Activity } from "lucide-react";
+import { ClipboardList, Shield, Wind, Eye, Activity } from "lucide-react";
 import { type DemoRole, DEMO_ROLE_TRACKS, DEMO_TRACK_LABELS } from "@/lib/demoMode";
 import { useAuthStore } from "@/store/auth";
 

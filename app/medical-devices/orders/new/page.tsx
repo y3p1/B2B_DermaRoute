@@ -962,7 +962,7 @@ export default function MedicalDevicesNewOrderPage() {
                     <div>
                       <Label className="text-xs text-slate-600 mb-1 block">Product Name</Label>
                       <p className="text-[10px] text-slate-400 mb-1">
-                        Specific garment name (e.g., "Jobst Opaque", "Mediven Plus")
+                        Specific garment name (e.g., &quot;Jobst Opaque&quot;, &quot;Mediven Plus&quot;)
                       </p>
                       <Input
                         className="h-9 text-sm"
@@ -1198,6 +1198,7 @@ export default function MedicalDevicesNewOrderPage() {
               {formData.signatureMode === "draw" && formData.signatureData && (
                 <div>
                   <p className="text-xs text-slate-500 mb-2">Captured Signature:</p>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={formData.signatureData}
                     alt="Physician signature"

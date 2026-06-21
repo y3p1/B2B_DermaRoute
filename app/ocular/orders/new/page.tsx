@@ -578,7 +578,7 @@ function StepDiagnosis({
       </div>
 
       <div style={{ marginTop: 16, background: "#fff8f0", borderRadius: 8, padding: "10px 14px", border: "1px solid #fcd34d", fontSize: 12, color: "#92400e" }}>
-        ⚠️ <strong>CPT 65778</strong> — "Placement of amniotic membrane on the ocular surface; without sutures." This is an <strong>in-office procedure</strong>. Billable per eye, per encounter.
+        ⚠️ <strong>CPT 65778</strong> — &quot;Placement of amniotic membrane on the ocular surface; without sutures.&quot; This is an <strong>in-office procedure</strong>. Billable per eye, per encounter.
       </div>
     </div>
   );
