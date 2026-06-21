@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { LogOut, Menu, Settings, User, Save, Loader2, RefreshCw, RotateCcw } from "lucide-react";
+import { LogOut, Menu, Settings, User, Save, Loader2, RefreshCw, RotateCcw, ArrowLeftRight } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +19,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import IntegrityTissueLogo from "../IntegrityTissueLogo";
 import { useAuthStore } from "@/store/auth";
 import { apiPatch, apiPost } from "@/lib/apiClient";
 import { isClientDemoMode, DEMO_ROLE_COOKIE, type DemoRole } from "@/lib/demoMode";
@@ -59,8 +58,12 @@ const fieldLabels: Record<keyof ProviderFormData, string> = {
 };
 
 function switchDemoRole(role: DemoRole) {
+  if (role === "provider" || role === "provider_wound2" || role === "provider_ocular") {
+    window.location.href = "/demo";
+    return;
+  }
   document.cookie = `${DEMO_ROLE_COOKIE}=${role}; path=/; max-age=86400; samesite=lax`;
-  const dest = role === "admin" ? "/admin" : role === "clinic_staff" ? "/clinic-staff" : "/";
+  const dest = role === "admin" ? "/admin" : "/clinic-staff";
   window.location.href = dest;
 }
 
@@ -176,9 +179,21 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
             <Menu className="w-5 h-5" />
           </Button>
         )}
-        <IntegrityTissueLogo width={200} height={80} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/dermaroute-logo.svg" alt="DermaRoute" className="h-9 w-auto" />
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
+        {isClientDemoMode() && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-slate-600 hover:text-slate-800 border-slate-300 hover:bg-slate-100"
+            onClick={() => { window.location.href = "/demo"; }}
+          >
+            <ArrowLeftRight className="w-4 h-4 mr-1.5" />
+            Switch Role
+          </Button>
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -223,7 +238,7 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
                 </DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer" onClick={() => switchDemoRole("clinic_staff")}>
                   <RefreshCw className="w-4 h-4 mr-2" />
-                  Clinic Staff
+                  DR Representative
                 </DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer" onClick={() => switchDemoRole("admin")}>
                   <RefreshCw className="w-4 h-4 mr-2" />

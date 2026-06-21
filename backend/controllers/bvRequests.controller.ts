@@ -16,11 +16,21 @@ import {
   getAllClinicStaffEmails,
 } from "../services/clinicStaffAcct.service";
 import { sendBvRequestNotification } from "../services/sendgrid.service";
+import { isDemoMode } from "../../lib/demoMode";
 
 export async function listBvRequestsController(_req: Request, res: Response) {
   const userId = res.locals.userId as string | undefined;
   if (!userId) {
     return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  if (isDemoMode()) {
+    const demoRole = res.locals.demoRole as string | undefined;
+    if (demoRole === "admin" || demoRole === "clinic_staff") {
+      const rows = await listAllBvRequests();
+      return res.json({ success: true, data: rows });
+    }
+    return res.json({ success: true, data: [] });
   }
 
   // Check if user is admin or clinic staff

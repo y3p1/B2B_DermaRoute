@@ -161,7 +161,7 @@ export default function ClinicStaffSignupStep1Profile({
           <SignupStepper
             currentStep={1}
             steps={steps}
-            title="Create Clinic Staff Account"
+            title="Create DR Representative Account"
           />
         </div>
 

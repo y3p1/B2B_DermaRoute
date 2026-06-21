@@ -133,7 +133,7 @@ function Step1Details({
   const title =
     watchedRole === "admin"
       ? "Create Admin Account"
-      : "Create Clinic Staff Account";
+      : "Create DR Representative Account";
 
   const fixedRole: AdminRole | null =
     allowedRoles.length === 1 ? allowedRoles[0] : null;
@@ -165,7 +165,7 @@ function Step1Details({
               <div className="text-sm">
                 <div className="text-black font-medium">Role</div>
                 <div className="mt-1 inline-flex px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-xs">
-                  {fixedRole === "admin" ? "Admin" : "Clinic Staff"}
+                  {fixedRole === "admin" ? "Admin" : "DR Representative"}
                 </div>
               </div>
             ) : (
@@ -188,7 +188,7 @@ function Step1Details({
                         <SelectContent>
                           {allowedRoles.includes("clinic_staff") ? (
                             <SelectItem value="clinic_staff">
-                              Clinic Staff
+                              DR Representative
                             </SelectItem>
                           ) : null}
                           {allowedRoles.includes("admin") ? (
@@ -324,7 +324,7 @@ function Step2Review({
   const title =
     values.role === "admin"
       ? "Create Admin Account"
-      : "Create Clinic Staff Account";
+      : "Create DR Representative Account";
 
   return (
     <div className="w-full px-8 py-4">
@@ -377,7 +377,7 @@ function Step2Review({
                 <div>
                   <p className="text-gray-600">Role:</p>
                   <p className="text-black font-medium">
-                    {values.role === "admin" ? "Admin" : "Clinic Staff"}
+                    {values.role === "admin" ? "Admin" : "DR Representative"}
                   </p>
                 </div>
                 <div>
@@ -462,7 +462,7 @@ function Step3Success({
 
           <div className="mb-12">
             <p className="text-xl text-black text-center">
-              The new {role === "admin" ? "admin" : "clinic staff"} can now sign
+              The new {role === "admin" ? "admin" : "DR Representative"} can now sign
               in with OTP using their phone number.
             </p>
           </div>

@@ -9,6 +9,7 @@ import {
   X,
   ChevronRight,
   Wind,
+  Eye,
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth";
@@ -25,7 +26,7 @@ import { LymphedemaOrderModal } from "@/components/dashboard/LymphedemaOrderModa
 import { LymphedemaOrderPdfButton } from "@/components/dashboard/LymphedemaOrderPdf";
 import type { ProductOrderRow } from "@/components/dashboard/productOrderColumns";
 
-type TabKey = "bv_requests" | "order_products" | "baa_agreements" | "lymphedema_orders";
+type TabKey = "bv_requests" | "order_products" | "baa_agreements" | "lymphedema_orders" | "ocular_orders";
 
 type LymphedemaOrderRow = {
   id: string;
@@ -35,6 +36,17 @@ type LymphedemaOrderRow = {
   extremity: string[] | null;
   createdAt: string | null;
   submittedAt: string | null;
+};
+
+type OcularOrderRow = {
+  id: string;
+  status: string;
+  patient: { firstName?: string; lastName?: string } | null;
+  productVariant: string | null;
+  sizeMm: number | null;
+  sku: string | null;
+  quantity: number | null;
+  createdAt: string | null;
 };
 
 type BvRequestRow = {
@@ -130,7 +142,14 @@ export default function ProviderDashboardClient() {
   const token = useAuthStore((s) => s.jwt);
   const enabledTracks = useAuthStore((s) => s.enabledTracks);
 
-  const [tab, setTab] = React.useState<TabKey>("bv_requests");
+  const defaultTab = (tracks: string[]): TabKey => {
+    if (tracks.includes("wound_care")) return "bv_requests";
+    if (tracks.includes("lymphedema")) return "lymphedema_orders";
+    if (tracks.includes("ocular")) return "ocular_orders";
+    return "baa_agreements";
+  };
+
+  const [tab, setTab] = React.useState<TabKey>(() => defaultTab(enabledTracks));
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   // BV Requests state
@@ -183,6 +202,11 @@ export default function ProviderDashboardClient() {
   const [lymphedemaLoading, setLymphedemaLoading] = React.useState(false);
   const [lymphedemaError, setLymphedemaError] = React.useState<string | null>(null);
   const [lymphedemaModalOpen, setLymphedemaModalOpen] = React.useState(false);
+
+  // Ocular Orders state
+  const [ocularOrders, setOcularOrders] = React.useState<OcularOrderRow[]>([]);
+  const [ocularLoading, setOcularLoading] = React.useState(false);
+  const [ocularError, setOcularError] = React.useState<string | null>(null);
 
   const refreshBvRequests = React.useCallback(async () => {
     setBvLoading(true);
@@ -267,21 +291,51 @@ export default function ProviderDashboardClient() {
     }
   }, [token]);
 
+  const refreshOcularOrders = React.useCallback(async () => {
+    setOcularLoading(true);
+    setOcularError(null);
+    try {
+      if (!token) { setOcularError("Please sign in again."); return; }
+      const res = await apiGet<{ success: true; data: OcularOrderRow[] }>(
+        "/api/ocular/orders",
+        { token },
+      );
+      setOcularOrders(res.data);
+    } catch (err) {
+      setOcularError(err instanceof Error ? err.message : "Failed to load ocular orders");
+    } finally {
+      setOcularLoading(false);
+    }
+  }, [token]);
+
   React.useEffect(() => {
     const requestedTab = searchParams.get("tab");
     if (
       requestedTab === "bv_requests" ||
       requestedTab === "order_products" ||
       requestedTab === "baa_agreements" ||
-      requestedTab === "lymphedema_orders"
+      requestedTab === "lymphedema_orders" ||
+      requestedTab === "ocular_orders"
     ) {
-      setTab(requestedTab);
+      setTab(requestedTab as TabKey);
     }
   }, [searchParams]);
 
   React.useEffect(() => {
     if (status === "unauthenticated") router.replace("/auth");
   }, [router, status]);
+
+  React.useEffect(() => {
+    if (status === "authenticated" && enabledTracks.length > 0) {
+      setTab((current) => {
+        const isWoundTab = current === "bv_requests" || current === "order_products";
+        if (isWoundTab && !enabledTracks.includes("wound_care")) return defaultTab(enabledTracks);
+        if (current === "lymphedema_orders" && !enabledTracks.includes("lymphedema")) return defaultTab(enabledTracks);
+        if (current === "ocular_orders" && !enabledTracks.includes("ocular")) return defaultTab(enabledTracks);
+        return current;
+      });
+    }
+  }, [status, enabledTracks]);
 
   React.useEffect(() => {
     if (status !== "authenticated") return;
@@ -294,10 +348,13 @@ export default function ProviderDashboardClient() {
 
   React.useEffect(() => {
     if (status !== "authenticated") return;
-    void refreshBvRequests();
-    void refreshProductOrders();
+    if (enabledTracks.includes("wound_care")) {
+      void refreshBvRequests();
+      void refreshProductOrders();
+    }
     void refreshBaaAgreements();
-    void refreshLymphedemaOrders();
+    if (enabledTracks.includes("lymphedema")) void refreshLymphedemaOrders();
+    if (enabledTracks.includes("ocular")) void refreshOcularOrders();
 
     const channel = supabase
       .channel("provider-dashboard")
@@ -320,36 +377,45 @@ export default function ProviderDashboardClient() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [status, refreshBvRequests, refreshProductOrders, refreshBaaAgreements, refreshLymphedemaOrders]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, enabledTracks, refreshBvRequests, refreshProductOrders, refreshBaaAgreements, refreshLymphedemaOrders, refreshOcularOrders]);
 
   if (status === "idle" || status === "loading") {
     return <div className="min-h-screen bg-[#F8F9FB]" />;
   }
 
   const navItems = [
-    {
-      key: "bv_requests" as TabKey,
-      label: "BV Requests",
-      icon: <ClipboardCheck className="w-5 h-5" />,
-      badge: bvRequests.length,
-    },
-    {
-      key: "order_products" as TabKey,
-      label: "Order Products",
-      icon: <Package className="w-5 h-5" />,
-      badge: productOrders.length,
-    },
-    {
-      key: "baa_agreements" as TabKey,
-      label: "BAA Provider Agreements",
-      icon: <FileText className="w-5 h-5" />,
-    },
+    ...(enabledTracks.includes("wound_care") ? [
+      {
+        key: "bv_requests" as TabKey,
+        label: "BV Requests",
+        icon: <ClipboardCheck className="w-5 h-5" />,
+        badge: bvRequests.length,
+      },
+      {
+        key: "order_products" as TabKey,
+        label: "Order Products",
+        icon: <Package className="w-5 h-5" />,
+        badge: productOrders.length,
+      },
+    ] : []),
     ...(enabledTracks.includes("lymphedema") ? [{
       key: "lymphedema_orders" as TabKey,
       label: "Medical Devices / Equipment",
       icon: <Wind className="w-5 h-5" />,
       badge: lymphedemaOrders.length,
     }] : []),
+    ...(enabledTracks.includes("ocular") ? [{
+      key: "ocular_orders" as TabKey,
+      label: "Ocular",
+      icon: <Eye className="w-5 h-5" />,
+      badge: ocularOrders.length,
+    }] : []),
+    {
+      key: "baa_agreements" as TabKey,
+      label: "BAA Provider Agreements",
+      icon: <FileText className="w-5 h-5" />,
+    },
   ];
 
   const activeItem = navItems.find((n) => n.key === tab);
@@ -972,6 +1038,101 @@ export default function ProviderDashboardClient() {
                             </td>
                             <td className="px-4 py-3 text-right">
                               <LymphedemaOrderPdfButton orderId={order.id} token={token} />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            ) : null}
+
+            {/* Ocular Orders Tab */}
+            {tab === "ocular_orders" ? (
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200">
+                <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+                  <div>
+                    <div className="text-base font-semibold text-[#18192B]">Ocular</div>
+                    <div className="text-sm text-slate-500">Submit and track VisiDisc® amniotic membrane orders.</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => { void refreshOcularOrders(); }}
+                      disabled={ocularLoading}
+                      className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 transition-colors"
+                    >
+                      Refresh
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => router.push("/ocular/orders/new")}
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#0c6e6e] rounded-lg hover:bg-[#095858] transition-colors"
+                    >
+                      <Eye className="w-4 h-4" />
+                      New Order
+                    </button>
+                  </div>
+                </div>
+
+                {ocularError && (
+                  <div className="mx-5 mt-4 bg-red-50 rounded-lg p-3 text-sm text-red-600 border border-red-100">
+                    {ocularError}
+                  </div>
+                )}
+
+                {ocularLoading && ocularOrders.length === 0 ? (
+                  <div className="p-8 text-center text-slate-500">Loading…</div>
+                ) : ocularOrders.length === 0 ? (
+                  <div className="p-8 text-center text-slate-400 text-sm">
+                    No ocular orders yet.{" "}
+                    <button onClick={() => router.push("/ocular/orders/new")} className="text-[#0c6e6e] underline font-medium">
+                      Place your first order
+                    </button>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="bg-slate-50 border-b border-slate-200 text-left">
+                          <th className="px-4 py-3 font-medium text-slate-600">Date</th>
+                          <th className="px-4 py-3 font-medium text-slate-600">Patient</th>
+                          <th className="px-4 py-3 font-medium text-slate-600">Product</th>
+                          <th className="px-4 py-3 font-medium text-slate-600">Qty</th>
+                          <th className="px-4 py-3 font-medium text-slate-600">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {ocularOrders.map((order) => (
+                          <tr key={order.id} className="hover:bg-slate-50 transition-colors">
+                            <td className="px-4 py-3 text-slate-500 text-xs">
+                              {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "—"}
+                            </td>
+                            <td className="px-4 py-3 text-slate-700 font-medium">
+                              {order.patient
+                                ? [order.patient.firstName, order.patient.lastName].filter(Boolean).join(" ") || "—"
+                                : "—"}
+                            </td>
+                            <td className="px-4 py-3 text-slate-600">
+                              {order.productVariant
+                                ? `VisiDisc® ${order.productVariant.charAt(0).toUpperCase() + order.productVariant.slice(1)} ${order.sizeMm ? `${order.sizeMm}mm` : ""}`.trim()
+                                : "—"}
+                              {order.sku && <div className="text-xs text-slate-400 font-mono">{order.sku}</div>}
+                            </td>
+                            <td className="px-4 py-3 text-slate-600">{order.quantity ?? "—"}</td>
+                            <td className="px-4 py-3">
+                              <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium capitalize ${
+                                order.status === "approved" || order.status === "completed"
+                                  ? "bg-green-100 text-green-800"
+                                  : order.status === "shipped"
+                                    ? "bg-blue-100 text-blue-800"
+                                    : order.status === "denied" || order.status === "cancelled"
+                                      ? "bg-red-100 text-red-800"
+                                      : "bg-yellow-100 text-yellow-800"
+                              }`}>
+                                {order.status.replace(/_/g, " ")}
+                              </span>
                             </td>
                           </tr>
                         ))}

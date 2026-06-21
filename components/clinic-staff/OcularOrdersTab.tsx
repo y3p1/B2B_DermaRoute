@@ -25,11 +25,17 @@ type OcularOrderRow = {
   createdAt: string | null;
   providerId: string | null;
   clinicName: string | null;
+  secondaryDiagnosis: string | null;
+  shipTo: { address?: string; city?: string; state?: string; zip?: string } | null;
+  specialInstructions: string | null;
+  insurancePayer: string | null;
+  dateNeededBy: string | null;
 };
 
-const STATUS_OPTIONS = ["pending", "approved", "shipped", "completed", "denied", "cancelled"];
+const STATUS_OPTIONS = ["pending_review", "pending", "approved", "shipped", "completed", "denied", "cancelled"];
 
 const STATUS_COLORS: Record<string, string> = {
+  pending_review: "bg-orange-100 text-orange-700",
   pending: "bg-yellow-100 text-yellow-700",
   approved: "bg-blue-100 text-blue-700",
   shipped: "bg-purple-100 text-purple-700",
@@ -50,6 +56,7 @@ export function OcularOrdersTab() {
   const [error, setError] = React.useState<string | null>(null);
   const [updatingId, setUpdatingId] = React.useState<string | null>(null);
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
+  const [sendingEmailId, setSendingEmailId] = React.useState<string | null>(null);
 
   const refresh = React.useCallback(async () => {
     setLoading(true);
@@ -69,6 +76,21 @@ export function OcularOrdersTab() {
   }, [token]);
 
   React.useEffect(() => { void refresh(); }, [refresh]);
+
+  const handleSendEmail = async (id: string) => {
+    if (!token) return;
+    setSendingEmailId(id);
+    try {
+      await fetch(`/api/ocular/orders/${id}/send-email`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send email");
+    } finally {
+      setSendingEmailId(null);
+    }
+  };
 
   const handleStatusChange = async (id: string, status: string) => {
     if (!token) return;
@@ -178,12 +200,27 @@ export function OcularOrdersTab() {
                   {expandedId === row.id && (
                     <tr>
                       <td colSpan={8} className="px-6 py-4 bg-slate-50 text-xs text-slate-600">
-                        <div className="grid grid-cols-2 gap-x-8 gap-y-1">
-                          <div><span className="font-medium">Diagnosis:</span> {row.primaryDiagnosis ?? "—"}</div>
-                          <div><span className="font-medium">SKU:</span> <span className="font-mono">{row.sku ?? "—"}</span></div>
+                        <div className="grid grid-cols-2 gap-x-8 gap-y-1.5 mb-3">
+                          <div><span className="font-medium">Primary Diagnosis:</span> {row.primaryDiagnosis ?? "—"}</div>
+                          <div><span className="font-medium">Secondary Diagnosis:</span> {row.secondaryDiagnosis ?? "—"}</div>
                           <div><span className="font-medium">DOB:</span> {row.patient?.dob ?? "—"}</div>
+                          <div><span className="font-medium">Date Needed By:</span> {row.dateNeededBy ?? "—"}</div>
+                          <div><span className="font-medium">SKU:</span> <span className="font-mono">{row.sku ?? "—"}</span></div>
+                          <div><span className="font-medium">Insurance:</span> {row.insurancePayer ?? "—"}</div>
+                          <div><span className="font-medium">Ship To:</span> {row.shipTo ? [row.shipTo.address, row.shipTo.city, row.shipTo.state, row.shipTo.zip].filter(Boolean).join(", ") : "—"}</div>
+                          <div><span className="font-medium">Special Instructions:</span> {row.specialInstructions ?? "—"}</div>
                           <div><span className="font-medium">Submitted:</span> {row.submittedAt ? new Date(row.submittedAt).toLocaleString() : "Pending"}</div>
                           <div className="col-span-2"><span className="font-medium">Order ID:</span> <span className="font-mono">{row.id}</span></div>
+                        </div>
+                        <div className="flex items-center gap-2 pt-2 border-t border-slate-200">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); void handleSendEmail(row.id); }}
+                            disabled={sendingEmailId === row.id}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-teal-50 border border-teal-200 text-teal-700 hover:bg-teal-100 disabled:opacity-50 transition-colors"
+                          >
+                            {sendingEmailId === row.id ? "Sending…" : "📧 Send to Skye Biologics"}
+                          </button>
+                          <span className="text-slate-400">orders@skyebiologics.com</span>
                         </div>
                       </td>
                     </tr>

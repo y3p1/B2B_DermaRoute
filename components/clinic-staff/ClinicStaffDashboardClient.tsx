@@ -43,6 +43,7 @@ import { AnalyticsTab } from "@/components/clinic-staff/AnalyticsTab";
 import { AuditLogsTab } from "@/components/clinic-staff/AuditLogsTab";
 import { PolicyTrackerTab } from "@/components/clinic-staff/PolicyTrackerTab";
 import { ItsRepresentativesTab } from "@/components/clinic-staff/ItsRepresentativesTab";
+import { ProviderAccountsTab } from "@/components/clinic-staff/ProviderAccountsTab";
 import { PracticeTracksTab } from "@/components/clinic-staff/PracticeTracksTab";
 import { SystemSettingsTab } from "@/components/clinic-staff/SystemSettingsTab";
 import { LymphedemaOrdersTab } from "@/components/clinic-staff/LymphedemaOrdersTab";
@@ -73,6 +74,7 @@ type TabKey =
   | "audit_logs"
   | "policy_tracker"
   | "its_representatives"
+  | "provider_accounts"
   | "practice_tracks"
   | "system_settings";
 
@@ -95,7 +97,7 @@ type BvRequestRow = {
 
 function roleLabel(role: string | null) {
   if (role === "admin") return "Admin";
-  if (role === "clinic_staff") return "Clinic Staff";
+  if (role === "clinic_staff") return "DR Representative";
   return "";
 }
 
@@ -240,6 +242,7 @@ export default function ClinicStaffDashboardClient({
       requestedTab === "audit_logs" ||
       requestedTab === "policy_tracker" ||
       requestedTab === "its_representatives" ||
+      requestedTab === "provider_accounts" ||
       requestedTab === "lymphedema_orders" ||
       requestedTab === "ocular_orders" ||
       requestedTab === "practice_tracks" ||
@@ -358,9 +361,19 @@ export default function ClinicStaffDashboardClient({
     },
     {
       key: "product_orders" as TabKey,
-      label: "Wound Care Products",
+      label: "Wound Care",
       icon: <Package className="w-5 h-5" />,
       badge: productOrders.length,
+    },
+    {
+      key: "lymphedema_orders" as TabKey,
+      label: "Medical Devices / Equipment",
+      icon: <Wind className="w-5 h-5" />,
+    },
+    {
+      key: "ocular_orders" as TabKey,
+      label: "Ocular",
+      icon: <Eye className="w-5 h-5" />,
     },
     {
       key: "reorder_log" as TabKey,
@@ -376,16 +389,6 @@ export default function ClinicStaffDashboardClient({
       key: "baa_agreements" as TabKey,
       label: "BAA Provider Agreements",
       icon: <FileText className="w-5 h-5" />,
-    },
-    {
-      key: "lymphedema_orders" as TabKey,
-      label: "Medical Devices / Equipment",
-      icon: <Wind className="w-5 h-5" />,
-    },
-    {
-      key: "ocular_orders" as TabKey,
-      label: "Ocular Orders",
-      icon: <Eye className="w-5 h-5" />,
     },
     ...(role === "admin" ? [
       {
@@ -425,7 +428,12 @@ export default function ClinicStaffDashboardClient({
       },
       {
         key: "its_representatives" as TabKey,
-        label: "ITS Representatives",
+        label: "DR Representatives",
+        icon: <Users className="w-5 h-5" />,
+      },
+      {
+        key: "provider_accounts" as TabKey,
+        label: "Provider Accounts",
         icon: <Users className="w-5 h-5" />,
       },
       {
@@ -576,7 +584,7 @@ export default function ClinicStaffDashboardClient({
                 <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                   <div>
                     <div className="text-base font-semibold text-[#18192B]">
-                      Wound Care Products
+                      Wound Care
                     </div>
                     <div className="text-sm text-slate-500">
                       Product orders and catalog for wound care
@@ -994,6 +1002,8 @@ export default function ClinicStaffDashboardClient({
             {tab === "policy_tracker" ? <PolicyTrackerTab /> : null}
 
             {tab === "its_representatives" ? <ItsRepresentativesTab /> : null}
+
+            {tab === "provider_accounts" ? <ProviderAccountsTab /> : null}
 
             {tab === "lymphedema_orders" ? (
               <div className="space-y-4">

@@ -63,7 +63,7 @@ export async function createOcularOrder(
       insurancePayer: input.insurancePayer ?? null,
       insuranceMemberId: input.insuranceMemberId ?? null,
       ocularProductId: input.ocularProductId ?? null,
-      status: "pending",
+      status: "pending_review",
     })
     .returning({ id: ocularOrders.id });
   return row.id;
@@ -91,6 +91,11 @@ export async function getOcularOrders(filters?: { providerIds?: string[] }) {
       createdAt: ocularOrders.createdAt,
       providerId: ocularOrders.providerId,
       clinicName: providerAcct.clinicName,
+      secondaryDiagnosis: ocularOrders.secondaryDiagnosis,
+      shipTo: ocularOrders.shipTo,
+      specialInstructions: ocularOrders.specialInstructions,
+      insurancePayer: ocularOrders.insurancePayer,
+      dateNeededBy: ocularOrders.dateNeededBy,
     })
     .from(ocularOrders)
     .leftJoin(providerAcct, eq(ocularOrders.providerId, providerAcct.id))

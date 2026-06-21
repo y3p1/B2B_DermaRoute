@@ -220,7 +220,7 @@ export default function OcularProductInfoPage() {
         </div>
         <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
           Reimbursement information is provided as a reference only. Verify coverage with each payer
-          prior to placing an order. Your ITS representative can assist with coverage questions.
+          prior to placing an order. Your DR representative can assist with coverage questions.
         </div>
       </div>
     </div>

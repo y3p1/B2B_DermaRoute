@@ -47,6 +47,9 @@ export type LymphedemaFormData = {
   physicianName?: string;
   physicianPhone?: string;
   physicianNpi?: string;
+  selectedGarmentKeys?: string[];
+  pumpArea?: string;
+  orderType?: string;
 };
 
 const s = StyleSheet.create({
@@ -196,22 +199,8 @@ function FieldLine({
   );
 }
 
-function hasLeg(extremity: string[]): boolean {
-  return extremity.some(
-    (e) => e === "Left Leg" || e === "Right Leg" || e === "Bilateral Legs",
-  );
-}
-
-function hasArm(extremity: string[]): boolean {
-  return extremity.some((e) => e === "Left Arm" || e === "Right Arm");
-}
-
-function garmentMatches(
-  data: LymphedemaFormData,
-  category: string,
-  label: string,
-): boolean {
-  return data.garmentType === category && data.garmentStyle === label;
+function garmentChecked(data: LymphedemaFormData, key: string): boolean {
+  return data.selectedGarmentKeys?.includes(key) ?? false;
 }
 
 function compressionLevelMatches(
@@ -230,8 +219,6 @@ function compressionLevelMatches(
 
 export function ReMarxOrderDocument({ data }: { data: LymphedemaFormData }) {
   const orderDate = new Date().toLocaleDateString("en-US");
-  const legSelected = hasLeg(data.extremity);
-  const armSelected = hasArm(data.extremity);
 
   return (
     <Document>
@@ -273,8 +260,8 @@ export function ReMarxOrderDocument({ data }: { data: LymphedemaFormData }) {
             <Text style={{ fontSize: 8, fontWeight: "bold", marginRight: 8 }}>
               SELECT PRODUCT:
             </Text>
-            <PdfCheckbox checked label="PUMP" />
-            <PdfCheckbox checked label="GARMENT" />
+            <PdfCheckbox checked={data.orderType === "pump" || data.orderType === "both"} label="PUMP" />
+            <PdfCheckbox checked={data.orderType === "garment" || data.orderType === "both"} label="GARMENT" />
           </View>
         </View>
 
@@ -303,15 +290,15 @@ export function ReMarxOrderDocument({ data }: { data: LymphedemaFormData }) {
         <SubHeader>Diagnosis Code (ICD 10)</SubHeader>
         <View style={s.row}>
           <PdfCheckbox
-            checked={data.diagnosis.includes("i89.0")}
+            checked={data.diagnosis.some((d) => d.toLowerCase() === "i89.0")}
             label="I89.0 — Lymphedema"
           />
           <PdfCheckbox
-            checked={data.diagnosis.includes("q82.0")}
+            checked={data.diagnosis.some((d) => d.toLowerCase() === "q82.0")}
             label="Q82.0 — Hereditary Lymphedema"
           />
           <PdfCheckbox
-            checked={data.diagnosis.includes("i97.2")}
+            checked={data.diagnosis.some((d) => d.toLowerCase() === "i97.2")}
             label="I97.2 — Post-mastectomy Lymphedema"
           />
         </View>
@@ -330,42 +317,27 @@ export function ReMarxOrderDocument({ data }: { data: LymphedemaFormData }) {
             }}
           >
             <PdfCheckbox
-              checked={data.hcpcs === "E0651" && legSelected}
+              checked={data.hcpcs === "E0651" && data.pumpArea === "Full Leg"}
               label="Full Leg"
             />
             <PdfCheckbox
-              checked={
-                data.hcpcs === "E0651" &&
-                data.extremity.includes("Left Leg")
-              }
+              checked={data.hcpcs === "E0651" && data.pumpArea === "Left Leg"}
               label="Left Leg"
             />
             <PdfCheckbox
-              checked={
-                data.hcpcs === "E0651" &&
-                data.extremity.includes("Right Leg")
-              }
+              checked={data.hcpcs === "E0651" && data.pumpArea === "Right Leg"}
               label="Right Leg"
             />
             <PdfCheckbox
-              checked={
-                data.hcpcs === "E0651" &&
-                data.extremity.includes("Bilateral Legs")
-              }
+              checked={data.hcpcs === "E0651" && data.pumpArea === "Bilateral"}
               label="Bilateral"
             />
             <PdfCheckbox
-              checked={
-                data.hcpcs === "E0651" &&
-                data.extremity.includes("Left Arm")
-              }
+              checked={data.hcpcs === "E0651" && data.pumpArea === "Arm Left"}
               label="Arm Left"
             />
             <PdfCheckbox
-              checked={
-                data.hcpcs === "E0651" &&
-                data.extremity.includes("Right Arm")
-              }
+              checked={data.hcpcs === "E0651" && data.pumpArea === "Arm Right"}
               label="Arm Right"
             />
           </View>
@@ -383,47 +355,41 @@ export function ReMarxOrderDocument({ data }: { data: LymphedemaFormData }) {
             }}
           >
             <PdfCheckbox
-              checked={data.hcpcs === "E0652" && legSelected}
+              checked={data.hcpcs === "E0652" && data.pumpArea === "Full Leg"}
               label="Full Leg"
             />
             <PdfCheckbox
-              checked={
-                data.hcpcs === "E0652" &&
-                data.extremity.includes("Left Leg")
-              }
+              checked={data.hcpcs === "E0652" && data.pumpArea === "Left Leg"}
               label="Left Leg"
             />
             <PdfCheckbox
-              checked={
-                data.hcpcs === "E0652" &&
-                data.extremity.includes("Right Leg")
-              }
+              checked={data.hcpcs === "E0652" && data.pumpArea === "Right Leg"}
               label="Right Leg"
             />
             <PdfCheckbox
-              checked={
-                data.hcpcs === "E0652" &&
-                data.extremity.includes("Bilateral Legs")
-              }
+              checked={data.hcpcs === "E0652" && data.pumpArea === "Bilateral"}
               label="Bilateral"
             />
             <PdfCheckbox
-              checked={
-                data.hcpcs === "E0652" &&
-                data.extremity.includes("Left Arm")
-              }
+              checked={data.hcpcs === "E0652" && data.pumpArea === "Arm Left"}
               label="Arm Left"
             />
             <PdfCheckbox
-              checked={
-                data.hcpcs === "E0652" &&
-                data.extremity.includes("Right Arm")
-              }
+              checked={data.hcpcs === "E0652" && data.pumpArea === "Arm Right"}
               label="Arm Right"
             />
-            <PdfCheckbox checked={false} label="Pant System" />
-            <PdfCheckbox checked={false} label="Arm Plus Left" />
-            <PdfCheckbox checked={false} label="Arm Plus Right" />
+            <PdfCheckbox
+              checked={data.hcpcs === "E0652" && data.pumpArea === "Pant System"}
+              label="Pant System"
+            />
+            <PdfCheckbox
+              checked={data.hcpcs === "E0652" && data.pumpArea === "Arm Plus Left"}
+              label="Arm Plus Left"
+            />
+            <PdfCheckbox
+              checked={data.hcpcs === "E0652" && data.pumpArea === "Arm Plus Right"}
+              label="Arm Plus Right"
+            />
           </View>
         </View>
 
@@ -499,15 +465,15 @@ export function ReMarxOrderDocument({ data }: { data: LymphedemaFormData }) {
               Stockings
             </Text>
             <PdfCheckbox
-              checked={garmentMatches(data, "Stockings", "Below Knee")}
+              checked={garmentChecked(data, "lowerBelowKnee")}
               label="Below Knee"
             />
             <PdfCheckbox
-              checked={garmentMatches(data, "Stockings", "Thigh")}
+              checked={garmentChecked(data, "lowerThigh")}
               label="Thigh"
             />
             <PdfCheckbox
-              checked={garmentMatches(data, "Stockings", "Pantyhose")}
+              checked={garmentChecked(data, "lowerPantyhose")}
               label="Pantyhose"
             />
             <Text
@@ -522,29 +488,27 @@ export function ReMarxOrderDocument({ data }: { data: LymphedemaFormData }) {
               Garments
             </Text>
             <PdfCheckbox
-              checked={garmentMatches(data, "Garments", "Foot")}
+              checked={garmentChecked(data, "lowerFoot")}
               label="Foot"
             />
             <PdfCheckbox
-              checked={garmentMatches(data, "Garments", "Calf")}
+              checked={garmentChecked(data, "lowerCalf")}
               label="Calf"
             />
             <PdfCheckbox
-              checked={garmentMatches(data, "Garments", "Knee")}
+              checked={garmentChecked(data, "lowerKnee")}
               label="Knee"
             />
             <PdfCheckbox
-              checked={garmentMatches(data, "Garments", "Thigh")}
+              checked={garmentChecked(data, "lowerThighGarment")}
               label="Thigh"
             />
             <PdfCheckbox
-              checked={garmentMatches(data, "Garments", "Full Leg")}
+              checked={garmentChecked(data, "lowerFullLeg")}
               label="Full Leg"
             />
             <PdfCheckbox
-              checked={
-                garmentMatches(data, "Garments", "Full Leg w/ Foot")
-              }
+              checked={garmentChecked(data, "lowerFullLegWFoot")}
               label="Full Leg w/ Foot"
             />
           </View>
@@ -567,35 +531,19 @@ export function ReMarxOrderDocument({ data }: { data: LymphedemaFormData }) {
               Gloves &amp; Sleeves
             </Text>
             <PdfCheckbox
-              checked={garmentMatches(
-                data,
-                "Gloves & Sleeves",
-                "Gauntlet",
-              )}
+              checked={garmentChecked(data, "upperGauntlet")}
               label="Gauntlet"
             />
             <PdfCheckbox
-              checked={garmentMatches(
-                data,
-                "Gloves & Sleeves",
-                "Glove",
-              )}
+              checked={garmentChecked(data, "upperGlove")}
               label="Glove"
             />
             <PdfCheckbox
-              checked={garmentMatches(
-                data,
-                "Gloves & Sleeves",
-                "Glove Sleeve Combo",
-              )}
+              checked={garmentChecked(data, "upperGloveSleeve")}
               label="Glove Sleeve Combo"
             />
             <PdfCheckbox
-              checked={garmentMatches(
-                data,
-                "Gloves & Sleeves",
-                "Arm Sleeve",
-              )}
+              checked={garmentChecked(data, "upperArmSleeve")}
               label="Arm Sleeve"
             />
             <Text
@@ -610,11 +558,11 @@ export function ReMarxOrderDocument({ data }: { data: LymphedemaFormData }) {
               Wraps
             </Text>
             <PdfCheckbox
-              checked={garmentMatches(data, "Wraps", "Hand Velcro Wrap")}
+              checked={garmentChecked(data, "upperHandVelcro")}
               label="Hand Velcro Wrap"
             />
             <PdfCheckbox
-              checked={garmentMatches(data, "Wraps", "Arm Wrap")}
+              checked={garmentChecked(data, "upperArmWrap")}
               label="Arm Wrap"
             />
             <Text
@@ -629,23 +577,15 @@ export function ReMarxOrderDocument({ data }: { data: LymphedemaFormData }) {
               Garments
             </Text>
             <PdfCheckbox
-              checked={garmentMatches(data, "Garments", "Glove")}
+              checked={garmentChecked(data, "upperGloveGarment")}
               label="Glove"
             />
             <PdfCheckbox
-              checked={garmentMatches(
-                data,
-                "Garments",
-                "Fingertips to Axilla",
-              )}
+              checked={garmentChecked(data, "upperFingertipsAxilla")}
               label="Fingertips to Axilla"
             />
             <PdfCheckbox
-              checked={garmentMatches(
-                data,
-                "Garments",
-                "Wrist to Axilla",
-              )}
+              checked={garmentChecked(data, "upperWristAxilla")}
               label="Wrist to Axilla"
             />
           </View>
@@ -708,7 +648,7 @@ export function ReMarxOrderDocument({ data }: { data: LymphedemaFormData }) {
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             {[
               "Medi USA",
-              "BSN Jobst/Farrow",
+              "BSN (Jobst/Farrow)",
               "L&R",
               "Juzo",
               "Sigvaris",
@@ -859,6 +799,35 @@ function orderToFormData(order: LymphedemaOrderForPdf): LymphedemaFormData {
     distalPressureMmhg: order.distalPressureMmhg != null ? String(order.distalPressureMmhg) : "",
     timesPerDay: order.timesPerDay != null ? String(order.timesPerDay) : "",
     minutesPerSession: order.minutesPerSession != null ? String(order.minutesPerSession) : "",
+    selectedGarmentKeys: (() => {
+      const labelToKey: Record<string, string> = {
+        "Below Knee": "lowerBelowKnee",
+        "Thigh": "lowerThigh",
+        "Pantyhose": "lowerPantyhose",
+        "Foot": "lowerFoot",
+        "Calf": "lowerCalf",
+        "Knee": "lowerKnee",
+        "Full Leg": "lowerFullLeg",
+        "Full Leg w/ Foot": "lowerFullLegWFoot",
+        "Full Leg W/Foot": "lowerFullLegWFoot",
+        "Gauntlet": "upperGauntlet",
+        "Glove": "upperGlove",
+        "Glove Sleeve Combo": "upperGloveSleeve",
+        "Arm Sleeve": "upperArmSleeve",
+        "Hand Velcro Wrap": "upperHandVelcro",
+        "Arm Wrap": "upperArmWrap",
+        "Fingertips to Axilla": "upperFingertipsAxilla",
+        "Wrist to Axilla": "upperWristAxilla",
+      };
+      return (order.garmentStyle ?? "")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .map((label) => labelToKey[label])
+        .filter(Boolean) as string[];
+    })(),
+    pumpArea: order.garmentType ?? "",
+    orderType: order.hcpcs ? (order.garmentStyle ? "both" : "pump") : (order.garmentStyle ? "garment" : ""),
   };
 }
 

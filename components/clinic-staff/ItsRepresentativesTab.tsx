@@ -37,7 +37,7 @@ export function ItsRepresentativesTab() {
       setRecords(res.data);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to load ITS Representatives",
+        err instanceof Error ? err.message : "Failed to load DR Representatives",
       );
     } finally {
       setLoading(false);
@@ -79,10 +79,10 @@ export function ItsRepresentativesTab() {
         <div>
           <div className="text-base font-semibold text-[#18192B] flex items-center gap-2">
             <Users className="w-5 h-5 text-blue-600" />
-            ITS Representatives
+            DR Representatives
           </div>
           <div className="text-sm text-slate-500">
-            Manage ITS Representative accounts. Approve pending registrations or deactivate existing accounts.
+            Manage DR Representative accounts. Approve pending registrations or deactivate existing accounts.
           </div>
         </div>
         <div className="flex items-center gap-3 shrink-0">
@@ -116,9 +116,9 @@ export function ItsRepresentativesTab() {
 
       <div className="overflow-hidden rounded-lg border border-slate-200">
         {loading && records.length === 0 ? (
-          <div className="p-8 text-center text-slate-500">Loading ITS Representatives...</div>
+          <div className="p-8 text-center text-slate-500">Loading DR Representatives...</div>
         ) : records.length === 0 ? (
-          <div className="p-8 text-center text-slate-500">No ITS Representatives found.</div>
+          <div className="p-8 text-center text-slate-500">No DR Representatives found.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

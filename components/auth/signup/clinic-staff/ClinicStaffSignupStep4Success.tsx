@@ -37,7 +37,7 @@ export default function ClinicStaffSignupStep4Success() {
 
           <div className="mb-12">
             <p className="text-xl text-black text-center">
-              Your ITS Representative account is pending admin approval.
+              Your DR Representative account is pending admin approval.
             </p>
             <p className="text-sm text-gray-500 text-center mt-2">
               You will be able to sign in after an administrator approves your account.

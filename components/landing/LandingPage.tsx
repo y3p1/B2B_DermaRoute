@@ -53,18 +53,11 @@ export function LandingPage() {
   const isAuthenticated = status === "authenticated" || isDemo;
 
   function isEnabled(track: TrackKey): boolean {
-    if (isDemo) return true;
     if (!isAuthenticated) return false;
     return enabledTracks.includes(track);
   }
 
   function handleServiceClick(service: ServiceCard) {
-    // Demo: all tracks enabled, no auth gate. Avoids race where a click during
-    // hydration (status still "loading") routes to /auth → /demo.
-    if (isDemo) {
-      router.push(service.href);
-      return;
-    }
     if (!isAuthenticated) {
       router.push("/auth");
       return;

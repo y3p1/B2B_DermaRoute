@@ -29,12 +29,7 @@ export async function listLymphedemaOrdersController(req: Request, res: Response
       const orders = await getLymphedemaOrders();
       return res.json({ success: true, data: orders });
     }
-    const provider = await getProviderProfileByUserId(userId);
-    if (provider) {
-      const orders = await getLymphedemaOrders({ providerIds: [provider.id] });
-      return res.json({ success: true, data: orders });
-    }
-    return res.status(403).json({ error: "Forbidden" });
+    return res.json({ success: true, data: [] });
   }
 
   const adminProfile = await getAdminProfileByUserId(userId);
@@ -71,38 +66,6 @@ export async function createLymphedemaOrderController(req: Request, res: Respons
   }
 
   const id = await createLymphedemaOrder(parsed.data, provider.id, userId);
-
-  // Determine submission email
-  let submissionEmail = "Lb@centralpalmsmedical.com";
-  if (isDemoMode()) {
-    submissionEmail = "shawn.druzali04@gmail.com";
-  } else {
-    const configured = await getSetting("lymphedema_submission_email");
-    if (configured) submissionEmail = configured;
-  }
-
-  // Send email notification
-  const patient = parsed.data.patient as { firstName: string; lastName: string };
-  try {
-    await sendEmail({
-      to: submissionEmail,
-      subject: `Lymphedema Order — ${patient.firstName} ${patient.lastName} — ${provider.clinicName}`,
-      text: [
-        `New lymphedema order submitted by ${provider.clinicName}`,
-        `Patient: ${patient.firstName} ${patient.lastName}`,
-        `Insurance: ${parsed.data.insurance}`,
-        `Device: ${parsed.data.device ?? "Not specified"}`,
-        `Garment type: ${parsed.data.garmentType ?? "None"}`,
-        `Compression level: ${parsed.data.compressionLevel ?? "Not specified"}`,
-        `Quantity: ${parsed.data.quantity ?? "Not specified"}`,
-        `Order ID: ${id}`,
-      ].join("\n"),
-    });
-    await updateLymphedemaOrderStatus(id, "pending", submissionEmail);
-  } catch {
-    // Email failure is non-fatal — order is still created
-  }
-
   return res.status(201).json({ success: true, data: { id } });
 }
 
@@ -151,7 +114,7 @@ export async function getLymphedemaOrderController(req: Request, res: Response) 
 }
 
 const updateStatusSchema = z.object({
-  status: z.enum(["pending", "approved", "shipped", "completed", "denied", "cancelled"]),
+  status: z.enum(["pending_review", "pending", "approved", "shipped", "completed", "denied", "cancelled"]),
 });
 
 export async function updateLymphedemaOrderStatusController(req: Request, res: Response) {
@@ -168,4 +131,53 @@ export async function updateLymphedemaOrderStatusController(req: Request, res: R
 
   await updateLymphedemaOrderStatus(id, parsed.data.status);
   return res.json({ success: true });
+}
+
+export async function sendLymphedemaOrderEmailController(req: Request, res: Response) {
+  const id = getLastPathSegment(req.url);
+  if (!id) return res.status(400).json({ error: "id required" });
+
+  const order = await getLymphedemaOrder(id);
+  if (!order) return res.status(404).json({ error: "Not found" });
+
+  let submissionEmail = "Lb@centralpalmsmedical.com";
+  if (isDemoMode()) {
+    submissionEmail = "shawn.druzali04@gmail.com";
+  } else {
+    const configured = await getSetting("lymphedema_submission_email");
+    if (configured) submissionEmail = configured;
+  }
+
+  const patientRaw = order.patient as { firstName?: string; lastName?: string; fullName?: string } | null;
+  const patientName =
+    patientRaw?.fullName ??
+    ([patientRaw?.firstName, patientRaw?.lastName].filter(Boolean).join(" ") || "Unknown");
+
+  try {
+    await sendEmail({
+      to: submissionEmail,
+      subject: `Lymphedema Order — ${patientName}`,
+      text: [
+        `LYMPHEDEMA ORDER (Approved by DR Representative)`,
+        ``,
+        `Patient: ${patientName}`,
+        `Insurance: ${order.insurance ?? "N/A"}`,
+        `Device: ${order.device ?? "N/A"}`,
+        `HCPCS: ${order.hcpcs ?? "N/A"}`,
+        `Garment: ${[order.garmentStyle, order.garmentType ? `(${order.garmentType})` : ""].filter(Boolean).join(" ") || "N/A"}`,
+        `Compression: ${order.compressionLevel ?? "N/A"}`,
+        `Quantity: ${order.quantity ?? "N/A"}`,
+        `Manufacturer: ${order.manufacturerPreference ?? "N/A"}`,
+        `Distal Pressure: ${order.distalPressureMmhg ? `${order.distalPressureMmhg} mmHg` : "N/A"}`,
+        `Times/Day: ${order.timesPerDay ?? "N/A"}`,
+        `Min/Session: ${order.minutesPerSession ?? "N/A"}`,
+        ``,
+        `Order ID: ${id}`,
+      ].join("\n"),
+    });
+    await updateLymphedemaOrderStatus(id, order.status, submissionEmail);
+    return res.json({ success: true });
+  } catch {
+    return res.status(500).json({ error: "Failed to send email" });
+  }
 }

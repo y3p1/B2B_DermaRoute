@@ -11,8 +11,10 @@ type LymphedemaOrderRow = {
   status: string;
   insurance: string | null;
   device: string | null;
-  patient: { firstName?: string; lastName?: string } | null;
+  patient: { firstName?: string; lastName?: string; fullName?: string } | null;
   extremity: string[] | null;
+  garmentStyle: string | null;
+  garmentType: string | null;
   createdAt: string | null;
 };
 
@@ -122,10 +124,18 @@ export default function MedicalDevicesOrdersPage() {
                 <tr key={order.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-5 py-3 font-medium text-slate-800">
                     {order.patient
-                      ? `${order.patient.firstName ?? ""} ${order.patient.lastName ?? ""}`.trim() || "—"
+                      ? order.patient.fullName ||
+                        `${order.patient.firstName ?? ""} ${order.patient.lastName ?? ""}`.trim() ||
+                        "—"
                       : "—"}
                   </td>
-                  <td className="px-5 py-3 text-slate-600">{order.device ?? "—"}</td>
+                  <td className="px-5 py-3 text-slate-600">
+                    {order.device
+                      ? order.device
+                      : order.garmentStyle
+                        ? `Garment${order.garmentType ? ` (${order.garmentType})` : ""}`
+                        : "—"}
+                  </td>
                   <td className="px-5 py-3 text-slate-600">{order.insurance ?? "—"}</td>
                   <td className="px-5 py-3 text-slate-600 text-xs">{Array.isArray(order.extremity) ? order.extremity.join(", ") : "—"}</td>
                   <td className="px-5 py-3">
@@ -139,9 +149,9 @@ export default function MedicalDevicesOrdersPage() {
                   <td className="px-5 py-3 text-right">
                     <Link
                       href={`/medical-devices/orders/${order.id}`}
-                      className="text-xs font-medium text-purple-600 hover:text-purple-700"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-md bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 transition-colors"
                     >
-                      View →
+                      View details
                     </Link>
                   </td>
                 </tr>

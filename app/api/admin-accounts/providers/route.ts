@@ -1,36 +1,21 @@
-import {
-  createOcularOrderController,
-  listOcularOrdersController,
-} from "../../../../backend/controllers/ocular.controller";
 import { corsMiddleware } from "../../../../backend/middlewares/cors";
 import { errorHandler } from "../../../../backend/middlewares/errorHandler";
 import { requireAuth } from "../../../../backend/middlewares/requireAuth";
+import { requireAdmin } from "../../../../backend/middlewares/requireAdmin";
 import { rateLimit } from "../../../../backend/middlewares/rateLimit";
 import { getAllowedOrigins } from "../../../../backend/config/env";
 import { runServerPipeline } from "../../../../backend/serverPipeline";
+import { listAllProviders } from "../../../../backend/services/providerAccounts.service";
 
 const cors = corsMiddleware({ allowedOrigins: getAllowedOrigins() });
-const baseRateLimit = rateLimit({ windowMs: 60_000, max: 60 });
+const baseRateLimit = rateLimit({ windowMs: 60_000, max: 120 });
 
 export async function GET(request: Request) {
   return runServerPipeline(request, {
-    middlewares: [cors, baseRateLimit, requireAuth],
-    handler: (req, res, next) => {
-      void listOcularOrdersController(req, res)
-        .then(() => next())
-        .catch(next);
-    },
-    errorHandler,
-  });
-}
-
-export async function POST(request: Request) {
-  return runServerPipeline(request, {
-    middlewares: [cors, baseRateLimit, requireAuth],
-    handler: (req, res, next) => {
-      void createOcularOrderController(req, res)
-        .then(() => next())
-        .catch(next);
+    middlewares: [cors, baseRateLimit, requireAuth, requireAdmin],
+    handler: async (_req, res) => {
+      const data = await listAllProviders();
+      return res.json({ success: true, data });
     },
     errorHandler,
   });

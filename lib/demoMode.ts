@@ -1,7 +1,7 @@
 export const DEMO_ROLE_COOKIE = "demo_role";
-export type DemoRole = "provider" | "clinic_staff" | "admin";
+export type DemoRole = "provider" | "provider_ocular" | "provider_wound2" | "clinic_staff" | "admin";
 
-const VALID_ROLES: DemoRole[] = ["provider", "clinic_staff", "admin"];
+const VALID_ROLES: DemoRole[] = ["provider", "provider_ocular", "provider_wound2", "clinic_staff", "admin"];
 
 export function isDemoMode(): boolean {
   return process.env.DEMO_MODE === "true";
@@ -64,20 +64,44 @@ export function getDemoRoleFromRequest(req: {
 
 const ROLE_USER_ENV: Record<DemoRole, string> = {
   provider: "DEMO_PROVIDER_USER_ID",
+  provider_ocular: "DEMO_OCULAR_PROVIDER_USER_ID",
+  provider_wound2: "DEMO_WOUND2_PROVIDER_USER_ID",
   admin: "DEMO_ADMIN_USER_ID",
   clinic_staff: "DEMO_CLINIC_STAFF_USER_ID",
 };
 
 const ROLE_EMAIL: Record<DemoRole, string> = {
   provider: "demo-provider@dermaroute-demo.example.com",
+  provider_ocular: "demo-ocular@dermaroute-demo.example.com",
+  provider_wound2: "demo-wound2@dermaroute-demo.example.com",
   admin: "demo-admin@dermaroute-demo.example.com",
   clinic_staff: "demo-clinicstaff@dermaroute-demo.example.com",
 };
 
+const DEMO_FALLBACK_IDS: Record<DemoRole, string> = {
+  provider:        "00000000-0000-4000-8000-000000000001",
+  provider_wound2: "00000000-0000-4000-8000-000000000002",
+  provider_ocular: "00000000-0000-4000-8000-000000000003",
+  admin:           "00000000-0000-4000-8000-000000000004",
+  clinic_staff:    "00000000-0000-4000-8000-000000000005",
+};
+
+export const DEMO_TRACK_LABELS: Record<string, string> = {
+  wound_care: "Wound Care",
+  lymphedema: "Medical Devices",
+  ocular: "Ocular",
+};
+
+export const DEMO_ROLE_TRACKS: Record<DemoRole, string[]> = {
+  provider:        ["wound_care", "lymphedema"],
+  provider_wound2: ["wound_care"],
+  provider_ocular: ["ocular"],
+  clinic_staff:    [],
+  admin:           [],
+};
+
 export function getDemoUser(role: DemoRole): { userId: string; user: object } {
-  const userId =
-    process.env[ROLE_USER_ENV[role]] ||
-    `00000000-0000-4000-a000-${role.replace("_", "").padStart(12, "0").slice(0, 12)}`;
+  const userId = process.env[ROLE_USER_ENV[role]] || DEMO_FALLBACK_IDS[role];
   return {
     userId,
     user: {

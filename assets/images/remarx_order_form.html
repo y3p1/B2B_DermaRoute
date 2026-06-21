@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ReMarx Compression Order Form — Integrity Tissue Solutions</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #f0f4f8; min-height: 100vh; }
+    input[type="radio"], input[type="checkbox"] { accent-color: #0c0c1a; }
+    canvas { touch-action: none; }
+    ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #f1f1f1; } ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useRef, useEffect } = React;
+
+const STEPS = ["Product", "Order Info", "Pump Order", "Garment Order", "Physician", "Review"];
+
+const MOCK_SESSION = {
+  salesRepName: "Will Bright",
+  salesRepPhone: "(478) 555-0100",
+  physicianName: "Dr. Sarah Johnson",
+  physicianPhone: "(404) 555-1234",
+  physicianNPI: "1112223333",
+};
+
+const makeInitial = () => ({
+  productType: "",
+  patientFullName: "",
+  orderDate: new Date().toISOString().split("T")[0],
+  salesRepName: MOCK_SESSION.salesRepName,
+  salesRepPhone: MOCK_SESSION.salesRepPhone,
+  faxOrderTo: "",
+  contraindications: "",
+  diagnosisCode: "",
+  pumpType: "",
+  pumpGarment: "",
+  pumpGarmentE0652: "",
+  mmHg: "",
+  mmHgOther: "",
+  timesPerDay: "",
+  minutesPerSession: "",
+  lowerStockingBelowKnee: false, lowerStockingThigh: false, lowerStockingPantyhose: false,
+  lowerGarmentFoot: false, lowerGarmentCalf: false, lowerGarmentKnee: false,
+  lowerGarmentThigh: false, lowerGarmentFullLeg: false, lowerGarmentFullLegFoot: false,
+  upperGauntlet: false, upperGlove: false, upperGloveSleevCombo: false, upperArmSleeve: false,
+  upperHandVelcroWrap: false, upperArmWrap: false,
+  upperGloveGarment: false, upperFingertipsToAxilla: false, upperWristToAxilla: false,
+  compressionLevel: "", quantityPerExtremity: "", customMadeGarment: "",
+  manufacturerPreference: "", productName: "", productType2: "",
+  physicianName: MOCK_SESSION.physicianName,
+  physicianPhone: MOCK_SESSION.physicianPhone,
+  physicianNPI: MOCK_SESSION.physicianNPI,
+  physicianDate: new Date().toISOString().split("T")[0],
+  signatureMode: "", signatureData: "",
+});
+
+const DEVICE_PRODUCTS = [
+  { id:"remarx", name:"ReMarx — Compression Pump & Garment", icon:"🫀", desc:"Compression pump and/or garment order via ReMarx Medical Services (AIROS 6 / AIROS 8)", tag:"Available Now", tagColor:"#16a34a", tagBg:"#f0fdf4", disabled:false },
+  { id:"coming_soon", name:"More Devices Coming Soon", icon:"⏳", desc:"Additional Medical Devices & Equipment order forms will be available here as they are added to the portal.", tag:"Coming Soon", tagColor:"#92400e", tagBg:"#fef3c7", disabled:true },
+];
+
+function ProductSelector({onSelect}) {
+  return (
+    <div style={{minHeight:"100vh",background:"#f0f4f8"}}>
+      <div style={{background:"#0c0c1a",padding:"16px 24px",display:"flex",alignItems:"center",gap:12}}>
+        <div style={{color:"white"}}>
+          <div style={{fontWeight:700,letterSpacing:2,fontSize:14}}>INTEGRITY TISSUE</div>
+          <div style={{fontWeight:700,letterSpacing:2,fontSize:14}}>SOLUTIONS</div>
+        </div>
+        <div style={{flex:1}}/>
+        <div style={{color:"#9ca3af",fontSize:13}}>Medical Devices & Equipment</div>
+      </div>
+      <div style={{maxWidth:700,margin:"40px auto",padding:"0 16px"}}>
+        <div style={{marginBottom:28}}>
+          <h1 style={{fontSize:22,fontWeight:700,color:"#0c0c1a",marginBottom:6}}>+ New Order</h1>
+          <p style={{fontSize:14,color:"#6b7280"}}>Select the product you would like to order.</p>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:14}}>
+          {DEVICE_PRODUCTS.map(p=>(
+            <div key={p.id}
+              onClick={()=>!p.disabled&&onSelect(p.id)}
+              style={{background:"white",borderRadius:12,padding:"20px 24px",boxShadow:"0 1px 4px rgba(0,0,0,0.08)",border:"2px solid #e5e7eb",cursor:p.disabled?"not-allowed":"pointer",opacity:p.disabled?0.6:1,display:"flex",alignItems:"center",gap:18}}
+              onMouseEnter={e=>{if(!p.disabled)e.currentTarget.style.borderColor="#0c0c1a";}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor="#e5e7eb";}}>
+              <div style={{fontSize:36,flexShrink:0}}>{p.icon}</div>
+              <div style={{flex:1}}>
+                <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:4,flexWrap:"wrap"}}>
+                  <span style={{fontWeight:700,fontSize:15,color:"#111827"}}>{p.name}</span>
+                  <span style={{fontSize:11,fontWeight:600,color:p.tagColor,background:p.tagBg,padding:"2px 8px",borderRadius:20}}>{p.tag}</span>
+                </div>
+                <div style={{fontSize:13,color:"#6b7280"}}>{p.desc}</div>
+              </div>
+              {!p.disabled&&<div style={{fontSize:20,color:"#9ca3af",flexShrink:0}}>→</div>}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [screen, setScreen] = useState("selector");
+  const [step, setStep] = useState(0);
+  const [form, setForm] = useState(makeInitial());
+  const [submitted, setSubmitted] = useState(false);
+  const [generating, setGenerating] = useState(false);
+
+  const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
+  const toggle = (key) => setForm(f => ({ ...f, [key]: !f[key] }));
+  const formatDate = (d) => { if (!d) return "  /  /  "; const [y,m,day]=d.split("-"); return `${m}/${day}/${y}`; };
+
+  const activeSteps = STEPS.map((s,i) => {
+    if (i===2 && form.productType==="garment") return null;
+    if (i===3 && form.productType==="pump") return null;
+    return i;
+  }).filter(x => x !== null);
+
+  const activeStepIndex = activeSteps.indexOf(step);
+
+  const canProceed = () => {
+    if (step===0) return form.productType !== "";
+    if (step===1) return form.patientFullName !== "";
+    if (step===2) return form.contraindications!==""&&form.diagnosisCode!==""&&form.pumpType!==""&&form.mmHg!==""&&form.timesPerDay!==""&&form.minutesPerSession!=="";
+    if (step===3) return form.compressionLevel!==""&&form.quantityPerExtremity!==""&&form.customMadeGarment!=="";
+    if (step===4) return form.signatureMode!==""&&(form.signatureMode==="manual"||form.signatureData!=="");
+    return true;
+  };
+
+  const handleDownload = async () => {
+    setGenerating(true);
+    await new Promise(r => setTimeout(r, 1500));
+    setGenerating(false);
+    setSubmitted(true);
+  };
+
+  const reset = () => { setForm(makeInitial()); setStep(0); setSubmitted(false); setScreen('selector'); };
+
+  if (screen==="selector") return <ProductSelector onSelect={(id)=>{ if(id==="remarx") setScreen("remarx"); }}/>;
+  if (submitted) return <SuccessScreen form={form} onReset={reset} />;
+
+  return (
+    <div style={{minHeight:"100vh",background:"#f0f4f8"}}>
+      {/* Header */}
+      <div style={{background:"#0c0c1a",padding:"16px 24px",display:"flex",alignItems:"center",gap:12}}>
+        <div style={{color:"white"}}>
+          <div style={{fontWeight:700,letterSpacing:2,fontSize:14}}>INTEGRITY TISSUE</div>
+          <div style={{fontWeight:700,letterSpacing:2,fontSize:14}}>SOLUTIONS</div>
+        </div>
+        <div style={{flex:1}}/>
+        <div style={{color:"#9ca3af",fontSize:13}}>ReMarx Compression Order Form</div>
+      </div>
+
+      <div style={{maxWidth:700,margin:"32px auto",padding:"0 16px"}}>
+        {/* Progress */}
+        <div style={{background:"white",borderRadius:12,padding:"20px 24px",marginBottom:20,boxShadow:"0 1px 4px rgba(0,0,0,0.08)"}}>
+          <div style={{display:"flex"}}>
+            {activeSteps.map((si,idx) => (
+              <div key={si} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center"}}>
+                <div style={{display:"flex",alignItems:"center",width:"100%"}}>
+                  {idx>0 && <div style={{flex:1,height:2,background:idx<=activeStepIndex?"#0c0c1a":"#e5e7eb"}}/>}
+                  <div style={{width:28,height:28,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",background:idx<=activeStepIndex?"#0c0c1a":"#e5e7eb",color:idx<=activeStepIndex?"white":"#9ca3af",fontSize:12,fontWeight:600,flexShrink:0}}>
+                    {idx<activeStepIndex?"✓":idx+1}
+                  </div>
+                  {idx<activeSteps.length-1 && <div style={{flex:1,height:2,background:idx<activeStepIndex?"#0c0c1a":"#e5e7eb"}}/>}
+                </div>
+                <div style={{fontSize:10,color:idx===activeStepIndex?"#0c0c1a":"#9ca3af",marginTop:4,fontWeight:idx===activeStepIndex?600:400}}>{STEPS[si]}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Card */}
+        <div style={{background:"white",borderRadius:12,padding:"28px 32px",boxShadow:"0 1px 4px rgba(0,0,0,0.08)"}}>
+          {step===0 && <StepProduct form={form} set={set}/>}
+          {step===1 && <StepOrderInfo form={form} set={set}/>}
+          {step===2 && <StepPumpOrder form={form} set={set}/>}
+          {step===3 && <StepGarmentOrder form={form} set={set} toggle={toggle}/>}
+          {step===4 && <StepPhysician form={form} set={set}/>}
+          {step===5 && <StepReview form={form} formatDate={formatDate}/>}
+
+          <div style={{display:"flex",gap:12,marginTop:28,paddingTop:20,borderTop:"1px solid #f3f4f6"}}>
+            {step>0 && <button onClick={()=>setStep(activeSteps[activeStepIndex-1])} style={{flex:1,padding:"12px",borderRadius:8,border:"1px solid #e5e7eb",background:"white",cursor:"pointer",fontWeight:600,color:"#374151"}}>← Back</button>}
+            {step<5
+              ? <button onClick={()=>setStep(activeSteps[activeStepIndex+1])} disabled={!canProceed()} style={{flex:2,padding:"12px",borderRadius:8,border:"none",background:canProceed()?"#0c0c1a":"#e5e7eb",color:canProceed()?"white":"#9ca3af",cursor:canProceed()?"pointer":"not-allowed",fontWeight:600,fontSize:15}}>Continue →</button>
+              : <button onClick={handleDownload} disabled={generating} style={{flex:2,padding:"12px",borderRadius:8,border:"none",background:"#16a34a",color:"white",cursor:"pointer",fontWeight:600,fontSize:15}}>{generating?"Generating PDF...":"⬇ Download Filled PDF"}</button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StepProduct({form,set}) {
+  const opts=[
+    {val:"pump",label:"Compression Pump",icon:"🔧",desc:"AIROS 6 / AIROS 8 pump order only"},
+    {val:"garment",label:"Garment Only",icon:"🧤",desc:"Compression stockings, wraps & garments"},
+    {val:"both",label:"Pump + Garment",icon:"📋",desc:"Complete order — both pump and garment"},
+  ];
+  return (
+    <div>
+      <h2 style={H2}>Select Product Type</h2>
+      <p style={{color:"#6b7280",marginBottom:20,fontSize:14}}>What would you like to order today?</p>
+      <div style={{display:"flex",flexDirection:"column",gap:12}}>
+        {opts.map(o=>(
+          <div key={o.val} onClick={()=>set("productType",o.val)} style={{padding:"16px 20px",borderRadius:10,border:`2px solid ${form.productType===o.val?"#0c0c1a":"#e5e7eb"}`,background:form.productType===o.val?"#f8fafc":"white",cursor:"pointer",display:"flex",alignItems:"center",gap:14}}>
+            <span style={{fontSize:24}}>{o.icon}</span>
+            <div><div style={{fontWeight:600,color:"#111827"}}>{o.label}</div><div style={{fontSize:13,color:"#6b7280"}}>{o.desc}</div></div>
+            {form.productType===o.val&&<span style={{marginLeft:"auto",color:"#0c0c1a",fontWeight:700}}>✓</span>}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StepOrderInfo({form,set}) {
+  return (
+    <div>
+      <h2 style={H2}>Order Information</h2>
+      <div style={{background:"#f0f9ff",border:"1px solid #bae6fd",borderRadius:8,padding:"10px 14px",marginBottom:20,display:"flex",gap:10}}>
+        <span>ℹ️</span>
+        <div style={{fontSize:13,color:"#0369a1"}}><strong>Sales rep info has been auto-filled</strong> from your Integrity Tissue Solutions account. Contact your administrator if incorrect.</div>
+      </div>
+      <div style={GRID}>
+        <div style={{gridColumn:"1/-1"}}><Lbl>Patient Full Name *</Lbl><Inp value={form.patientFullName} onChange={e=>set("patientFullName",e.target.value)} placeholder="Enter patient full name"/></div>
+        <div><Lbl>Order Date</Lbl><Inp type="date" value={form.orderDate} onChange={e=>set("orderDate",e.target.value)}/></div>
+        <div>
+          <Lbl>Fax Order To</Lbl>
+          <Inp value={form.faxOrderTo} onChange={e=>set("faxOrderTo",e.target.value)} placeholder="e.g. (888) 673-6279"/>
+          <div style={{fontSize:11,color:"#6b7280",marginTop:4}}>Enter fax number for this form. Default ReMarx fax: <strong>(888) 673-6279</strong>. Leave blank to fill manually before faxing.</div>
+        </div>
+        <div>
+          <Lbl>Sales Rep Name</Lbl>
+          <div style={{padding:"10px 12px",borderRadius:8,border:"1px solid #e5e7eb",background:"#f9fafb",fontSize:14,color:"#374151",display:"flex",alignItems:"center",gap:8}}>🔒 {form.salesRepName}</div>
+          <div style={{fontSize:11,color:"#9ca3af",marginTop:4}}>Auto-filled from your account</div>
+        </div>
+        <div>
+          <Lbl>Sales Rep Phone</Lbl>
+          <div style={{padding:"10px 12px",borderRadius:8,border:"1px solid #e5e7eb",background:"#f9fafb",fontSize:14,color:"#374151",display:"flex",alignItems:"center",gap:8}}>🔒 {form.salesRepPhone}</div>
+          <div style={{fontSize:11,color:"#9ca3af",marginTop:4}}>Auto-filled from your account</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StepPumpOrder({form,set}) {
+  const e0651=["Full Leg","Left Leg","Right Leg","Bilateral","Arm Left","Arm Right"];
+  const e0652=["Full Leg","Left Leg","Right Leg","Bilateral","Pant System","Arm Left","Arm Right","Arm Plus Left","Arm Plus Right"];
+  return (
+    <div>
+      <h2 style={H2}>Compression Pump Order</h2>
+      <Sec title="Contraindications">
+        <p style={{fontSize:13,color:"#374151",marginBottom:10}}>Does the patient currently present with any contraindications for the use of the device?</p>
+        <RG options={[{val:"yes",label:"YES"},{val:"no",label:"NO"}]} value={form.contraindications} onChange={v=>set("contraindications",v)}/>
+      </Sec>
+      <Sec title="Diagnosis Code (ICD-10) *">
+        <RG vertical options={[{val:"I89.0",label:"(I89.0) Lymphedema"},{val:"Q82.0",label:"(Q82.0) Hereditary Lymphedema"},{val:"I97.2",label:"(I97.2) Postmastecomy Lymphedema Syndrome"}]} value={form.diagnosisCode} onChange={v=>set("diagnosisCode",v)}/>
+      </Sec>
+      <Sec title="Select Pump Type *">
+        <RG vertical options={[{val:"E0651",label:"HCPCS E0651 — Gradient Sequential Pneumatic Compression Pump"},{val:"E0652",label:"HCPCS E0652 — Gradient Sequential WITH Calibrated Pressure"}]} value={form.pumpType} onChange={v=>set("pumpType",v)}/>
+        {form.pumpType==="E0651"&&<div style={{marginTop:12}}><p style={{fontSize:12,color:"#6b7280",marginBottom:8}}>Select garment area:</p><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{e0651.map(g=><Chip key={g} active={form.pumpGarment===g} onClick={()=>set("pumpGarment",g)}>{g}</Chip>)}</div></div>}
+        {form.pumpType==="E0652"&&<div style={{marginTop:12}}><p style={{fontSize:12,color:"#6b7280",marginBottom:8}}>Select garment area:</p><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{e0652.map(g=><Chip key={g} active={form.pumpGarmentE0652===g} onClick={()=>set("pumpGarmentE0652",g)}>{g}</Chip>)}</div></div>}
+      </Sec>
+      <Sec title="Treatment Protocol">
+        <div style={{marginBottom:16}}>
+          <Lbl>mmHg Distal Pressure Setting *</Lbl>
+          <div style={{display:"flex",flexWrap:"wrap",gap:8,marginTop:6}}>
+            {["65","60","55","50","45","40","35","30"].map(v=><Chip key={v} active={form.mmHg===v} onClick={()=>set("mmHg",v)}>{v}</Chip>)}
+            <Chip active={form.mmHg==="other"} onClick={()=>set("mmHg","other")}>Other</Chip>
+          </div>
+          {form.mmHg==="other"&&<Inp value={form.mmHgOther} onChange={e=>set("mmHgOther",e.target.value)} placeholder="Enter custom mmHg" style={{marginTop:8}}/>}
+        </div>
+        <div style={{marginBottom:16}}>
+          <Lbl>Times Per Day *</Lbl>
+          <div style={{display:"flex",gap:8,marginTop:6}}>{["1","2","3"].map(v=><Chip key={v} active={form.timesPerDay===v} onClick={()=>set("timesPerDay",v)}>{v}x</Chip>)}</div>
+        </div>
+        <div>
+          <Lbl>Minutes Per Treatment Session *</Lbl>
+          <div style={{display:"flex",gap:8,marginTop:6}}>{["15","30","45","60"].map(v=><Chip key={v} active={form.minutesPerSession===v} onClick={()=>set("minutesPerSession",v)}>{v} min</Chip>)}</div>
+        </div>
+      </Sec>
+    </div>
+  );
+}
+
+function StepGarmentOrder({form,set,toggle}) {
+  const lowerStockings=[
+    {key:"lowerStockingBelowKnee",label:"Below Knee",icon:"🦵",desc:"Foot to just below knee"},
+    {key:"lowerStockingThigh",label:"Thigh",icon:"🦵",desc:"Foot up to mid-thigh"},
+    {key:"lowerStockingPantyhose",label:"Pantyhose",icon:"👗",desc:"Full coverage both legs"},
+  ];
+  const lowerGarments=[
+    {key:"lowerGarmentFoot",label:"Foot",icon:"🦶",desc:"Foot only"},
+    {key:"lowerGarmentCalf",label:"Calf",icon:"🦵",desc:"Ankle to calf"},
+    {key:"lowerGarmentKnee",label:"Knee",icon:"🦵",desc:"Ankle to knee"},
+    {key:"lowerGarmentThigh",label:"Thigh",icon:"🦵",desc:"Ankle to thigh"},
+    {key:"lowerGarmentFullLeg",label:"Full Leg",icon:"🦵",desc:"Complete leg coverage"},
+    {key:"lowerGarmentFullLegFoot",label:"Full Leg W/Foot",icon:"🦶",desc:"Full leg including foot"},
+  ];
+  const upperGloves=[
+    {key:"upperGauntlet",label:"Gauntlet",icon:"🖐️",desc:"Hand and fingers"},
+    {key:"upperGlove",label:"Glove",icon:"🧤",desc:"Full hand glove"},
+    {key:"upperGloveSleevCombo",label:"Glove Sleeve Combo",icon:"🦾",desc:"Glove + arm sleeve"},
+    {key:"upperArmSleeve",label:"Arm Sleeve",icon:"💪",desc:"Wrist to shoulder"},
+  ];
+  const upperWraps=[
+    {key:"upperHandVelcroWrap",label:"Hand Velcro Wrap",icon:"✋",desc:"Adjustable hand wrap"},
+    {key:"upperArmWrap",label:"Arm Wrap",icon:"💪",desc:"Adjustable arm wrap"},
+  ];
+  const upperGarments=[
+    {key:"upperGloveGarment",label:"Glove",icon:"🧤",desc:"Upper extremity glove"},
+    {key:"upperFingertipsToAxilla",label:"Fingertips to Axilla",icon:"🖐️",desc:"Fingertips to armpit"},
+    {key:"upperWristToAxilla",label:"Wrist to Axilla",icon:"💪",desc:"Wrist to armpit"},
+  ];
+
+  const GCard=({item})=>(
+    <div onClick={()=>toggle(item.key)} style={{padding:"10px 14px",borderRadius:10,border:`2px solid ${form[item.key]?"#0c0c1a":"#e5e7eb"}`,background:form[item.key]?"#f8fafc":"white",cursor:"pointer",display:"flex",alignItems:"center",gap:10,minWidth:150}}>
+      <span style={{fontSize:20}}>{item.icon}</span>
+      <div><div style={{fontWeight:600,fontSize:13,color:"#111827"}}>{item.label}</div><div style={{fontSize:11,color:"#6b7280"}}>{item.desc}</div></div>
+      {form[item.key]&&<span style={{marginLeft:"auto",color:"#0c0c1a",fontWeight:700,fontSize:12}}>✓</span>}
+    </div>
+  );
+
+  return (
+    <div>
+      <h2 style={H2}>Garment Order</h2>
+      <p style={{fontSize:13,color:"#6b7280",marginBottom:20}}>Select all garments needed. You may choose multiple.</p>
+      <Sec title="Lower Extremity — Compression Stockings"><div style={{display:"flex",flexWrap:"wrap",gap:10}}>{lowerStockings.map(i=><GCard key={i.key} item={i}/>)}</div></Sec>
+      <Sec title="Lower Extremity — Garments"><div style={{display:"flex",flexWrap:"wrap",gap:10}}>{lowerGarments.map(i=><GCard key={i.key} item={i}/>)}</div></Sec>
+      <Sec title="Upper Extremity — Gloves / Sleeves"><div style={{display:"flex",flexWrap:"wrap",gap:10}}>{upperGloves.map(i=><GCard key={i.key} item={i}/>)}</div></Sec>
+      <Sec title="Upper Extremity — Compression Wraps"><div style={{display:"flex",flexWrap:"wrap",gap:10}}>{upperWraps.map(i=><GCard key={i.key} item={i}/>)}</div></Sec>
+      <Sec title="Upper Extremity — Garments"><div style={{display:"flex",flexWrap:"wrap",gap:10}}>{upperGarments.map(i=><GCard key={i.key} item={i}/>)}</div></Sec>
+      <Sec title="Garment Requirements">
+        <div style={{marginBottom:16}}><Lbl>Compression Level *</Lbl><RG vertical options={[{val:"CL1",label:"CL1: 20-30mmhg (mild)"},{val:"CLII",label:"CLII: 30-40mmhg (moderate)"},{val:"CLIII",label:"CLIII: 40-50mmhg (firm)"}]} value={form.compressionLevel} onChange={v=>set("compressionLevel",v)}/></div>
+        <div style={{marginBottom:16}}>
+          <Lbl>Quantity per Extremity *</Lbl>
+          <RG options={[{val:"1",label:"Qty 1"},{val:"2",label:"Qty 2"},{val:"3",label:"Qty 3"}]} value={form.quantityPerExtremity} onChange={v=>set("quantityPerExtremity",v)}/>
+          <div style={{fontSize:11,color:"#6b7280",marginTop:4}}>*Medicare provides 3 garments per extremity every 6 months</div>
+        </div>
+        <div style={{marginBottom:16}}>
+          <Lbl>Custom Made Garment *</Lbl>
+          <RG options={[{val:"no",label:"No"},{val:"yes",label:"Yes"}]} value={form.customMadeGarment} onChange={v=>set("customMadeGarment",v)}/>
+          {form.customMadeGarment==="yes"&&<div style={{background:"#fef3c7",border:"1px solid #fcd34d",borderRadius:6,padding:"8px 12px",marginTop:8,fontSize:12,color:"#92400e"}}>⚠️ Custom garments require clinical notes explaining why they are needed. Once you have completed this workflow and printed the form, please write your clinical notes on the back of the printed order form before submitting to ReMarx.</div>}
+        </div>
+        <div style={{marginBottom:16}}>
+          <Lbl>Manufacturer Preference</Lbl>
+          <div style={{display:"flex",flexWrap:"wrap",gap:8,marginTop:6}}>
+            {[["medi_usa","Medi USA"],["bsn","BSN (Jobst/Farrow)"],["l_r","L&R"],["juzo","Juzo"],["sigvaris","Sigvaris"],["no_preference","No Preference"]].map(([val,label])=>(
+              <Chip key={val} active={form.manufacturerPreference===val} onClick={()=>set("manufacturerPreference",val)}>{label}</Chip>
+            ))}
+          </div>
+        </div>
+        <div style={GRID}>
+          <div>
+            <Lbl>Product Name</Lbl>
+            <div style={{fontSize:11,color:"#6b7280",marginBottom:4}}>THE SPECIFIC NAME OF THE GARMENT PRODUCT (E.G. "JOBST OPAQUE", "MEDIVEN PLUS")</div>
+            <Inp value={form.productName} onChange={e=>set("productName",e.target.value)} placeholder="e.g. Jobst Opaque"/>
+          </div>
+          <div>
+            <Lbl>Product Type</Lbl>
+            <div style={{fontSize:11,color:"#6b7280",marginBottom:6}}>SELECT WHEN THE PATIENT WILL WEAR THIS GARMENT</div>
+            <div style={{display:"flex",gap:8}}>
+              {[["daytime","Daytime"],["nighttime","Nighttime"],["both","Both"]].map(([val,label])=>(
+                <Chip key={val} active={form.productType2===val} onClick={()=>set("productType2",val)}>{label}</Chip>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Sec>
+    </div>
+  );
+}
+
+function StepPhysician({form,set}) {
+  const canvasRef=useRef(null);
+  const [isDrawing,setIsDrawing]=useState(false);
+  const [hasSignature,setHasSignature]=useState(false);
+  const lastPos=useRef(null);
+
+  useEffect(()=>{
+    if(form.signatureMode==="draw"&&canvasRef.current){
+      const ctx=canvasRef.current.getContext("2d");
+      ctx.fillStyle="white"; ctx.fillRect(0,0,600,150);
+      ctx.strokeStyle="#0c0c1a"; ctx.lineWidth=2; ctx.lineCap="round";
+    }
+  },[form.signatureMode]);
+
+  const getPos=(e,canvas)=>{
+    const rect=canvas.getBoundingClientRect();
+    const sx=canvas.width/rect.width, sy=canvas.height/rect.height;
+    if(e.touches) return {x:(e.touches[0].clientX-rect.left)*sx,y:(e.touches[0].clientY-rect.top)*sy};
+    return {x:(e.clientX-rect.left)*sx,y:(e.clientY-rect.top)*sy};
+  };
+
+  const startDraw=(e)=>{e.preventDefault();setIsDrawing(true);lastPos.current=getPos(e,canvasRef.current);};
+  const draw=(e)=>{
+    e.preventDefault();
+    if(!isDrawing) return;
+    const canvas=canvasRef.current, ctx=canvas.getContext("2d");
+    const pos=getPos(e,canvas);
+    ctx.beginPath(); ctx.moveTo(lastPos.current.x,lastPos.current.y); ctx.lineTo(pos.x,pos.y); ctx.stroke();
+    lastPos.current=pos; setHasSignature(true);
+  };
+  const stopDraw=()=>{
+    if(isDrawing&&hasSignature) set("signatureData",canvasRef.current.toDataURL());
+    setIsDrawing(false);
+  };
+  const clearSig=()=>{
+    const ctx=canvasRef.current.getContext("2d");
+    ctx.fillStyle="white"; ctx.fillRect(0,0,600,150);
+    setHasSignature(false); set("signatureData","");
+  };
+
+  return (
+    <div>
+      <h2 style={H2}>Physician Information</h2>
+      <div style={{background:"#f0f9ff",border:"1px solid #bae6fd",borderRadius:8,padding:"10px 14px",marginBottom:20,display:"flex",gap:10}}>
+        <span>ℹ️</span>
+        <div style={{fontSize:13,color:"#0369a1"}}><strong>Physician info has been auto-filled</strong> from your Integrity Tissue Solutions account profile. Contact your administrator if corrections are needed.</div>
+      </div>
+      <div style={GRID}>
+        <div style={{gridColumn:"1/-1"}}>
+          <Lbl>Physician Name</Lbl>
+          <div style={{padding:"10px 12px",borderRadius:8,border:"1px solid #e5e7eb",background:"#f9fafb",fontSize:14,color:"#374151",display:"flex",gap:8}}>🔒 {form.physicianName}</div>
+          <div style={{fontSize:11,color:"#9ca3af",marginTop:4}}>Auto-filled from your account</div>
+        </div>
+        <div>
+          <Lbl>Phone</Lbl>
+          <div style={{padding:"10px 12px",borderRadius:8,border:"1px solid #e5e7eb",background:"#f9fafb",fontSize:14,color:"#374151",display:"flex",gap:8}}>🔒 {form.physicianPhone}</div>
+          <div style={{fontSize:11,color:"#9ca3af",marginTop:4}}>Auto-filled from your account</div>
+        </div>
+        <div>
+          <Lbl>NPI</Lbl>
+          <div style={{padding:"10px 12px",borderRadius:8,border:"1px solid #e5e7eb",background:"#f9fafb",fontSize:14,color:"#374151",display:"flex",gap:8}}>🔒 {form.physicianNPI}</div>
+          <div style={{fontSize:11,color:"#9ca3af",marginTop:4}}>Auto-filled from your account</div>
+        </div>
+        <div><Lbl>Signature Date</Lbl><Inp type="date" value={form.physicianDate} onChange={e=>set("physicianDate",e.target.value)}/></div>
+      </div>
+
+      <div style={{marginTop:24}}>
+        <Lbl>Physician Signature *</Lbl>
+        <p style={{fontSize:13,color:"#6b7280",marginBottom:12}}>Choose how the physician will sign this order:</p>
+        <div style={{display:"flex",gap:12,marginBottom:16}}>
+          <div onClick={()=>{set("signatureMode","draw");set("signatureData","");setHasSignature(false);}} style={{flex:1,padding:"14px",borderRadius:10,border:`2px solid ${form.signatureMode==="draw"?"#0c0c1a":"#e5e7eb"}`,background:form.signatureMode==="draw"?"#f8fafc":"white",cursor:"pointer",textAlign:"center"}}>
+            <div style={{fontSize:22,marginBottom:4}}>✍️</div>
+            <div style={{fontWeight:600,fontSize:13}}>Sign Digitally</div>
+            <div style={{fontSize:11,color:"#6b7280"}}>Draw with mouse or touchscreen</div>
+          </div>
+          <div onClick={()=>{set("signatureMode","manual");set("signatureData","MANUAL");}} style={{flex:1,padding:"14px",borderRadius:10,border:`2px solid ${form.signatureMode==="manual"?"#0c0c1a":"#e5e7eb"}`,background:form.signatureMode==="manual"?"#f8fafc":"white",cursor:"pointer",textAlign:"center"}}>
+            <div style={{fontSize:22,marginBottom:4}}>🖨️</div>
+            <div style={{fontWeight:600,fontSize:13}}>Sign on Printed Copy</div>
+            <div style={{fontSize:11,color:"#6b7280"}}>Print and sign before faxing</div>
+          </div>
+        </div>
+        {form.signatureMode==="draw"&&(
+          <div>
+            <div style={{border:"1px solid #e5e7eb",borderRadius:8,overflow:"hidden",background:"white",position:"relative"}}>
+              <canvas ref={canvasRef} width={600} height={150}
+                onMouseDown={startDraw} onMouseMove={draw} onMouseUp={stopDraw} onMouseLeave={stopDraw}
+                onTouchStart={startDraw} onTouchMove={draw} onTouchEnd={stopDraw}
+                style={{width:"100%",height:150,cursor:"crosshair",display:"block"}}/>
+              {!hasSignature&&<div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",color:"#d1d5db",fontSize:14,pointerEvents:"none",textAlign:"center"}}>Sign here with your mouse or finger</div>}
+            </div>
+            {hasSignature&&<button onClick={clearSig} style={{marginTop:8,padding:"6px 14px",borderRadius:6,border:"1px solid #e5e7eb",background:"white",cursor:"pointer",fontSize:13,color:"#6b7280"}}>Clear & Redo</button>}
+          </div>
+        )}
+        {form.signatureMode==="manual"&&(
+          <div style={{background:"#fef3c7",border:"1px solid #fcd34d",borderRadius:8,padding:"12px 16px"}}>
+            <p style={{fontSize:13,color:"#92400e",margin:0}}>⚠️ Signature line will be left blank on the PDF. Please print and have the physician sign before faxing to ReMarx at <strong>(888) 673-6279</strong>.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function StepReview({form,formatDate}) {
+  const diagLabels={"I89.0":"Lymphedema (I89.0)","Q82.0":"Hereditary Lymphedema (Q82.0)","I97.2":"Postmastecomy Lymphedema Syndrome (I97.2)"};
+  const garments=[
+    ["lowerStockingBelowKnee","Below Knee Stocking"],["lowerStockingThigh","Thigh Stocking"],["lowerStockingPantyhose","Pantyhose"],
+    ["lowerGarmentFoot","Foot"],["lowerGarmentCalf","Calf"],["lowerGarmentKnee","Knee"],["lowerGarmentThigh","Thigh Garment"],
+    ["lowerGarmentFullLeg","Full Leg"],["lowerGarmentFullLegFoot","Full Leg W/Foot"],
+    ["upperGauntlet","Gauntlet"],["upperGlove","Glove"],["upperGloveSleevCombo","Glove Sleeve Combo"],["upperArmSleeve","Arm Sleeve"],
+    ["upperHandVelcroWrap","Hand Velcro Wrap"],["upperArmWrap","Arm Wrap"],
+    ["upperGloveGarment","Upper Glove"],["upperFingertipsToAxilla","Fingertips to Axilla"],["upperWristToAxilla","Wrist to Axilla"],
+  ].filter(([k])=>form[k]);
+
+  return (
+    <div>
+      <h2 style={H2}>Review & Confirm</h2>
+      <p style={{color:"#6b7280",fontSize:13,marginBottom:20}}>Please review all information before generating the PDF.</p>
+      <RevSec title="Order Information">
+        <Row label="Patient" value={form.patientFullName}/>
+        <Row label="Order Date" value={formatDate(form.orderDate)}/>
+        <Row label="Sales Rep" value={form.salesRepName}/>
+        <Row label="Rep Phone" value={form.salesRepPhone}/>
+        {form.faxOrderTo&&<Row label="Fax To" value={form.faxOrderTo}/>}
+      </RevSec>
+      {(form.productType==="pump"||form.productType==="both")&&(
+        <RevSec title="Pump Order">
+          <Row label="Contraindications" value={form.contraindications?.toUpperCase()}/>
+          <Row label="Diagnosis" value={diagLabels[form.diagnosisCode]}/>
+          <Row label="Pump Type" value={form.pumpType}/>
+          <Row label="Garment Area" value={form.pumpGarment||form.pumpGarmentE0652||"—"}/>
+          <Row label="mmHg Setting" value={form.mmHg==="other"?form.mmHgOther:form.mmHg}/>
+          <Row label="Times/Day" value={form.timesPerDay}/>
+          <Row label="Minutes/Session" value={form.minutesPerSession}/>
+        </RevSec>
+      )}
+      {(form.productType==="garment"||form.productType==="both")&&(
+        <RevSec title="Garment Order">
+          {garments.length>0&&<Row label="Selected Garments" value={garments.map(([,l])=>l).join(", ")}/>}
+          <Row label="Compression Level" value={form.compressionLevel}/>
+          <Row label="Qty/Extremity" value={form.quantityPerExtremity}/>
+          <Row label="Custom Garment" value={form.customMadeGarment}/>
+          {form.manufacturerPreference&&<Row label="Manufacturer" value={form.manufacturerPreference.replace(/_/g," ")}/>}
+          {form.productName&&<Row label="Product Name" value={form.productName}/>}
+          {form.productType2&&<Row label="Wear Time" value={form.productType2}/>}
+        </RevSec>
+      )}
+      <RevSec title="Physician">
+        <Row label="Name" value={form.physicianName}/>
+        <Row label="Phone" value={form.physicianPhone}/>
+        <Row label="NPI" value={form.physicianNPI}/>
+        <Row label="Signature" value={form.signatureMode==="draw"?"Digital signature captured ✓":"Will sign on printed copy"}/>
+        <Row label="Date" value={formatDate(form.physicianDate)}/>
+      </RevSec>
+      {form.signatureMode==="draw"&&form.signatureData&&(
+        <div style={{marginTop:8}}>
+          <div style={{fontSize:12,color:"#6b7280",marginBottom:6}}>Captured Signature:</div>
+          <img src={form.signatureData} alt="sig" style={{border:"1px solid #e5e7eb",borderRadius:6,maxWidth:"100%",height:80,objectFit:"contain",background:"white"}}/>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SuccessScreen({form,onReset}) {
+  return (
+    <div style={{maxWidth:680,margin:"40px auto",padding:"0 16px",textAlign:"center"}}>
+      <div style={{background:"white",borderRadius:12,padding:40,boxShadow:"0 1px 4px rgba(0,0,0,0.08)"}}>
+        <div style={{fontSize:48,marginBottom:16}}>✅</div>
+        <h2 style={{color:"#0c0c1a",fontSize:22,fontWeight:700,marginBottom:8}}>Form Ready</h2>
+        <p style={{color:"#6b7280",fontSize:14,marginBottom:24}}>The ReMarx Compression Order Form for <strong>{form.patientFullName}</strong> has been completed.</p>
+        <div style={{background:"#f0fdf4",border:"1px solid #86efac",borderRadius:8,padding:"12px 16px",marginBottom:16,textAlign:"left"}}>
+          <p style={{fontSize:13,color:"#166534",margin:0}}>📠 <strong>ReMarx Services Inc.</strong><br/>Fax: (888) 673-6279 | Email: info@remarkservices.com</p>
+        </div>
+        {form.signatureMode==="manual"&&(
+          <div style={{background:"#fef3c7",border:"1px solid #fcd34d",borderRadius:8,padding:"12px 16px",marginBottom:24,textAlign:"left"}}>
+            <p style={{fontSize:13,color:"#92400e",margin:0}}>⚠️ Physician must sign the printed copy before faxing to ReMarx.</p>
+          </div>
+        )}
+        <button onClick={onReset} style={{padding:"12px 28px",borderRadius:8,border:"none",background:"#0c0c1a",color:"white",cursor:"pointer",fontWeight:600,fontSize:14}}>+ New Order</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Tiny shared components ───
+const H2={fontSize:20,fontWeight:700,color:"#0c0c1a",marginBottom:6,marginTop:0};
+const GRID={display:"grid",gridTemplateColumns:"1fr 1fr",gap:14};
+const Lbl=({children})=><div style={{fontSize:13,fontWeight:500,color:"#374151",marginBottom:4}}>{children}</div>;
+const Inp=({style,...p})=><input {...p} style={{width:"100%",padding:"10px 12px",borderRadius:8,border:"1px solid #e5e7eb",fontSize:14,outline:"none",boxSizing:"border-box",...style}}/>;
+const Chip=({active,onClick,children})=><button onClick={onClick} style={{padding:"6px 14px",borderRadius:20,border:`1.5px solid ${active?"#0c0c1a":"#e5e7eb"}`,background:active?"#0c0c1a":"white",color:active?"white":"#374151",cursor:"pointer",fontSize:13,fontWeight:active?600:400}}>{children}</button>;
+const RG=({options,value,onChange,vertical})=><div style={{display:"flex",flexDirection:vertical?"column":"row",gap:vertical?8:16,flexWrap:"wrap"}}>{options.map(o=><label key={o.val} style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",fontSize:13,color:"#374151"}}><input type="radio" checked={value===o.val} onChange={()=>onChange(o.val)} style={{accentColor:"#0c0c1a"}}/>{o.label}</label>)}</div>;
+const Sec=({title,children})=><div style={{marginBottom:24}}><div style={{fontWeight:600,fontSize:12,color:"#374151",textTransform:"uppercase",letterSpacing:1,marginBottom:10,paddingBottom:6,borderBottom:"1px solid #f3f4f6"}}>{title}</div>{children}</div>;
+const RevSec=({title,children})=><div style={{marginBottom:16,background:"#f9fafb",borderRadius:8,padding:"14px 16px"}}><div style={{fontWeight:600,fontSize:11,color:"#6b7280",textTransform:"uppercase",letterSpacing:1,marginBottom:10}}>{title}</div>{children}</div>;
+const Row=({label,value})=><div style={{display:"flex",justifyContent:"space-between",fontSize:13,marginBottom:6}}><span style={{color:"#6b7280"}}>{label}</span><span style={{fontWeight:500,color:"#111827",textAlign:"right",maxWidth:"60%"}}>{value||"—"}</span></div>;
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

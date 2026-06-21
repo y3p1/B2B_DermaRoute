@@ -13,7 +13,7 @@ export default function ClinicStaffSignupFlow() {
       Step1Component={ClinicStaffSignupStep1Profile}
       Step3Component={ClinicStaffSignupStep3Summary}
       Step4Component={ClinicStaffSignupStep4Success}
-      title="Create Clinic Staff Account"
+      title="Create DR Representative Account"
       signInUrl="/auth?role=clinic_staff"
     />
   );

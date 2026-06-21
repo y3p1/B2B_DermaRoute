@@ -3,28 +3,31 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 import { getDb } from "./db";
 import { lymphedemaOrders, providerAcct } from "../../db/schema";
 
-const patientSchema = z.object({
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
-  dob: z.string().min(1),
-  mrn: z.string().optional(),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  zip: z.string().optional(),
-  phone: z.string().optional(),
-  email: z.string().optional(),
-});
+const patientSchema = z
+  .object({
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+    fullName: z.string().optional(),
+    dob: z.string().optional(),
+    mrn: z.string().optional(),
+    address: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    zip: z.string().optional(),
+    phone: z.string().optional(),
+    email: z.string().optional(),
+  })
+  .catchall(z.unknown());
 
 export const createLymphedemaOrderSchema = z.object({
   orderingProviderId: z.string().uuid().optional(),
   patient: patientSchema,
-  insurance: z.string().min(1),
+  insurance: z.string().optional(),
   placeOfService: z.string().optional(),
-  diagnosis: z.array(z.string()).min(1),
-  conservativeTherapyCompleted: z.boolean(),
-  skinChanges: z.array(z.string()),
-  extremity: z.array(z.string()),
+  diagnosis: z.array(z.string()).optional(),
+  conservativeTherapyCompleted: z.boolean().optional(),
+  skinChanges: z.array(z.string()).optional(),
+  extremity: z.array(z.string()).optional(),
   measurements: z.record(z.string(), z.number()).optional(),
   device: z.string().optional(),
   hcpcs: z.string().optional(),
@@ -56,12 +59,12 @@ export async function createLymphedemaOrder(
       submittedBy,
       orderingProviderId: input.orderingProviderId ?? null,
       patient: input.patient,
-      insurance: input.insurance,
+      insurance: input.insurance ?? null,
       placeOfService: input.placeOfService ?? null,
-      diagnosis: input.diagnosis,
-      conservativeTherapyCompleted: input.conservativeTherapyCompleted,
-      skinChanges: input.skinChanges,
-      extremity: input.extremity,
+      diagnosis: input.diagnosis ?? null,
+      conservativeTherapyCompleted: input.conservativeTherapyCompleted ?? null,
+      skinChanges: input.skinChanges ?? null,
+      extremity: input.extremity ?? null,
       measurements: input.measurements ?? null,
       device: input.device ?? null,
       hcpcs: input.hcpcs ?? null,
@@ -76,7 +79,7 @@ export async function createLymphedemaOrder(
       timesPerDay: input.timesPerDay ?? null,
       minutesPerSession: input.minutesPerSession ?? null,
       lymphedemaProductId: input.lymphedemaProductId ?? null,
-      status: "pending",
+      status: "pending_review",
     })
     .returning({ id: lymphedemaOrders.id });
   return row.id;
@@ -97,10 +100,21 @@ export async function getLymphedemaOrders(filters?: { providerIds?: string[] }) 
       device: lymphedemaOrders.device,
       patient: lymphedemaOrders.patient,
       extremity: lymphedemaOrders.extremity,
+      garmentStyle: lymphedemaOrders.garmentStyle,
+      garmentType: lymphedemaOrders.garmentType,
       submittedAt: lymphedemaOrders.submittedAt,
       createdAt: lymphedemaOrders.createdAt,
       providerId: lymphedemaOrders.providerId,
       clinicName: providerAcct.clinicName,
+      compressionLevel: lymphedemaOrders.compressionLevel,
+      quantity: lymphedemaOrders.quantity,
+      manufacturerPreference: lymphedemaOrders.manufacturerPreference,
+      distalPressureMmhg: lymphedemaOrders.distalPressureMmhg,
+      timesPerDay: lymphedemaOrders.timesPerDay,
+      minutesPerSession: lymphedemaOrders.minutesPerSession,
+      diagnosis: lymphedemaOrders.diagnosis,
+      hcpcs: lymphedemaOrders.hcpcs,
+      placeOfService: lymphedemaOrders.placeOfService,
     })
     .from(lymphedemaOrders)
     .leftJoin(providerAcct, eq(lymphedemaOrders.providerId, providerAcct.id))

@@ -22,11 +22,23 @@ type LymphedemaOrderRow = {
   createdAt: string | null;
   providerId: string | null;
   clinicName: string | null;
+  compressionLevel: string | null;
+  garmentType: string | null;
+  garmentStyle: string | null;
+  quantity: number | null;
+  manufacturerPreference: string | null;
+  distalPressureMmhg: number | null;
+  timesPerDay: number | null;
+  minutesPerSession: number | null;
+  diagnosis: unknown;
+  hcpcs: string | null;
+  placeOfService: string | null;
 };
 
-const STATUS_OPTIONS = ["pending", "approved", "shipped", "completed", "denied", "cancelled"];
+const STATUS_OPTIONS = ["pending_review", "pending", "approved", "shipped", "completed", "denied", "cancelled"];
 
 const STATUS_COLORS: Record<string, string> = {
+  pending_review: "bg-orange-100 text-orange-700",
   pending: "bg-yellow-100 text-yellow-700",
   approved: "bg-blue-100 text-blue-700",
   shipped: "bg-purple-100 text-purple-700",
@@ -47,6 +59,7 @@ export function LymphedemaOrdersTab() {
   const [error, setError] = React.useState<string | null>(null);
   const [updatingId, setUpdatingId] = React.useState<string | null>(null);
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
+  const [sendingEmailId, setSendingEmailId] = React.useState<string | null>(null);
 
   const refresh = React.useCallback(async () => {
     setLoading(true);
@@ -66,6 +79,21 @@ export function LymphedemaOrdersTab() {
   }, [token]);
 
   React.useEffect(() => { void refresh(); }, [refresh]);
+
+  const handleSendEmail = async (id: string) => {
+    if (!token) return;
+    setSendingEmailId(id);
+    try {
+      await fetch(`/api/lymphedema-orders/${id}/send-email`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send email");
+    } finally {
+      setSendingEmailId(null);
+    }
+  };
 
   const handleStatusChange = async (id: string, status: string) => {
     if (!token) return;
@@ -123,6 +151,7 @@ export function LymphedemaOrdersTab() {
                 <th className="text-left px-4 py-3 font-medium text-slate-600">Practice</th>
                 <th className="text-left px-4 py-3 font-medium text-slate-600">Insurance</th>
                 <th className="text-left px-4 py-3 font-medium text-slate-600">Device</th>
+                <th className="text-left px-4 py-3 font-medium text-slate-600">Extremity</th>
                 <th className="text-left px-4 py-3 font-medium text-slate-600">Status</th>
                 <th className="text-left px-4 py-3 font-medium text-slate-600">Date</th>
                 <th className="px-4 py-3" />
@@ -141,6 +170,7 @@ export function LymphedemaOrdersTab() {
                     <td className="px-4 py-3 text-slate-500">{row.clinicName ?? "—"}</td>
                     <td className="px-4 py-3 text-slate-500">{row.insurance ?? "—"}</td>
                     <td className="px-4 py-3 text-slate-500">{row.device ?? "—"}</td>
+                    <td className="px-4 py-3 text-slate-500 text-xs">{Array.isArray(row.extremity) ? row.extremity.join(", ") : "—"}</td>
                     <td className="px-4 py-3">
                       <select
                         value={row.status}
@@ -168,12 +198,33 @@ export function LymphedemaOrdersTab() {
                   </tr>
                   {expandedId === row.id && (
                     <tr>
-                      <td colSpan={7} className="px-6 py-4 bg-slate-50 text-xs text-slate-600 space-y-1">
-                        <div className="grid grid-cols-2 gap-x-8 gap-y-1">
+                      <td colSpan={8} className="px-6 py-4 bg-slate-50 text-xs text-slate-600">
+                        <div className="grid grid-cols-2 gap-x-8 gap-y-1.5 mb-3">
+                          <div><span className="font-medium">DOB:</span> {(row.patient as { dob?: string } | null)?.dob ?? "—"}</div>
+                          <div><span className="font-medium">Submitted:</span> {row.submittedAt ? new Date(row.submittedAt).toLocaleString() : "Pending"}</div>
+                          <div><span className="font-medium">Diagnosis:</span> {Array.isArray(row.diagnosis) ? (row.diagnosis as string[]).join(", ") : "—"}</div>
+                          <div><span className="font-medium">Place of Service:</span> {row.placeOfService ?? "—"}</div>
+                          <div><span className="font-medium">HCPCS:</span> {row.hcpcs ?? "—"}</div>
+                          <div><span className="font-medium">Garment Type:</span> {row.garmentType ?? "—"}</div>
+                          <div><span className="font-medium">Garment Style:</span> {row.garmentStyle ?? "—"}</div>
+                          <div><span className="font-medium">Compression Level:</span> {row.compressionLevel ?? "—"}</div>
+                          <div><span className="font-medium">Quantity:</span> {row.quantity ?? "—"}</div>
+                          <div><span className="font-medium">Manufacturer:</span> {row.manufacturerPreference ?? "—"}</div>
+                          <div><span className="font-medium">Distal Pressure:</span> {row.distalPressureMmhg ? `${row.distalPressureMmhg} mmHg` : "—"}</div>
+                          <div><span className="font-medium">Times/Day:</span> {row.timesPerDay ? `${row.timesPerDay}×` : "—"}</div>
+                          <div><span className="font-medium">Min/Session:</span> {row.minutesPerSession ? `${row.minutesPerSession} min` : "—"}</div>
                           <div><span className="font-medium">Extremity:</span> {Array.isArray(row.extremity) ? row.extremity.join(", ") : "—"}</div>
-                          <div><span className="font-medium">Submitted:</span> {row.submittedAt ? new Date(row.submittedAt).toLocaleString() : "Pending submission"}</div>
-                          <div><span className="font-medium">DOB:</span> {(row.patient as Patient | null)?.dob ?? "—"}</div>
                           <div><span className="font-medium">Order ID:</span> <span className="font-mono">{row.id}</span></div>
+                        </div>
+                        <div className="flex items-center gap-2 pt-2 border-t border-slate-200">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); void handleSendEmail(row.id); }}
+                            disabled={sendingEmailId === row.id}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 disabled:opacity-50 transition-colors"
+                          >
+                            {sendingEmailId === row.id ? "Sending…" : "📧 Send to Central Palms Medical"}
+                          </button>
+                          <span className="text-slate-400">Lb@centralpalmsmedical.com</span>
                         </div>
                       </td>
                     </tr>

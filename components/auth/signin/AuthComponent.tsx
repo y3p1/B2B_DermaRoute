@@ -156,7 +156,7 @@ export default function AuthComponent() {
       if (!selectedRole) {
         setError({
           title: "Choose a role",
-          description: "Please choose Provider or Clinic Staff to continue.",
+          description: "Please choose Provider or DR Representative to continue.",
         });
         return;
       }
@@ -296,7 +296,7 @@ export default function AuthComponent() {
               Sign in
             </h1>
             <p className="text-black/80 font-bold my-6 text-center">
-              Are you signing in as a Provider/Clinic Staff or ITS Representative?
+              Are you signing in as a Provider / DR Representative or as a DR Representative?
             </p>
             <div className="flex flex-col gap-4 w-full">
               <button
@@ -307,7 +307,7 @@ export default function AuthComponent() {
                 }}
                 type="button"
               >
-                I am a Provider/Clinic Staff
+                I am a Provider / DR Representative
               </button>
               <button
                 className="w-full px-6 py-3 bg-white text-black rounded-lg font-semibold shadow hover:bg-neutral-100 transition"
@@ -317,7 +317,7 @@ export default function AuthComponent() {
                 }}
                 type="button"
               >
-                I am an ITS Representative
+                I am a DR Representative
               </button>
             </div>
           </>
@@ -325,7 +325,7 @@ export default function AuthComponent() {
           <>
             <h1 className="text-black font-bold text-3xl mb-6 mt-4 text-center">
               {selectedRole === "clinic_staff"
-                ? "ITS Representative Portal"
+                ? "DR Representative Portal"
                 : "Provider Portal"}
             </h1>
 

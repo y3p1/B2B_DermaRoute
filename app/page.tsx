@@ -16,7 +16,6 @@ export default async function HomePage() {
     if (!demoRole) redirect("/demo");
     if (demoRole === "admin") redirect("/admin");
     if (demoRole === "clinic_staff") redirect("/clinic-staff");
-    // provider → show landing page below
   }
 
   return <LandingPage />;

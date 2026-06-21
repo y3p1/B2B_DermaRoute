@@ -8,8 +8,80 @@ import {
   updateProviderProfileSchema,
 } from "../services/providerAcct.service";
 import { getEnabledTracks } from "../services/tracks.service";
+import { isDemoMode, getDemoUser, DEMO_ROLE_TRACKS, type DemoRole } from "../../lib/demoMode";
+
+const DEMO_CLINIC_NAMES: Record<string, string> = {
+  provider:        "Cedar Hills Wound Center",
+  provider_wound2: "Summit Wound Specialists",
+  provider_ocular: "Coastal Eye Clinic",
+};
+
+const DEMO_PROVIDER_NAMES: Record<string, { first: string; last: string }> = {
+  provider:        { first: "Jordan", last: "Rivera" },
+  provider_wound2: { first: "Casey", last: "Morrison" },
+  provider_ocular: { first: "Taylor", last: "Nguyen" },
+};
 
 export async function meController(_req: Request, res: Response) {
+  if (isDemoMode()) {
+    const demoRole = (res.locals.demoRole ?? "provider") as DemoRole;
+    const { userId, user: demoUser } = getDemoUser(demoRole);
+    const du = demoUser as { email: string };
+    const tracks = DEMO_ROLE_TRACKS[demoRole] ?? [];
+    const isProvider = ["provider", "provider_wound2", "provider_ocular"].includes(demoRole);
+
+    const providerMock = isProvider
+      ? {
+          id: userId,
+          accountPhone: "+10000000000",
+          email: du.email,
+          npiNumber: "0000000000",
+          clinicName: DEMO_CLINIC_NAMES[demoRole] ?? "Demo Clinic",
+          clinicAddress: "123 Demo St",
+          clinicCity: "Demo City",
+          clinicState: "CA",
+          clinicZip: "90000",
+          clinicPhone: null,
+          providerSpecialty: null,
+          taxId: null,
+          groupNpi: null,
+          role: "provider",
+          userId,
+          active: true,
+          createdAt: "2024-01-01T00:00:00.000Z",
+          updatedAt: "2024-01-01T00:00:00.000Z",
+          ...( DEMO_PROVIDER_NAMES[demoRole] ? { firstName: DEMO_PROVIDER_NAMES[demoRole].first, lastName: DEMO_PROVIDER_NAMES[demoRole].last } : {} ),
+        }
+      : null;
+
+    const adminMock = !isProvider
+      ? {
+          id: userId,
+          accountPhone: "+10000000000",
+          email: du.email,
+          firstName: demoRole === "admin" ? "Morgan" : "Alex",
+          lastName: demoRole === "admin" ? "Chen" : "Patel",
+          role: demoRole === "admin" ? "admin" : "clinic_staff",
+          userId,
+          active: true,
+          createdAt: "2024-01-01T00:00:00.000Z",
+          updatedAt: "2024-01-01T00:00:00.000Z",
+        }
+      : null;
+
+    return res.json({
+      success: true,
+      data: {
+        user: { id: userId, email: du.email, phone: null, user_metadata: { role: demoRole } },
+        accountType: isProvider ? "provider" : "admin",
+        role: isProvider ? "provider" : demoRole === "admin" ? "admin" : "clinic_staff",
+        provider: providerMock,
+        admin: adminMock,
+        enabledTracks: tracks,
+      },
+    });
+  }
+
   const user = res.locals.user as
     | {
       id: string;

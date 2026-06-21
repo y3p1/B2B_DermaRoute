@@ -79,7 +79,7 @@ export default function ClinicStaffSignupStep3Summary({
             <SignupStepper
               currentStep={3}
               steps={steps}
-              title="Create Clinic Staff Account"
+              title="Create DR Representative Account"
             />
           </div>
 
