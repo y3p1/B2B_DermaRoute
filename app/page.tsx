@@ -8,8 +8,12 @@ export const metadata: Metadata = {
     "DermaRoute Provider Portal — Tissue Products & PRP, Medical Devices / Equipment, and Ocular Products ordering for healthcare providers.",
 };
 
+const isDemoEnv =
+  process.env.DEMO_MODE === "true" ||
+  process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+
 export default async function HomePage() {
-  if (process.env.DEMO_MODE === "true") {
+  if (isDemoEnv) {
     const cookieStore = await cookies();
     const demoRole = cookieStore.get("demo_role")?.value;
 
