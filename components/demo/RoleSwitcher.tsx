@@ -2,7 +2,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { ClipboardList, Shield, Wind, Eye, Activity } from "lucide-react";
-import { type DemoRole, DEMO_ROLE_TRACKS, DEMO_TRACK_LABELS } from "@/lib/demoMode";
+import { type DemoRole, DEMO_TRACK_LABELS } from "@/lib/demoMode";
 import { useAuthStore } from "@/store/auth";
 
 type CardDef = {
@@ -14,8 +14,8 @@ type CardDef = {
   href: string;
 };
 
-function getTrackTag(role: DemoRole): string | null {
-  const tracks = DEMO_ROLE_TRACKS[role];
+function getTrackTag(role: DemoRole, trackMap: Record<string, string[]>): string | null {
+  const tracks = trackMap[role];
   if (!tracks || tracks.length === 0) return null;
   const labels = tracks.map((t) => DEMO_TRACK_LABELS[t] ?? t);
   if (labels.length === 1) return `${labels[0]} only`;
@@ -72,13 +72,15 @@ function RoleCard({
   card,
   pending,
   onPick,
+  trackMap,
 }: {
   card: CardDef;
   pending: DemoRole | null;
   onPick: (role: DemoRole, href: string) => void;
+  trackMap: Record<string, string[]>;
 }) {
   const { role, label, sublabel, icon: Icon, description, href } = card;
-  const trackTag = getTrackTag(role);
+  const trackTag = getTrackTag(role, trackMap);
   return (
     <button
       key={role}
@@ -113,6 +115,27 @@ export function RoleSwitcher() {
   const switchDemoRole = useAuthStore((s) => s.switchDemoRole);
   const [pendingRole, setPendingRole] = React.useState<DemoRole | null>(null);
 
+  // Fetch practice tracks from DB on mount
+  const [trackMap, setTrackMap] = React.useState<Record<string, string[]>>({});
+
+  React.useEffect(() => {
+    let cancelled = false;
+    async function fetchTracks() {
+      try {
+        const res = await fetch("/api/demo-tracks");
+        if (!res.ok) return;
+        const json = await res.json() as { success: boolean; data: Record<string, string[]> };
+        if (!cancelled && json.success && json.data) {
+          setTrackMap(json.data);
+        }
+      } catch {
+        // Keep hardcoded defaults on error
+      }
+    }
+    void fetchTracks();
+    return () => { cancelled = true; };
+  }, []);
+
   const pick = async (role: DemoRole, href: string) => {
     if (pendingRole) return;
     setPendingRole(role);
@@ -145,7 +168,7 @@ export function RoleSwitcher() {
           <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3 text-center">Provider Accounts</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {PROVIDER_CARDS.map((card) => (
-              <RoleCard key={card.role} card={card} pending={pendingRole} onPick={(r, h) => { void pick(r, h); }} />
+              <RoleCard key={card.role} card={card} pending={pendingRole} onPick={(r, h) => { void pick(r, h); }} trackMap={trackMap} />
             ))}
           </div>
         </div>
@@ -154,15 +177,14 @@ export function RoleSwitcher() {
           <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3 text-center">Staff & Administration</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto">
             {STAFF_CARDS.map((card) => (
-              <RoleCard key={card.role} card={card} pending={pendingRole} onPick={(r, h) => { void pick(r, h); }} />
+              <RoleCard key={card.role} card={card} pending={pendingRole} onPick={(r, h) => { void pick(r, h); }} trackMap={trackMap} />
             ))}
           </div>
         </div>
       </div>
 
-      <p className="mt-12 text-xs text-gray-400">
-        DermaRoute Demo — illustrative only, not a real patient environment.
-      </p>
+
     </div>
   );
 }
+

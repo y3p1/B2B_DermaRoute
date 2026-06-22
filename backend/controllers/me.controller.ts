@@ -9,6 +9,7 @@ import {
 } from "../services/providerAcct.service";
 import { getEnabledTracks } from "../services/tracks.service";
 import { isDemoMode, getDemoUser, DEMO_ROLE_TRACKS, type DemoRole } from "../../lib/demoMode";
+import { getDemoProviderTracks } from "../services/demoTracks.service";
 
 const DEMO_CLINIC_NAMES: Record<string, string> = {
   provider:        "Cedar Hills Wound Center",
@@ -27,8 +28,20 @@ export async function meController(_req: Request, res: Response) {
     const demoRole = (res.locals.demoRole ?? "provider") as DemoRole;
     const { userId, user: demoUser } = getDemoUser(demoRole);
     const du = demoUser as { email: string };
-    const tracks = DEMO_ROLE_TRACKS[demoRole] ?? [];
     const isProvider = ["provider", "provider_wound2", "provider_ocular"].includes(demoRole);
+
+    // Resolve tracks from DB for provider roles, falling back to hardcoded constant
+    let tracks: string[] = DEMO_ROLE_TRACKS[demoRole] ?? [];
+    if (isProvider) {
+      try {
+        const dbTracks = await getDemoProviderTracks(du.email);
+        if (dbTracks !== null) {
+          tracks = dbTracks;
+        }
+      } catch {
+        // Fall back to hardcoded tracks if DB lookup fails
+      }
+    }
 
     const providerMock = isProvider
       ? {

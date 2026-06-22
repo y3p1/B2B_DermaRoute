@@ -180,9 +180,7 @@ export function LandingPage() {
       )}
 
       <p className="mt-12 text-xs text-gray-400">
-        {isDemo
-          ? "DermaRoute Demo — illustrative only, not a real patient environment."
-          : "DermaRoute Provider Portal"}
+        DermaRoute Provider Portal
       </p>
     </div>
   );
