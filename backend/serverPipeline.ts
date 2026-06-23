@@ -60,6 +60,14 @@ async function parseBodyIfAny(req: Request): Promise<unknown> {
     }
   }
 
+  if (contentType.includes("multipart/form-data")) {
+    try {
+      return await req.formData();
+    } catch {
+      throw new Error("Invalid form data");
+    }
+  }
+
   return undefined;
 }
 

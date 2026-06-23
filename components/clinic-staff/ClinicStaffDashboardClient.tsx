@@ -22,12 +22,14 @@ import {
   Settings,
   Wind,
   Eye,
+  MessageSquare,
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth";
 import { supabase } from "@/lib/supabaseClient";
 import { apiGet } from "@/lib/apiClient";
 import { isClientDemoMode } from "@/lib/demoMode";
+import PolicyAssistantClient from "@/components/policy-assistant/PolicyAssistantClient";
 import DashboardNavbar from "@/components/dashboard/DashboardNavbar";
 import BaaProvidersEmbeddedClient from "@/components/admin/baa-providers/BaaProvidersEmbeddedClient";
 import BvVerificationModal from "@/components/clinic-staff/BvVerificationModal";
@@ -75,7 +77,8 @@ type TabKey =
   | "its_representatives"
   | "provider_accounts"
   | "practice_tracks"
-  | "system_settings";
+  | "system_settings"
+  | "policy_assistant";
 
 type BvRequestRow = {
   id: string;
@@ -388,6 +391,11 @@ export default function ClinicStaffDashboardClient({
       key: "baa_agreements" as TabKey,
       label: "BAA Provider Agreements",
       icon: <FileText className="w-5 h-5" />,
+    },
+    {
+      key: "policy_assistant" as TabKey,
+      label: "Policy Assistant",
+      icon: <MessageSquare className="w-5 h-5" />,
     },
     ...(role === "admin" ? [
       {
@@ -1059,6 +1067,8 @@ export default function ClinicStaffDashboardClient({
             {tab === "practice_tracks" ? <PracticeTracksTab /> : null}
 
             {tab === "system_settings" ? <SystemSettingsTab /> : null}
+
+            {tab === "policy_assistant" ? <PolicyAssistantClient /> : null}
           </div>
         </main>
       </div>

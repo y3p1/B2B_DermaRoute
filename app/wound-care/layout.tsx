@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Activity, LayoutDashboard, Plus, ClipboardList, Package, FileText, LogOut, Menu, X } from "lucide-react";
+import { Activity, LayoutDashboard, Plus, ClipboardList, Package, FileText, LogOut, Menu, MessageSquare, X } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
 import { supabase } from "@/lib/supabaseClient";
 import { isClientDemoMode } from "@/lib/demoMode";
@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { href: "/wound-care/orders", label: "BV History", icon: ClipboardList },
   { href: "/wound-care/order-products", label: "Order Products", icon: Package },
   { href: "/wound-care/baa-agreements", label: "BAA Agreements", icon: FileText },
+  { href: "/policy-assistant", label: "Policy Assistant", icon: MessageSquare },
 ];
 
 export default function WoundCareLayout({ children }: { children: React.ReactNode }) {

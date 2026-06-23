@@ -23,3 +23,4 @@ export * from "./lymphedema-products";
 export * from "./ocular-products";
 export * from "./lymphedema-orders";
 export * from "./ocular-orders";
+export * from "./document-chunks";

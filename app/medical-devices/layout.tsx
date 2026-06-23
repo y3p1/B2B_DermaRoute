@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Wind, LayoutDashboard, Plus, ClipboardList, LogOut, Menu, X } from "lucide-react";
+import { Wind, LayoutDashboard, Plus, ClipboardList, LogOut, Menu, MessageSquare, X } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
 import { supabase } from "@/lib/supabaseClient";
 import { isClientDemoMode } from "@/lib/demoMode";
@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: "/medical-devices/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/medical-devices/orders/new", label: "New Order", icon: Plus },
   { href: "/medical-devices/orders", label: "Order History", icon: ClipboardList },
+  { href: "/policy-assistant", label: "Policy Assistant", icon: MessageSquare },
 ];
 
 export default function MedicalDevicesLayout({ children }: { children: React.ReactNode }) {

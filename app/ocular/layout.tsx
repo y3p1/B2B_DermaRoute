@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Eye, LayoutDashboard, Info, Plus, ClipboardList, LogOut, Menu, X } from "lucide-react";
+import { Eye, LayoutDashboard, Info, Plus, ClipboardList, LogOut, Menu, MessageSquare, X } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
 import { supabase } from "@/lib/supabaseClient";
 import { isClientDemoMode } from "@/lib/demoMode";
@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { href: "/ocular/product-info", label: "Product Info", icon: Info },
   { href: "/ocular/orders/new", label: "New Order", icon: Plus },
   { href: "/ocular/orders", label: "Order History", icon: ClipboardList },
+  { href: "/policy-assistant", label: "Policy Assistant", icon: MessageSquare },
 ];
 
 export default function OcularLayout({ children }: { children: React.ReactNode }) {

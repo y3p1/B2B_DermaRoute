@@ -217,6 +217,11 @@ Manages VisiDisc® amniotic membrane disc orders (Skye Biologics).
 | `cms_policy_updates` | Parsed policy update articles |
 | `policy_monitors` | URL hash monitoring for coverage plan docs |
 
+### RAG Tables
+| Table | Purpose |
+|---|---|
+| `document_chunks` | PDF text chunks + `gemini-embedding-001` vector embeddings (3072 dims) for Policy Assistant RAG |
+
 ---
 
 ## Admin Dashboard — All Tabs
@@ -373,6 +378,14 @@ Activated via `DEMO_MODE=true` and `NEXT_PUBLIC_DEMO_MODE=true` environment vari
 | GET/POST | `/api/cms-policy-updates` | CMS policy feed articles |
 | GET | `/api/admin-accounts/providers` | All provider accounts |
 
+### RAG / Policy Assistant
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| POST | `/api/rag/ingest` | admin, clinic_staff | Upload PDF → chunk + embed → store in `document_chunks` |
+| POST | `/api/rag/query` | all roles | Natural language question → cosine search → Gemini answer |
+| GET | `/api/rag/documents` | admin, clinic_staff | List ingested documents with chunk counts |
+| DELETE | `/api/rag/documents/[filename]` | admin only | Delete all chunks for a document |
+
 ### Cron Jobs (Vercel Cron)
 | Path | Schedule | Description |
 |---|---|---|
@@ -398,6 +411,7 @@ Activated via `DEMO_MODE=true` and `NEXT_PUBLIC_DEMO_MODE=true` environment vari
 | `NEXT_PUBLIC_ALLOW_INTERNATIONAL_PHONE` | Optional | Enables international phone numbers in signup |
 | `FRONTEND_ORIGINS` | Optional | Comma-separated additional CORS origins |
 | `ADMIN_NOTIFICATION_EMAIL` | Optional | Fallback email for BV notifications |
+| `GEMINI_API_KEY` | RAG feature | Google Gemini API key for embeddings (`gemini-embedding-001`) and generation (`gemini-2.5-flash`). Free tier: 10 RPM, ~1,500 req/day. |
 
 ---
 
@@ -422,6 +436,7 @@ npm run seed:bv
 npm run seed:insurances
 npm run seed:manufacturers:q1
 npm run seed:products:q1
+npm run seed:rag-demo  # Ingest CMS policy PDFs into document_chunks (requires GEMINI_API_KEY)
 ```
 
 Pre-commit hook (Husky): runs lint-staged (ESLint fix) → `npm run build`. Commits fail if build breaks.

@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
+  // pdf-parse imports canvas-related packages that fail during SSR bundling
+  serverExternalPackages: ["pdf-parse"],
 };
 
 export default nextConfig;

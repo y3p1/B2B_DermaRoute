@@ -91,5 +91,7 @@ next-env.d.ts
 # claude
 .claude/
 
-# system overview
-SYSTEM_OVERVIEW.md
+# system implementation documentation
+# DR_SYSTEM_OVERVIEW.md
+# DR_PHASE1_EXECUTION_PLAN.md
+# DR_IMPLEMENTATION_PLAN.md
