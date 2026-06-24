@@ -203,6 +203,10 @@ export default function ClinicStaffDashboardClient({
     string | null
   >(null);
 
+  // Order counts for the Medical Devices / Ocular tab pills
+  const [lymphedemaCount, setLymphedemaCount] = React.useState(0);
+  const [ocularCount, setOcularCount] = React.useState(0);
+
   const refreshBvRequests = React.useCallback(async () => {
     setBvLoading(true);
     setBvError(null);
@@ -277,6 +281,20 @@ export default function ClinicStaffDashboardClient({
     }
   }, [token]);
 
+  const refreshTrackCounts = React.useCallback(async () => {
+    if (!token) return;
+    try {
+      const [lymph, ocular] = await Promise.all([
+        apiGet<{ success: true; data: unknown[] }>("/api/lymphedema-orders", { token }),
+        apiGet<{ success: true; data: unknown[] }>("/api/ocular/orders", { token }),
+      ]);
+      setLymphedemaCount(lymph.data.length);
+      setOcularCount(ocular.data.length);
+    } catch {
+      // Counts are a non-critical nicety — ignore failures.
+    }
+  }, [token]);
+
   React.useEffect(() => {
     if (isClientDemoMode()) return;
     if (status === "unauthenticated") router.replace("/auth");
@@ -291,7 +309,8 @@ export default function ClinicStaffDashboardClient({
     if (status !== "authenticated") return;
     void refreshBvRequests();
     void refreshProductOrders();
-  }, [status, refreshBvRequests, refreshProductOrders]);
+    void refreshTrackCounts();
+  }, [status, refreshBvRequests, refreshProductOrders, refreshTrackCounts]);
 
   React.useEffect(() => {
     if (status !== "authenticated" || !token) return;
@@ -371,11 +390,13 @@ export default function ClinicStaffDashboardClient({
       key: "lymphedema_orders" as TabKey,
       label: "Medical Devices / Equipment",
       icon: <Wind className="w-5 h-5" />,
+      badge: lymphedemaCount,
     },
     {
       key: "ocular_orders" as TabKey,
       label: "Ocular",
       icon: <Eye className="w-5 h-5" />,
+      badge: ocularCount,
     },
     {
       key: "reorder_log" as TabKey,
