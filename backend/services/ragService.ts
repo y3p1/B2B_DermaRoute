@@ -9,8 +9,10 @@ function getGemini(): GoogleGenerativeAI {
   return new GoogleGenerativeAI(key);
 }
 
-// Retry transient Gemini errors (503 overload / 429 rate limit) with
-// exponential backoff. Free-tier models frequently return 503 under load.
+// Retry transient Gemini 503 (overload) with exponential backoff.
+// Note: we deliberately do NOT retry 429 (rate limit) — an inline retry
+// lands inside the same per-minute window, so it just burns more quota
+// and the request timeout. 429s surface to the controller as-is.
 async function withRetry<T>(
   fn: () => Promise<T>,
   attempts = 3,
@@ -26,9 +28,7 @@ async function withRetry<T>(
       const retryable =
         msg.includes("503") ||
         msg.includes("Service Unavailable") ||
-        msg.includes("overloaded") ||
-        msg.includes("429") ||
-        msg.includes("Too Many Requests");
+        msg.includes("overloaded");
       if (!retryable || i === attempts - 1) throw err;
       await new Promise((r) => setTimeout(r, baseDelayMs * 2 ** i));
     }
