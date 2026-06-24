@@ -44,6 +44,15 @@ export async function seedDemoBvRequests(): Promise<number> {
 
   const rows = STATUSES.map((status) => {
     const appDate = faker.date.recent({ days: 60 });
+    // Approved/completed requests carry verified manufacturer proof so the
+    // provider is eligible to order against them. Requests under review show
+    // a pending proof; everything else has no proof yet.
+    const proofStatus =
+      status === "approved" || status === "completed"
+        ? "verified"
+        : status === "pending_review"
+          ? "pending_review"
+          : null;
     return {
       providerId,
       provider: "Cedar Hills Wound Center",
@@ -61,6 +70,7 @@ export async function seedDemoBvRequests(): Promise<number> {
       initials: faker.helpers.arrayElement(INITIALS),
       applicationDate: appDate.toISOString().slice(0, 10),
       status,
+      proofStatus,
       healingTrackerActive: status === "completed" || status === "approved",
     };
   });
