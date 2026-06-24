@@ -6,9 +6,11 @@ import { eq } from "drizzle-orm";
 import { practiceTracks, providerAcct } from "../../../db/schema";
 import { closeDb, getDb } from "../../services/db";
 import { getSupabaseAdminClient } from "../../services/supabaseAdmin";
+import { DEMO_USER_IDS, type DemoRole } from "../../../lib/demoMode";
 
 const EXTRA_PROVIDERS = [
   {
+    demoRole: "provider_ocular" as DemoRole,
     email: "demo-ocular@dermaroute-demo.example.com",
     password: "DemoOcular2024!",
     phone: "+15550003001",
@@ -24,6 +26,7 @@ const EXTRA_PROVIDERS = [
     tracks: ["ocular"] as string[],
   },
   {
+    demoRole: "provider_wound2" as DemoRole,
     email: "demo-wound2@dermaroute-demo.example.com",
     password: "DemoWound2024!",
     phone: "+15550003002",
@@ -95,7 +98,10 @@ export async function seedDemoPracticeTracks(): Promise<number> {
 
   // Create extra providers and collect their IDs
   for (const cfg of EXTRA_PROVIDERS) {
-    const userId = await getOrCreateProviderId(cfg);
+    // Ensure auth user exists, but pin providerAcct.userId to the
+    // deterministic demo UUID so the role resolves to this provider.
+    await getOrCreateProviderId(cfg);
+    const userId = DEMO_USER_IDS[cfg.demoRole];
 
     await db
       .insert(providerAcct)

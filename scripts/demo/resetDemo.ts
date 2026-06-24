@@ -86,6 +86,10 @@ export async function runDemoReset(): Promise<{ rowsCreated: number; tables: str
   await seedDemoUsers();
   tables.push("users (upserted)");
 
+  // Practice tracks creates the extra demo providers (ocular, wound2), so it
+  // must run before any per-provider data seeding (BV requests, orders).
+  track("practice_tracks", await seedDemoPracticeTracks());
+
   track("coverage_plans", await seedDemoCoveragePlans());
   track("cms_policy_updates", await seedDemoCmsPolicy());
   track("bv_requests", await seedDemoBvRequests());
@@ -96,7 +100,6 @@ export async function runDemoReset(): Promise<{ rowsCreated: number; tables: str
 
   // Phase 5 — new module seeds
   track("system_settings", await seedDemoSystemSettings());
-  track("practice_tracks", await seedDemoPracticeTracks());
   track("product_catalogs", await seedDemoProductCatalogs());
   track("lymphedema_orders", await seedDemoLymphedemaOrders());
   track("ocular_orders", await seedDemoOcularOrders());

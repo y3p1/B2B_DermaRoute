@@ -5,6 +5,7 @@ dotenv.config({ path: ".env.local" });
 import { adminAcct, clinicStaffAcct, providerAcct } from "../../../db/schema";
 import { closeDb, getDb } from "../../services/db";
 import { getSupabaseAdminClient } from "../../services/supabaseAdmin";
+import { DEMO_USER_IDS } from "../../../lib/demoMode";
 
 const USERS = [
   {
@@ -79,11 +80,11 @@ export async function seedDemoUsers(): Promise<Record<string, string>> {
   const ids: Record<string, string> = {};
 
   for (const cfg of USERS) {
-    const supabaseUserId = await getOrCreateUserId(cfg);
-    // Prefer the hardcoded env-var UUID so the DB record matches what
-    // requireAuth puts on res.locals.userId in demo mode. Falls back to
-    // the Supabase-generated UUID when the env var is unset.
-    const userId = process.env[cfg.envKey] ?? supabaseUserId;
+    // Ensure a Supabase auth user exists (for email/password login paths),
+    // but use the deterministic demo UUID as the providerAcct.userId so it
+    // matches what getDemoUser resolves at request time — env-independent.
+    await getOrCreateUserId(cfg);
+    const userId = DEMO_USER_IDS[cfg.role];
     ids[cfg.envKey] = userId;
 
     if (cfg.role === "provider") {

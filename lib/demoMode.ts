@@ -62,14 +62,6 @@ export function getDemoRoleFromRequest(req: {
   return "provider";
 }
 
-const ROLE_USER_ENV: Record<DemoRole, string> = {
-  provider: "DEMO_PROVIDER_USER_ID",
-  provider_ocular: "DEMO_OCULAR_PROVIDER_USER_ID",
-  provider_wound2: "DEMO_WOUND2_PROVIDER_USER_ID",
-  admin: "DEMO_ADMIN_USER_ID",
-  clinic_staff: "DEMO_CLINIC_STAFF_USER_ID",
-};
-
 const ROLE_EMAIL: Record<DemoRole, string> = {
   provider: "demo-provider@dermaroute-demo.example.com",
   provider_ocular: "demo-ocular@dermaroute-demo.example.com",
@@ -78,7 +70,12 @@ const ROLE_EMAIL: Record<DemoRole, string> = {
   clinic_staff: "demo-clinicstaff@dermaroute-demo.example.com",
 };
 
-const DEMO_FALLBACK_IDS: Record<DemoRole, string> = {
+// Deterministic per-role user IDs. Demo mode does not authenticate against
+// real Supabase users, so these fixed UUIDs are the single source of truth
+// for demo identity — used both here (request → userId) and by the demo
+// seed scripts (userId → providerAcct). Keeping them env-independent means
+// local and Vercel resolve to the same provider without env var syncing.
+export const DEMO_USER_IDS: Record<DemoRole, string> = {
   provider:        "00000000-0000-4000-8000-000000000001",
   provider_wound2: "00000000-0000-4000-8000-000000000002",
   provider_ocular: "00000000-0000-4000-8000-000000000003",
@@ -101,7 +98,7 @@ export const DEMO_ROLE_TRACKS: Record<DemoRole, string[]> = {
 };
 
 export function getDemoUser(role: DemoRole): { userId: string; user: object } {
-  const userId = process.env[ROLE_USER_ENV[role]] || DEMO_FALLBACK_IDS[role];
+  const userId = DEMO_USER_IDS[role];
   return {
     userId,
     user: {

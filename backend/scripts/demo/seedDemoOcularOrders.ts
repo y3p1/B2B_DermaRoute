@@ -77,14 +77,16 @@ const ORDERS = [
 export async function seedDemoOcularOrders(): Promise<number> {
   const db = getDb();
 
+  // Ocular orders belong to the ocular provider (Coastal Eye Clinic), which
+  // has the ocular practice track — not the wound-care demo provider.
   const providerRows = await db
     .select({ id: providerAcct.id })
     .from(providerAcct)
-    .where(eq(providerAcct.email, "demo-provider@dermaroute-demo.example.com"))
+    .where(eq(providerAcct.email, "demo-ocular@dermaroute-demo.example.com"))
     .limit(1);
 
   if (!providerRows[0]) {
-    throw new Error("Demo provider not found — run seedDemoUsers first");
+    throw new Error("Ocular demo provider not found — run seedDemoPracticeTracks first");
   }
 
   const providerId = providerRows[0].id;
