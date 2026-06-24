@@ -29,7 +29,13 @@ export async function listLymphedemaOrdersController(req: Request, res: Response
       const orders = await getLymphedemaOrders();
       return res.json({ success: true, data: orders });
     }
-    return res.json({ success: true, data: [] });
+    // Provider demo roles → scope to their own seeded orders
+    const provider = await getProviderProfileByUserId(userId);
+    if (!provider) {
+      return res.json({ success: true, data: [] });
+    }
+    const orders = await getLymphedemaOrders({ providerIds: [provider.id] });
+    return res.json({ success: true, data: orders });
   }
 
   const adminProfile = await getAdminProfileByUserId(userId);

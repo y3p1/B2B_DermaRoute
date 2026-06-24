@@ -30,7 +30,13 @@ export async function listBvRequestsController(_req: Request, res: Response) {
       const rows = await listAllBvRequests();
       return res.json({ success: true, data: rows });
     }
-    return res.json({ success: true, data: [] });
+    // Provider demo roles → scope to their own seeded BV requests
+    const profile = await getProviderProfileByUserId(userId);
+    if (!profile) {
+      return res.json({ success: true, data: [] });
+    }
+    const rows = await listBvRequestsForProvider(profile.id);
+    return res.json({ success: true, data: rows });
   }
 
   // Check if user is admin or clinic staff

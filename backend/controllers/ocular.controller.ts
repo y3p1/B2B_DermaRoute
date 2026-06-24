@@ -29,7 +29,13 @@ export async function listOcularOrdersController(req: Request, res: Response) {
       const orders = await getOcularOrders();
       return res.json({ success: true, data: orders });
     }
-    return res.json({ success: true, data: [] });
+    // Provider demo roles → scope to their own seeded orders
+    const provider = await getProviderProfileByUserId(userId);
+    if (!provider) {
+      return res.json({ success: true, data: [] });
+    }
+    const orders = await getOcularOrders({ providerIds: [provider.id] });
+    return res.json({ success: true, data: orders });
   }
 
   const adminProfile = await getAdminProfileByUserId(userId);
