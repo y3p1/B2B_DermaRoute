@@ -3,14 +3,6 @@ import { sql } from "drizzle-orm";
 import { getDb } from "./db";
 import { documentChunks } from "../../db/document-chunks";
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { PDFParse } = require("pdf-parse") as {
-  PDFParse: new (data: Uint8Array) => {
-    load(): Promise<void>;
-    getText(): Promise<{ text: string; total: number }>;
-  };
-};
-
 function getGemini(): GoogleGenerativeAI {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new Error("GEMINI_API_KEY environment variable is not set");
@@ -42,6 +34,13 @@ export async function ingestDocument(
   buffer: Buffer,
   filename: string,
 ): Promise<{ chunksCreated: number }> {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { PDFParse } = require("pdf-parse") as {
+    PDFParse: new (data: Uint8Array) => {
+      load(): Promise<void>;
+      getText(): Promise<{ text: string; total: number }>;
+    };
+  };
   const parser = new PDFParse(new Uint8Array(buffer));
   await parser.load();
   const { text } = await parser.getText();
@@ -92,18 +91,12 @@ export async function queryDocuments(
     sql`SELECT content, source_file, 1 - (embedding <=> ${vectorStr}::vector) as similarity
         FROM document_chunks
         ORDER BY embedding <=> ${vectorStr}::vector
-        LIMIT 5`,
+        LIMIT 10`,
   )) as RawChunkRow[];
 
-  const sources: Source[] = rows
-    .filter((r) => Number(r.similarity) > 0.3)
-    .map((r) => ({
-      file: r.source_file,
-      excerpt: r.content.slice(0, 300),
-      similarity: Math.round(Number(r.similarity) * 100) / 100,
-    }));
+  const filtered = rows.filter((r) => Number(r.similarity) > 0.2);
 
-  if (sources.length === 0) {
+  if (filtered.length === 0) {
     return {
       answer:
         "I don't have enough information in the uploaded documents to answer that question.",
@@ -111,12 +104,19 @@ export async function queryDocuments(
     };
   }
 
-  const context = sources
-    .map((s, i) => `[Source ${i + 1}: ${s.file}]\n${s.excerpt}`)
+  const sources: Source[] = filtered.map((r) => ({
+    file: r.source_file,
+    excerpt: r.content.slice(0, 400),
+    similarity: Math.round(Number(r.similarity) * 100) / 100,
+  }));
+
+  // Use full chunk content for the model, not the truncated excerpt
+  const context = filtered
+    .map((r, i) => `[Source ${i + 1}: ${r.source_file}]\n${r.content}`)
     .join("\n\n");
 
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-  const prompt = `You are a clinical policy assistant for a healthcare portal. Answer the user's question based ONLY on the provided context. Cite the source document name when referencing information. If the context doesn't contain enough information, say "I don't have enough information in the uploaded documents to answer that question."
+  const prompt = `You are a clinical policy assistant for a wound care and tissue products portal. Answer the user's question using the provided context from uploaded policy documents. Cite the source document name when referencing information. Synthesize and summarize information from multiple sources when helpful. If the context genuinely does not contain relevant information, say so briefly.
 
 Context:
 ${context}
