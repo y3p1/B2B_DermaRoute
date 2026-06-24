@@ -9,6 +9,33 @@ function getGemini(): GoogleGenerativeAI {
   return new GoogleGenerativeAI(key);
 }
 
+// Retry transient Gemini errors (503 overload / 429 rate limit) with
+// exponential backoff. Free-tier models frequently return 503 under load.
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  attempts = 3,
+  baseDelayMs = 1000,
+): Promise<T> {
+  let lastErr: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      const msg = err instanceof Error ? err.message : String(err);
+      const retryable =
+        msg.includes("503") ||
+        msg.includes("Service Unavailable") ||
+        msg.includes("overloaded") ||
+        msg.includes("429") ||
+        msg.includes("Too Many Requests");
+      if (!retryable || i === attempts - 1) throw err;
+      await new Promise((r) => setTimeout(r, baseDelayMs * 2 ** i));
+    }
+  }
+  throw lastErr;
+}
+
 function chunkText(text: string, chunkSize = 2000, overlap = 200): string[] {
   const chunks: string[] = [];
   let start = 0;
@@ -24,7 +51,7 @@ async function embedTexts(genAI: GoogleGenerativeAI, texts: string[]): Promise<n
   const model = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
   const embeddings: number[][] = [];
   for (const text of texts) {
-    const result = await model.embedContent(text);
+    const result = await withRetry(() => model.embedContent(text));
     embeddings.push(result.embedding.values);
   }
   return embeddings;
@@ -115,7 +142,7 @@ export async function queryDocuments(
     .map((r, i) => `[Source ${i + 1}: ${r.source_file}]\n${r.content}`)
     .join("\n\n");
 
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
   const prompt = `You are a clinical policy assistant for a wound care and tissue products portal. Answer the user's question using the provided context from uploaded policy documents. Cite the source document name when referencing information. Synthesize and summarize information from multiple sources when helpful. If the context genuinely does not contain relevant information, say so briefly.
 
 Context:
@@ -123,7 +150,7 @@ ${context}
 
 Question: ${question}`;
 
-  const result = await model.generateContent(prompt);
+  const result = await withRetry(() => model.generateContent(prompt));
   const answer = result.response.text();
 
   return { answer, sources };

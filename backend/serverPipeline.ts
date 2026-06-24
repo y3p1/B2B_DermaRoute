@@ -167,6 +167,9 @@ type RunOptions = {
     res: HttpResponse,
     next: NextFunction,
   ) => unknown;
+  // Per-route request timeout. Defaults to 15s; routes that call slow
+  // upstreams (e.g. LLM generation with retries) can raise it.
+  timeoutMs?: number;
 };
 
 export async function runServerPipeline(
@@ -236,7 +239,7 @@ export async function runServerPipeline(
     const timeoutPromise = new Promise<void>((_, reject) => {
       timeoutId = setTimeout(
         () => reject(new Error("Request timed out")),
-        15_000,
+        options.timeoutMs ?? 15_000,
       );
     });
 

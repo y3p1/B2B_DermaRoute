@@ -197,7 +197,7 @@ Manages VisiDisc® amniotic membrane disc orders (Skye Biologics).
 | `insurance_routing` | Insurance ↔ manufacturer approval mapping |
 | `coverage_plans` | Detailed coverage per insurance plan |
 | `baa_provider` | Provider BAA agreements with signatures |
-| `bv_requests` | BV PDF form metadata |
+| `bv_forms` | BV PDF form metadata (uploaded forms per manufacturer, versioned) |
 
 ### Medical Devices / Ocular Tables
 | Table | Purpose |

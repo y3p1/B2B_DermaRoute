@@ -9,6 +9,10 @@ import { runServerPipeline } from "@/backend/serverPipeline";
 const cors = corsMiddleware({ allowedOrigins: getAllowedOrigins() });
 const baseRateLimit = rateLimit({ windowMs: 60_000, max: 60 });
 
+// Embedding + vector search + LLM generation (with retry/backoff on 503)
+// can exceed the default 15s budget under free-tier load.
+export const maxDuration = 60;
+
 export async function POST(request: Request) {
   return runServerPipeline(request, {
     middlewares: [cors, baseRateLimit, requireAuth],
@@ -18,6 +22,7 @@ export async function POST(request: Request) {
         .catch(next);
     },
     errorHandler,
+    timeoutMs: 45_000,
   });
 }
 

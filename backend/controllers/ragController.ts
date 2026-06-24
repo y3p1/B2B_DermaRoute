@@ -57,6 +57,16 @@ export async function queryController(req: Request, res: Response) {
         error: "The AI service is temporarily rate-limited. Please wait a moment and try again.",
       });
     }
+    if (
+      message.includes("503") ||
+      message.includes("Service Unavailable") ||
+      message.includes("overloaded")
+    ) {
+      return res.status(503).json({
+        success: false,
+        error: "The AI service is experiencing high demand. Please try again in a moment.",
+      });
+    }
     return res.status(500).json({ success: false, error: message });
   }
 }
