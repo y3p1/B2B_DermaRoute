@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
-import { eq } from "drizzle-orm";
-import { orderProducts, bvRequests, manufacturers, providerAcct } from "../../../db/schema";
+import { eq, isNotNull } from "drizzle-orm";
+import { orderProducts, bvRequests, products, providerAcct } from "../../../db/schema";
 import { getDb } from "../../services/db";
 
 faker.seed(42);
@@ -17,12 +17,6 @@ const RISK_TIERS = [
 
 const ORDER_STATUSES = ["pending", "shipped", "completed", "completed", "completed", "cancelled"] as const;
 
-const PRODUCT_NAMES = [
-  "OX 4x4 Wound Matrix", "OX 2x2 Wound Matrix", "TiDE Dermal Scaffold",
-  "TiGer Wound Cover 4x8", "Extremity Shield 6x6", "Venture Skin Graft",
-  "OX Disc 20cm2", "TiDE Disc 40cm2", "TiGer 2x2 Patch",
-];
-
 // Each wound-care provider gets its own product orders, scoped to its own BV
 // requests, so every provider account dashboard is populated independently.
 const ORDER_PROVIDERS = [
@@ -33,9 +27,21 @@ const ORDER_PROVIDERS = [
 export async function seedDemoOrderProducts(): Promise<number> {
   const db = getDb();
 
-  const mfgRows = await db.select({ id: manufacturers.id }).from(manufacturers).limit(5);
-  if (mfgRows.length === 0) {
-    throw new Error("No manufacturers found — run seed:manufacturers:q1 first");
+  // Use real products so the order tables' product/manufacturer joins
+  // (on product_id / manufacturer_id) resolve to actual names.
+  const productRows = await db
+    .select({
+      id: products.id,
+      name: products.name,
+      qCode: products.qCode,
+      manufacturerId: products.manufacturerId,
+    })
+    .from(products)
+    .where(isNotNull(products.manufacturerId))
+    .limit(20);
+
+  if (productRows.length === 0) {
+    throw new Error("No products with a manufacturer found — run seed:products:q1 first");
   }
 
   let total = 0;
@@ -62,12 +68,14 @@ export async function seedDemoOrderProducts(): Promise<number> {
 
     const rows = Array.from({ length: op.count }, (_, i) => {
       const riskTier = RISK_TIERS[i % RISK_TIERS.length];
-      const mfg = mfgRows[i % mfgRows.length];
+      const product = productRows[i % productRows.length]!;
       const bvRow = bvRows.length > 0 ? bvRows[i % bvRows.length] : undefined;
 
       return {
-        name: PRODUCT_NAMES[i % PRODUCT_NAMES.length],
-        manufacturerId: mfg.id,
+        name: product.name,
+        sku: product.qCode,
+        productId: product.id,
+        manufacturerId: product.manufacturerId!,
         status: ORDER_STATUSES[i % ORDER_STATUSES.length],
         bvRequestId: bvRow?.id ?? null,
         createdBy: providerId,
