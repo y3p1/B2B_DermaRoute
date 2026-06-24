@@ -142,7 +142,7 @@ export async function queryDocuments(
     .map((r, i) => `[Source ${i + 1}: ${r.source_file}]\n${r.content}`)
     .join("\n\n");
 
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
   const prompt = `You are a clinical policy assistant for a wound care and tissue products portal. Answer the user's question using the provided context from uploaded policy documents. Cite the source document name when referencing information. Synthesize and summarize information from multiple sources when helpful. If the context genuinely does not contain relevant information, say so briefly.
 
 Context:
