@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -102,12 +102,12 @@ function SidebarNavItem({
       title={collapsed ? label : undefined}
       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group relative ${
         active
-          ? "bg-blue-600 text-white shadow-sm"
-          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+          ? "bg-primary text-white shadow-sm"
+          : "text-white/65 hover:bg-white/10 hover:text-white"
       }`}
     >
       <span
-        className={`shrink-0 w-5 h-5 ${active ? "text-white" : "text-slate-500 group-hover:text-slate-700"}`}
+        className={`shrink-0 w-5 h-5 ${active ? "text-white" : "text-white/50 group-hover:text-white/90"}`}
       >
         {icon}
       </span>
@@ -119,7 +119,7 @@ function SidebarNavItem({
               className={`inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full text-xs font-semibold ${
                 active
                   ? "bg-white/20 text-white"
-                  : "bg-slate-200 text-slate-700"
+                  : "bg-white/15 text-white"
               }`}
             >
               {badge}
@@ -380,7 +380,7 @@ export default function ProviderDashboardClient() {
   }, [status, enabledTracks, refreshBvRequests, refreshProductOrders, refreshBaaAgreements, refreshLymphedemaOrders, refreshOcularOrders]);
 
   if (status === "idle" || status === "loading") {
-    return <div className="min-h-screen bg-[#F8F9FB]" />;
+    return <div className="min-h-screen bg-slate-50" />;
   }
 
   const navItems = [
@@ -421,18 +421,18 @@ export default function ProviderDashboardClient() {
 
   const renderSidebar = (onClose?: () => void) => (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-4 py-4 border-b border-slate-200">
+      <div className="flex items-center justify-between px-4 py-4 border-b border-white/10">
         <div>
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+          <p className="text-xs font-semibold text-white/40 uppercase tracking-wider">
             Provider
           </p>
-          <p className="text-sm font-bold text-slate-800 mt-0.5">Navigation</p>
+          <p className="text-sm font-bold text-white mt-0.5">Navigation</p>
         </div>
         {onClose && (
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+            className="p-1.5 rounded-md text-white/50 hover:bg-white/10 hover:text-white transition-colors"
             aria-label="Close menu"
           >
             <X className="w-4 h-4" />
@@ -538,12 +538,12 @@ export default function ProviderDashboardClient() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FB] flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
       <DashboardNavbar onMenuToggle={() => setSidebarOpen(true)} />
 
       <div className="flex flex-1 overflow-hidden">
         {/* Desktop sidebar */}
-        <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-slate-200 shrink-0 sticky top-18 h-[calc(100vh-72px)] overflow-y-auto">
+        <aside className="hidden lg:flex flex-col w-64 bg-brand-dark border-r border-white/10 shrink-0 sticky top-18 h-[calc(100vh-72px)] overflow-y-auto">
           {renderSidebar()}
         </aside>
 
@@ -555,7 +555,7 @@ export default function ProviderDashboardClient() {
               onClick={() => setSidebarOpen(false)}
               aria-hidden="true"
             />
-            <aside className="absolute left-0 top-0 bottom-0 w-72 bg-white shadow-2xl flex flex-col animate-in slide-in-from-left duration-200">
+            <aside className="absolute left-0 top-0 bottom-0 w-72 bg-brand-dark shadow-2xl flex flex-col animate-in slide-in-from-left duration-200">
               {renderSidebar(() => setSidebarOpen(false))}
             </aside>
           </div>
@@ -574,7 +574,7 @@ export default function ProviderDashboardClient() {
                     {activeItem?.label ?? ""}
                   </span>
                 </div>
-                <h1 className="text-2xl font-bold text-[#18192B]">
+                <h1 className="text-2xl font-bold text-brand-dark">
                   {activeItem?.label ?? "Dashboard"}
                 </h1>
               </div>
@@ -585,7 +585,7 @@ export default function ProviderDashboardClient() {
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div>
-                    <div className="text-base font-semibold text-[#18192B]">
+                    <div className="text-base font-semibold text-brand-dark">
                       BV Requests
                     </div>
                     <div className="text-sm text-slate-500">
@@ -596,7 +596,7 @@ export default function ProviderDashboardClient() {
                     <button
                       type="button"
                       onClick={() => setCreateBvModalOpen(true)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#00C48C] rounded-lg hover:bg-[#00a06c] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00C48C] transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-cta rounded-lg hover:bg-brand-cta-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-cta transition-colors"
                     >
                       <svg
                         className="w-4 h-4"
@@ -619,7 +619,7 @@ export default function ProviderDashboardClient() {
                       type="button"
                       onClick={refreshBvRequests}
                       disabled={bvLoading}
-                      className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Refresh
                     </button>
@@ -648,7 +648,7 @@ export default function ProviderDashboardClient() {
                         setBvSearchQuery(e.target.value);
                         setBvCurrentPage(1);
                       }}
-                      className="max-w-sm px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      className="max-w-sm px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white"
                     />
                     <div className="flex items-center gap-2 ml-4">
                       <span className="text-sm font-medium text-slate-600">Filter by Date:</span>
@@ -659,7 +659,7 @@ export default function ProviderDashboardClient() {
                           setBvDateFilter(e.target.value);
                           setBvCurrentPage(1);
                         }}
-                        className="px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white"
                       />
                       {bvDateFilter && (
                         <button
@@ -667,7 +667,7 @@ export default function ProviderDashboardClient() {
                             setBvDateFilter("");
                             setBvCurrentPage(1);
                           }}
-                          className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                          className="text-xs text-primary hover:text-primary-dark font-medium"
                         >
                           Clear
                         </button>
@@ -743,7 +743,7 @@ export default function ProviderDashboardClient() {
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div>
-                    <div className="text-base font-semibold text-[#18192B]">
+                    <div className="text-base font-semibold text-brand-dark">
                       Order Products
                     </div>
                     <div className="text-sm text-slate-500">
@@ -756,9 +756,9 @@ export default function ProviderDashboardClient() {
                         type="button"
                         onClick={() => setProductOrderModalOpen(true)}
                         disabled={!isEligibleForOrdering}
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#00C48C] rounded-lg transition-colors ${
+                        className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-cta rounded-lg transition-colors ${
                           isEligibleForOrdering
-                            ? "hover:bg-[#00a06c] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00C48C]"
+                            ? "hover:bg-brand-cta-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-cta"
                             : "opacity-50 cursor-not-allowed"
                         }`}
                       >
@@ -791,7 +791,7 @@ export default function ProviderDashboardClient() {
                       type="button"
                       onClick={refreshProductOrders}
                       disabled={productOrdersLoading}
-                      className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Refresh
                     </button>
@@ -820,7 +820,7 @@ export default function ProviderDashboardClient() {
                         setProductOrderSearchQuery(e.target.value);
                         setProductOrderCurrentPage(1);
                       }}
-                      className="max-w-sm px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      className="max-w-sm px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white"
                     />
                   </div>
 
@@ -834,7 +834,7 @@ export default function ProviderDashboardClient() {
                         <div className="overflow-x-auto">
                           <table className="w-full text-sm">
                             <thead>
-                              <tr className="bg-[#18192B] text-white text-left">
+                              <tr className="bg-brand-dark text-white text-left">
                                 <th className="py-3 px-4 font-medium">Date</th>
                                 <th className="py-3 px-4 font-medium">
                                   Practice
@@ -873,7 +873,7 @@ export default function ProviderDashboardClient() {
                                 paginatedProductOrders.map((order, idx) => (
                                   <tr
                                     key={order.id}
-                                    className={`${idx % 2 === 0 ? "bg-white" : "bg-slate-50"} hover:bg-blue-50/40 transition-colors`}
+                                    className={`${idx % 2 === 0 ? "bg-white" : "bg-slate-50"} hover:bg-primary/5 transition-colors`}
                                   >
                                     <td className="py-4 px-4">
                                       {order.createdAt
@@ -912,7 +912,7 @@ export default function ProviderDashboardClient() {
                                           setSelectedProductOrderId(order.id);
                                           setViewProductOrderModalOpen(true);
                                         }}
-                                        className="px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-medium shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                                        className="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-medium shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
                                       >
                                         View
                                       </button>
@@ -936,7 +936,7 @@ export default function ProviderDashboardClient() {
                               productOrderCurrentPage === 1 ||
                               filteredProductOrders.length === 0
                             }
-                            className="px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             Previous
                           </button>
@@ -950,7 +950,7 @@ export default function ProviderDashboardClient() {
                                 productOrderTotalPages ||
                               filteredProductOrders.length === 0
                             }
-                            className="px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             Next
                           </button>
@@ -967,7 +967,7 @@ export default function ProviderDashboardClient() {
               <div className="bg-white rounded-xl shadow-sm border border-slate-200">
                 <div className="p-5 border-b border-slate-100 flex items-center justify-between">
                   <div>
-                    <div className="text-base font-semibold text-[#18192B]">Medical Devices / Equipment</div>
+                    <div className="text-base font-semibold text-brand-dark">Medical Devices / Equipment</div>
                     <div className="text-sm text-slate-500">Submit and track AIROS compression pump & garment orders.</div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -982,7 +982,7 @@ export default function ProviderDashboardClient() {
                     <button
                       type="button"
                       onClick={() => setLymphedemaModalOpen(true)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#00C48C] rounded-lg hover:bg-[#00a06c] transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-cta rounded-lg hover:bg-brand-cta-dark transition-colors"
                     >
                       <Wind className="w-4 h-4" />
                       New Order
@@ -1052,7 +1052,7 @@ export default function ProviderDashboardClient() {
               <div className="bg-white rounded-xl shadow-sm border border-slate-200">
                 <div className="p-5 border-b border-slate-100 flex items-center justify-between">
                   <div>
-                    <div className="text-base font-semibold text-[#18192B]">Ocular</div>
+                    <div className="text-base font-semibold text-brand-dark">Ocular</div>
                     <div className="text-sm text-slate-500">Submit and track VisiDisc® amniotic membrane orders.</div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -1067,7 +1067,7 @@ export default function ProviderDashboardClient() {
                     <button
                       type="button"
                       onClick={() => router.push("/ocular/orders/new")}
-                      className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#0c6e6e] rounded-lg hover:bg-[#095858] transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors"
                     >
                       <Eye className="w-4 h-4" />
                       New Order
@@ -1086,7 +1086,7 @@ export default function ProviderDashboardClient() {
                 ) : ocularOrders.length === 0 ? (
                   <div className="p-8 text-center text-slate-400 text-sm">
                     No ocular orders yet.{" "}
-                    <button onClick={() => router.push("/ocular/orders/new")} className="text-[#0c6e6e] underline font-medium">
+                    <button onClick={() => router.push("/ocular/orders/new")} className="text-primary underline font-medium">
                       Place your first order
                     </button>
                   </div>
@@ -1147,7 +1147,7 @@ export default function ProviderDashboardClient() {
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div>
-                    <div className="text-base font-semibold text-[#18192B]">
+                    <div className="text-base font-semibold text-brand-dark">
                       BAA Provider Agreements
                     </div>
                     <div className="text-sm text-slate-500">
@@ -1158,7 +1158,7 @@ export default function ProviderDashboardClient() {
                     type="button"
                     onClick={refreshBaaAgreements}
                     disabled={baaLoading}
-                    className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shrink-0"
+                    className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors shrink-0"
                   >
                     Refresh
                   </button>
@@ -1186,7 +1186,7 @@ export default function ProviderDashboardClient() {
                         setBaaSearchQuery(e.target.value);
                         setBaaCurrentPage(1);
                       }}
-                      className="max-w-sm px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      className="max-w-sm px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white"
                     />
                   </div>
 
@@ -1200,7 +1200,7 @@ export default function ProviderDashboardClient() {
                         <div className="overflow-x-auto">
                           <table className="w-full text-sm">
                             <thead>
-                              <tr className="bg-[#18192B] text-white text-left">
+                              <tr className="bg-brand-dark text-white text-left">
                                 <th className="py-3 px-4 font-medium">
                                   Created
                                 </th>
@@ -1235,7 +1235,7 @@ export default function ProviderDashboardClient() {
                                 paginatedBaaAgreements.map((agreement, idx) => (
                                   <tr
                                     key={agreement.id}
-                                    className={`${idx % 2 === 0 ? "bg-white" : "bg-slate-50"} hover:bg-blue-50/40 transition-colors`}
+                                    className={`${idx % 2 === 0 ? "bg-white" : "bg-slate-50"} hover:bg-primary/5 transition-colors`}
                                   >
                                     <td className="py-4 px-4">
                                       {agreement.createdAt
@@ -1264,7 +1264,7 @@ export default function ProviderDashboardClient() {
                                             `/baa-providers/${agreement.id}`,
                                           );
                                         }}
-                                        className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 transition-colors"
+                                        className="px-3 py-1.5 text-xs font-medium text-white bg-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary transition-colors"
                                       >
                                         View
                                       </button>
@@ -1286,7 +1286,7 @@ export default function ProviderDashboardClient() {
                               baaCurrentPage === 1 ||
                               filteredBaaAgreements.length === 0
                             }
-                            className="px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             Previous
                           </button>
@@ -1297,7 +1297,7 @@ export default function ProviderDashboardClient() {
                               baaCurrentPage >= baaTotalPages ||
                               filteredBaaAgreements.length === 0
                             }
-                            className="px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             Next
                           </button>

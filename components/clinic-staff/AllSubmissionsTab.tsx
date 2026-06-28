@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
@@ -178,7 +178,7 @@ export function AllSubmissionsTab() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 text-slate-600 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 text-slate-600 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
         >
           <option value="all">All Statuses</option>
           {allStatuses.map((s) => (
@@ -236,7 +236,7 @@ export function AllSubmissionsTab() {
                     <td className="px-4 py-3 text-right">
                       <button
                         onClick={() => viewTab(row.type)}
-                        className="text-xs font-medium text-blue-600 hover:text-blue-700 whitespace-nowrap"
+                        className="text-xs font-medium text-primary hover:text-primary whitespace-nowrap"
                       >
                         View tab →
                       </button>

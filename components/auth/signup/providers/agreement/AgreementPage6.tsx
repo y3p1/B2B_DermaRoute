@@ -192,7 +192,7 @@ export default function AgreementPage6(props: AgreementPage6Props) {
                           </div>
                           <button
                             type="button"
-                            className="text-xs text-blue-600 underline mb-2"
+                            className="text-xs text-primary underline mb-2"
                             onClick={() => {
                               coveredEntitySigPad.current?.clear();
                               form.setValue("coveredEntitySignature", "", {
@@ -419,7 +419,7 @@ export default function AgreementPage6(props: AgreementPage6Props) {
                   type="submit"
                   className={`flex-1 text-base py-3 rounded-lg ${
                     form.formState.isValid && disclaimerAcknowledged
-                      ? "bg-blue-600 hover:bg-blue-700 text-white"
+                      ? "bg-primary hover:bg-primary-dark text-white"
                       : "bg-gray-300 text-gray-800"
                   }`}
                   disabled={!form.formState.isValid || !disclaimerAcknowledged}

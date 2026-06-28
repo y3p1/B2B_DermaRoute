@@ -220,7 +220,7 @@ export function LymphedemaOrdersTab() {
                           <button
                             onClick={(e) => { e.stopPropagation(); void handleSendEmail(row.id); }}
                             disabled={sendingEmailId === row.id}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 disabled:opacity-50 transition-colors"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-primary/5 border border-primary/20 text-primary hover:bg-primary/10 disabled:opacity-50 transition-colors"
                           >
                             {sendingEmailId === row.id ? "Sending…" : "📧 Send to Central Palms Medical"}
                           </button>

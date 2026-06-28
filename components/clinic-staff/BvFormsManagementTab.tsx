@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import {
@@ -254,7 +254,7 @@ function ViewModal({ open, onClose, form, token }: ViewModalProps) {
                 href={signedUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shrink-0 flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 transition-colors"
+                className="shrink-0 flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-dark transition-colors"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 Open
@@ -459,7 +459,7 @@ function UploadModal({
               ? "border-blue-400 bg-blue-50"
               : file
                 ? "border-green-400 bg-green-50"
-                : "border-slate-300 bg-slate-50 hover:border-blue-400 hover:bg-blue-50"
+                : "border-slate-300 bg-slate-50 hover:border-blue-400 hover:bg-primary/5"
           }`}
         >
           <input
@@ -502,7 +502,7 @@ function UploadModal({
               setManufacturer(""); // Reset manufacturer when insurance type changes
             }}
             required
-            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           >
             {(!insuranceTypeContext ||
               insuranceTypeContext === "commercial") && (
@@ -524,7 +524,7 @@ function UploadModal({
             value={manufacturer}
             onChange={(e) => setManufacturer(e.target.value)}
             required
-            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           >
             <option value="">Select manufacturer…</option>
             {manufacturerList.map((m) => (
@@ -545,7 +545,7 @@ function UploadModal({
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
             placeholder="Brief notes about this form (optional)"
-            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
           />
         </div>
 
@@ -567,7 +567,7 @@ function UploadModal({
           <button
             type="submit"
             disabled={uploading}
-            className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
           >
             {uploading ? (
               <>
@@ -704,7 +704,7 @@ function EditModal({ open, onClose, onSaved, token, form }: EditModalProps) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           />
         </div>
 
@@ -720,7 +720,7 @@ function EditModal({ open, onClose, onSaved, token, form }: EditModalProps) {
               setManufacturer(""); // Reset manufacturer when insurance type changes
             }}
             required
-            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           >
             <option value="true">Commercial</option>
             <option value="false">Non-Commercial (Medicare/Medicaid)</option>
@@ -737,7 +737,7 @@ function EditModal({ open, onClose, onSaved, token, form }: EditModalProps) {
             value={manufacturer}
             onChange={(e) => setManufacturer(e.target.value)}
             required
-            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           >
             <option value="">Select manufacturer…</option>
             {manufacturerList.map((m) => (
@@ -756,7 +756,7 @@ function EditModal({ open, onClose, onSaved, token, form }: EditModalProps) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
-            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
           />
         </div>
 
@@ -769,7 +769,7 @@ function EditModal({ open, onClose, onSaved, token, form }: EditModalProps) {
             value={fileName}
             onChange={(e) => setFileName(e.target.value)}
             required
-            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           />
           <p className="text-xs text-slate-500 mt-1">This is the filename users will see when they download the form (should end in .pdf)</p>
         </div>
@@ -802,7 +802,7 @@ function EditModal({ open, onClose, onSaved, token, form }: EditModalProps) {
           <button
             type="submit"
             disabled={saving}
-            className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60 transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark disabled:opacity-60 transition-colors"
           >
             {saving ? (
               <>
@@ -1042,7 +1042,7 @@ export function BvFormsManagementTab() {
         <button
           type="button"
           onClick={() => setUploadOpen(true)}
-          className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 transition-colors shrink-0"
+          className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-dark transition-colors shrink-0"
         >
           <Upload className="w-4 h-4" />
           Upload Form
@@ -1059,7 +1059,7 @@ export function BvFormsManagementTab() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search forms…"
-            className="w-full rounded-lg border border-slate-300 bg-white pl-9 pr-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full rounded-lg border border-slate-300 bg-white pl-9 pr-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           />
         </div>
 
@@ -1067,7 +1067,7 @@ export function BvFormsManagementTab() {
         <select
           value={manufacturerFilter}
           onChange={(e) => setManufacturerFilter(e.target.value)}
-          className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
         >
           <option value="all">All Manufacturers</option>
           {activeManufacturers.map((m) => (
@@ -1096,7 +1096,7 @@ export function BvFormsManagementTab() {
             <button
               type="button"
               onClick={() => void refreshForms()}
-              className="text-xs text-blue-600 hover:underline"
+              className="text-xs text-primary hover:underline"
             >
               Retry
             </button>
@@ -1113,7 +1113,7 @@ export function BvFormsManagementTab() {
               <button
                 type="button"
                 onClick={() => setUploadOpen(true)}
-                className="flex items-center gap-1.5 text-xs text-blue-600 hover:underline"
+                className="flex items-center gap-1.5 text-xs text-primary hover:underline"
               >
                 <Upload className="w-3.5 h-3.5" /> Upload your first form
               </button>
@@ -1231,7 +1231,7 @@ export function BvFormsManagementTab() {
                         onClick={() => void handleDownload(form)}
                         disabled={downloadingId === form.id}
                         title="Download PDF"
-                        className="p-1.5 rounded-md text-slate-500 hover:bg-blue-50 hover:text-blue-600 disabled:opacity-50 transition-colors"
+                        className="p-1.5 rounded-md text-slate-500 hover:bg-primary/5 hover:text-primary disabled:opacity-50 transition-colors"
                       >
                         {downloadingId === form.id ? (
                           <Loader2 className="w-4 h-4 animate-spin" />

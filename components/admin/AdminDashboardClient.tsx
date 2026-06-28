@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import { useRouter } from "next/navigation";
@@ -30,12 +30,12 @@ const AdminDashboardClient: React.FC = () => {
   }, [authStatus, role, router]);
 
   if (authStatus === "idle" || authStatus === "loading") {
-    return <div className="min-h-screen bg-[#F8F9FB]" />;
+    return <div className="min-h-screen bg-slate-50" />;
   }
 
   if (authStatus === "error") {
     return (
-      <div className="min-h-screen bg-[#F8F9FB] flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="bg-white rounded-lg shadow p-6 text-sm text-red-600">
           Failed to load session. Please sign in again.
         </div>

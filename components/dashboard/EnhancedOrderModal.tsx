@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import {
@@ -295,14 +295,14 @@ export default function EnhancedOrderModal({
             <div className="flex flex-col items-center gap-1">
               <div className={cn(
                 "flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300",
-                step === i ? "bg-blue-600 border-blue-600 text-white" :
+                step === i ? "bg-primary border-blue-600 text-white" :
                   step > i ? "bg-green-500 border-green-500 text-white" : "border-gray-200 text-gray-400"
               )}>
                 {step > i ? <Check className="w-5 h-5" /> : i}
               </div>
               <span className={cn(
                 "text-xs font-medium hidden sm:block",
-                step === i ? "text-blue-600" : step > i ? "text-green-600" : "text-gray-400"
+                step === i ? "text-primary" : step > i ? "text-green-600" : "text-gray-400"
               )}>
                 {label}
               </span>
@@ -319,7 +319,7 @@ export default function EnhancedOrderModal({
       <DialogContent className="max-w-2xl sm:max-w-3xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
         <DialogHeader className="p-6 bg-gray-50 border-b">
           <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-            <Package className="text-blue-600" />
+            <Package className="text-primary" />
             Place New Product Order
           </DialogTitle>
           <DialogDescription>
@@ -572,7 +572,7 @@ export default function EnhancedOrderModal({
                     id="notes"
                     value={formData.notes}
                     onChange={e => setFormData(f => ({ ...f, notes: e.target.value }))}
-                    className="w-full min-h-[100px] p-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"
+                    className="w-full min-h-[100px] p-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary outline-none transition-all text-sm"
                     placeholder="E.g., specific shipping instructions, billing notes, or delivery contact..."
                   />
                 </div>
@@ -613,7 +613,7 @@ export default function EnhancedOrderModal({
                     </div>
                     <div>
                       <h4 className="text-xs uppercase font-bold text-gray-400 tracking-wider mb-1">Product</h4>
-                      <p className="font-semibold text-blue-600">
+                      <p className="font-semibold text-primary">
                         {products.find(p => p.id === formData.productId)?.name || "N/A"}
                       </p>
                     </div>
@@ -649,7 +649,7 @@ export default function EnhancedOrderModal({
                 </div>
 
                 <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg flex items-start gap-3">
-                  <div className="p-2 bg-blue-600 rounded text-white mt-0.5">
+                  <div className="p-2 bg-primary rounded text-white mt-0.5">
                     <ClipboardCheck className="w-4 h-4" />
                   </div>
                   <div>
@@ -680,7 +680,7 @@ export default function EnhancedOrderModal({
                 (step === 1 && !canProceedStep1) ||
                 (step === 2 && !canProceedStep2)
               }
-              className="bg-blue-600 hover:bg-blue-700 text-white min-w-[120px]"
+              className="bg-primary hover:bg-primary-dark text-white min-w-[120px]"
             >
               Next <ChevronRight className="w-4 h-4 ml-2" />
             </Button>

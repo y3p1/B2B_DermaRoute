@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { apiGet, apiDelete } from "@/lib/apiClient";
@@ -115,7 +115,7 @@ export function DocumentUpload({ isAdmin }: { isAdmin: boolean }) {
                 void handleUpload();
               }}
               disabled={uploading}
-              className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 bg-primary text-white text-sm rounded-lg hover:bg-primary-dark disabled:opacity-50 transition-colors"
             >
               {uploading ? "Uploading..." : "Upload"}
             </button>

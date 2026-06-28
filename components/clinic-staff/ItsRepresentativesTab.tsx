@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { Users, Check, X, RefreshCw } from "lucide-react";
@@ -77,8 +77,8 @@ export function ItsRepresentativesTab() {
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div>
-          <div className="text-base font-semibold text-[#18192B] flex items-center gap-2">
-            <Users className="w-5 h-5 text-blue-600" />
+          <div className="text-base font-semibold text-brand-dark flex items-center gap-2">
+            <Users className="w-5 h-5 text-primary" />
             DR Representatives
           </div>
           <div className="text-sm text-slate-500">
@@ -100,7 +100,7 @@ export function ItsRepresentativesTab() {
             type="button"
             onClick={refresh}
             disabled={loading}
-            className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <RefreshCw className={`w-4 h-4 inline mr-1 ${loading ? "animate-spin" : ""}`} />
             Refresh
@@ -123,7 +123,7 @@ export function ItsRepresentativesTab() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[#18192B] text-white text-left">
+                <tr className="bg-brand-dark text-white text-left">
                   <th className="py-3 px-4 font-medium">Name</th>
                   <th className="py-3 px-4 font-medium">Email</th>
                   <th className="py-3 px-4 font-medium hidden sm:table-cell">Phone</th>
@@ -136,7 +136,7 @@ export function ItsRepresentativesTab() {
                 {records.map((record, idx) => (
                   <tr
                     key={record.id}
-                    className={`${idx % 2 === 0 ? "bg-white" : "bg-slate-50"} hover:bg-blue-50/40 transition-colors`}
+                    className={`${idx % 2 === 0 ? "bg-white" : "bg-slate-50"} hover:bg-primary/5 transition-colors`}
                   >
                     <td className="py-4 px-4 font-semibold text-slate-900">
                       {record.firstName} {record.lastName}

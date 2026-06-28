@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React from "react";
 import { useRouter } from "next/navigation";
 
@@ -166,7 +166,7 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
 
   return (
     <>
-    <nav className="w-full bg-slate-50 border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
+    <nav className="w-full bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40 shadow-sm">
       <div className="flex items-center gap-2">
         {onMenuToggle && (
           <Button
@@ -201,8 +201,8 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
               className="text-slate-700 hover:bg-slate-200 p-2 flex items-center gap-2"
               aria-label="User Menu"
             >
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-200">
-                <Settings className="w-4 h-4 text-slate-600" />
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+                <Settings className="w-4 h-4 text-primary" />
               </div>
             </Button>
           </DropdownMenuTrigger>
@@ -328,8 +328,8 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
 
         {/* Role & Account Type Header */}
         <div className="flex items-center gap-3 pb-3 border-b border-slate-200">
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100">
-            <User className="w-5 h-5 text-blue-600" />
+          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
+            <User className="w-5 h-5 text-primary" />
           </div>
           <div>
             <div className="text-sm font-semibold text-slate-800">
@@ -359,7 +359,7 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
                       type={field === "email" ? "email" : "text"}
                       value={form[field]}
                       onChange={(e) => handleChange(field, e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                     />
                   ) : (
                     <span className="text-sm text-slate-800 font-medium block py-2">
@@ -419,7 +419,7 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
                     size="sm"
                     onClick={() => void handleSave()}
                     disabled={saving}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    className="bg-primary hover:bg-primary-dark text-white"
                   >
                     {saving ? (
                       <>
@@ -438,7 +438,7 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
                 <Button
                   size="sm"
                   onClick={() => setIsEditing(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-primary hover:bg-primary-dark text-white"
                 >
                   Edit Profile
                 </Button>

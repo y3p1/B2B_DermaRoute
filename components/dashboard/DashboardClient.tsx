@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import { useRouter } from "next/navigation";
@@ -93,12 +93,12 @@ const DashboardClient: React.FC = () => {
   }, [authStatus, refreshBvRequests, role]);
 
   if (authStatus === "idle" || authStatus === "loading") {
-    return <div className="min-h-screen bg-[#F8F9FB]" />;
+    return <div className="min-h-screen bg-slate-50" />;
   }
 
   if (authStatus === "error") {
     return (
-      <div className="min-h-screen bg-[#F8F9FB] flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="bg-white rounded-lg shadow p-6 text-sm text-red-600">
           Failed to load session. Please sign in again.
         </div>
@@ -120,11 +120,11 @@ const DashboardClient: React.FC = () => {
   const titleRole = roleLabel(role);
 
   return authStatus === "authenticated" ? (
-    <div className="min-h-screen bg-[#F8F9FB]">
+    <div className="min-h-screen bg-slate-50">
       <DashboardNavbar />
       <main className="max-w-6xl mx-auto px-4 py-8">
         <div className="w-full text-center mb-6">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#18192B]">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-brand-dark">
             {titleRole ? `${titleRole} Dashboard` : "Dashboard"}
           </h1>
         </div>
@@ -137,10 +137,10 @@ const DashboardClient: React.FC = () => {
         )}
         {/* Header Row with Title and New BV Button */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-          <h2 className="text-2xl font-bold text-[#18192B]">BV Requests</h2>
+          <h2 className="text-2xl font-bold text-brand-dark">BV Requests</h2>
           <button
             type="button"
-            className="flex items-center gap-2 bg-[#00C48C] hover:bg-[#00a06c] text-white font-semibold rounded-lg px-6 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-[#00C48C] focus:ring-offset-2"
+            className="flex items-center gap-2 bg-brand-cta hover:bg-brand-cta-dark text-white font-semibold rounded-lg px-6 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-cta focus:ring-offset-2"
             onClick={() => setModalOpen(true)}
           >
             <svg

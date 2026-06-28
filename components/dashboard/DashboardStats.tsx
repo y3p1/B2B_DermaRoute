@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 
 type Props = {
   total: number;
@@ -12,7 +12,7 @@ const DashboardStats: React.FC<Props> = ({ total, pending, approved }) => (
       (stat) => (
       <div key={stat.label} className="bg-white rounded-xl shadow p-6 flex flex-col items-start">
         <span className="text-sm text-gray-500 mb-1">{stat.label}</span>
-        <span className="text-2xl font-bold text-[#18192B]">{stat.value}</span>
+        <span className="text-2xl font-bold text-brand-dark">{stat.value}</span>
       </div>
       )
     )}

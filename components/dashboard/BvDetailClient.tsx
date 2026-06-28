@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -191,7 +191,7 @@ export default function BvDetailClient({
       <div className="flex items-center justify-end mb-4">
         <button
           type="button"
-          className="flex items-center gap-2 bg-[#00C48C] hover:bg-[#00a06c] text-white font-semibold rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-[#00C48C] focus:ring-offset-2"
+          className="flex items-center gap-2 bg-brand-cta hover:bg-brand-cta-dark text-white font-semibold rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-cta focus:ring-offset-2"
           onClick={() => {
             if (onRequestEdit) {
               onRequestEdit(defaultValues);

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import {
@@ -256,7 +256,7 @@ export default function ViewProductOrderModal({
         onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogHeader className="px-6 pt-6 flex flex-row items-center justify-between">
-          <DialogTitle className="text-2xl font-bold text-[#18192B]">
+          <DialogTitle className="text-2xl font-bold text-brand-dark">
             Manage Product Order
           </DialogTitle>
           {isAdminOrStaff && !viewOnly && !loading && orderDetail && (
@@ -305,7 +305,7 @@ export default function ViewProductOrderModal({
                     </>
                   )}
                   {orderDetail.status === "approved" && (
-                    <Button size="sm" onClick={() => handleStatusQuickUpdate("shipped")} disabled={isUpdating} className="bg-blue-600 hover:bg-blue-700">Mark as Shipped</Button>
+                    <Button size="sm" onClick={() => handleStatusQuickUpdate("shipped")} disabled={isUpdating} className="bg-primary hover:bg-primary-dark">Mark as Shipped</Button>
                   )}
                   {orderDetail.status === "shipped" && (
                     <Button size="sm" onClick={() => handleStatusQuickUpdate("completed")} disabled={isUpdating} className="bg-green-600 hover:bg-green-700">Mark as Completed</Button>
@@ -335,7 +335,7 @@ export default function ViewProductOrderModal({
                       <select
                         value={editStatus}
                         onChange={(e) => setEditStatus(e.target.value)}
-                        className="w-full h-[38px] rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full h-[38px] rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                       >
                         <option value="pending">Pending</option>
                         <option value="approved">Approved</option>
@@ -378,7 +378,7 @@ export default function ViewProductOrderModal({
                             setEditProductId("");
                           }
                         }}
-                        className="w-full h-[38px] rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full h-[38px] rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                       >
                         <option value="">Select a manufacturer...</option>
                         {manufacturers.map((mfg) => (
@@ -399,7 +399,7 @@ export default function ViewProductOrderModal({
                         value={editProductId}
                         onChange={(e) => setEditProductId(e.target.value)}
                         disabled={!editManufacturerId}
-                        className="w-full h-[38px] rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full h-[38px] rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                       >
                         <option value="">{editManufacturerId ? "Select a product..." : "Select manufacturer first..."}</option>
                         {filteredProducts.map((prod) => (
@@ -511,7 +511,7 @@ export default function ViewProductOrderModal({
                   <textarea
                     value={editNotes}
                     onChange={(e) => setEditNotes(e.target.value)}
-                    className="w-full min-h-[100px] rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full min-h-[100px] rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                     placeholder="Add manual notes here..."
                   />
                 ) : (

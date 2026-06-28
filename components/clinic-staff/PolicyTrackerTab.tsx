@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { useAuthStore } from "@/store/auth";
@@ -243,7 +243,7 @@ function CoverageDatabasePanel({ token }: { token: string }) {
             </button>
             <button
               onClick={openCreateModal}
-              className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1.5"
+              className="px-3 py-1.5 text-xs font-medium text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-1.5"
             >
               <Plus className="w-3.5 h-3.5" />
               Add Plan
@@ -291,7 +291,7 @@ function CoverageDatabasePanel({ token }: { token: string }) {
                         href={plan.policyDocUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 mt-1"
+                        className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary mt-1"
                       >
                         <ExternalLink className="w-3 h-3" />
                         Policy Document
@@ -311,7 +311,7 @@ function CoverageDatabasePanel({ token }: { token: string }) {
                               href={monitor.monitorUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-blue-600 hover:underline truncate flex-1"
+                              className="text-primary hover:underline truncate flex-1"
                             >
                               {monitor.monitorUrl}
                             </a>
@@ -328,7 +328,7 @@ function CoverageDatabasePanel({ token }: { token: string }) {
                             <button
                               onClick={() => void handleCheckUrl(monitor.id)}
                               disabled={checking === monitor.id}
-                              className="px-2 py-1 text-[10px] font-medium text-blue-600 hover:bg-blue-50 rounded shrink-0 disabled:opacity-50"
+                              className="px-2 py-1 text-[10px] font-medium text-primary hover:bg-primary/5 rounded shrink-0 disabled:opacity-50"
                             >
                               {checking === monitor.id ? "Checking..." : "Check Now"}
                             </button>
@@ -386,7 +386,7 @@ function CoverageDatabasePanel({ token }: { token: string }) {
                   value={formPlanName}
                   onChange={(e) => setFormPlanName(e.target.value)}
                   placeholder="e.g. Aetna Better Health"
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
@@ -394,7 +394,7 @@ function CoverageDatabasePanel({ token }: { token: string }) {
                 <select
                   value={formPlanType}
                   onChange={(e) => setFormPlanType(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white"
                 >
                   <option value="Medicare Advantage">Medicare Advantage</option>
                   <option value="Medicare Standard">Medicare Standard</option>
@@ -409,7 +409,7 @@ function CoverageDatabasePanel({ token }: { token: string }) {
                   value={formPolicyDocUrl}
                   onChange={(e) => setFormPolicyDocUrl(e.target.value)}
                   placeholder="https://..."
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
@@ -419,7 +419,7 @@ function CoverageDatabasePanel({ token }: { token: string }) {
                   value={formMonitorUrl}
                   onChange={(e) => setFormMonitorUrl(e.target.value)}
                   placeholder="https://..."
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
@@ -428,7 +428,7 @@ function CoverageDatabasePanel({ token }: { token: string }) {
                   value={formNotes}
                   onChange={(e) => setFormNotes(e.target.value)}
                   rows={2}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                 />
               </div>
 
@@ -442,7 +442,7 @@ function CoverageDatabasePanel({ token }: { token: string }) {
                 <button
                   onClick={() => void handleCreate()}
                   disabled={submitting || !formPlanName}
-                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark disabled:opacity-50 transition-colors"
                 >
                   {submitting ? "Creating..." : "Create Plan"}
                 </button>
@@ -632,7 +632,7 @@ function CmsPolicyUpdatesPanel({ token }: { token: string }) {
                   setFormImpact("medium");
                   setAddModalOpen(true);
                 }}
-                className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1.5"
+                className="px-3 py-1.5 text-xs font-medium text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-1.5"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Add Manually
@@ -691,7 +691,7 @@ function CmsPolicyUpdatesPanel({ token }: { token: string }) {
                         href={update.sourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-semibold text-sm text-slate-800 hover:text-blue-600 transition-colors"
+                        className="font-semibold text-sm text-slate-800 hover:text-primary transition-colors"
                       >
                         {update.title}
                       </a>
@@ -731,7 +731,7 @@ function CmsPolicyUpdatesPanel({ token }: { token: string }) {
                     {!update.isRead && (
                       <button
                         onClick={() => void handleMarkRead(update.id)}
-                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-1.5 text-primary hover:bg-primary/5 rounded-lg transition-colors"
                         title="Mark as read"
                       >
                         <Eye className="w-4 h-4" />
@@ -767,28 +767,28 @@ function CmsPolicyUpdatesPanel({ token }: { token: string }) {
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Title *</label>
                 <input type="text" value={formTitle} onChange={(e) => setFormTitle(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Source URL *</label>
                 <input type="url" value={formUrl} onChange={(e) => setFormUrl(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Source Name</label>
                 <input type="text" value={formSource} onChange={(e) => setFormSource(e.target.value)}
                   placeholder="e.g. CMS.gov, Novitas Solutions"
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Summary</label>
                 <textarea value={formSummary} onChange={(e) => setFormSummary(e.target.value)}
-                  rows={2} className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
+                  rows={2} className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Impact Level</label>
                 <select value={formImpact} onChange={(e) => setFormImpact(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white">
                   <option value="high">High</option>
                   <option value="medium">Medium</option>
                   <option value="low">Low</option>
@@ -800,7 +800,7 @@ function CmsPolicyUpdatesPanel({ token }: { token: string }) {
                   Cancel
                 </button>
                 <button onClick={() => void handleAddManual()} disabled={submitting || !formTitle || !formUrl}
-                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark disabled:opacity-50 transition-colors">
                   {submitting ? "Adding..." : "Add Update"}
                 </button>
               </div>
@@ -854,17 +854,17 @@ function CmsPolicyUpdatesPanel({ token }: { token: string }) {
               <div className="space-y-2">
                 <input type="text" value={feedName} onChange={(e) => setFeedName(e.target.value)}
                   placeholder="Feed name (e.g. CMS Coverage Updates)"
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                 <input type="url" value={feedUrl} onChange={(e) => setFeedUrl(e.target.value)}
                   placeholder="RSS feed URL"
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                 <input type="text" value={feedRegion} onChange={(e) => setFeedRegion(e.target.value)}
                   placeholder="Region (optional, e.g. National, Jurisdiction H)"
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                 <button
                   onClick={() => void handleAddFeedSource()}
                   disabled={submitting || !feedName || !feedUrl}
-                  className="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  className="w-full px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark disabled:opacity-50 transition-colors"
                 >
                   {submitting ? "Adding..." : "Add Feed Source"}
                 </button>

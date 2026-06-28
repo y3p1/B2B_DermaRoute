@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { useAuthStore } from "@/store/auth";
@@ -402,7 +402,7 @@ function SuccessRatePanel({ token }: { token: string }) {
           <select
             value={woundType}
             onChange={(e) => setWoundType(e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white"
           >
             <option value="Diabetic foot ulcer">Diabetic foot ulcer</option>
             <option value="Venous leg ulcer">Venous leg ulcer</option>
@@ -413,7 +413,7 @@ function SuccessRatePanel({ token }: { token: string }) {
         <button
           onClick={() => void lookup()}
           disabled={loading}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark disabled:opacity-50 transition-colors"
         >
           {loading ? "Looking up..." : "Look Up"}
         </button>
@@ -599,7 +599,7 @@ function OutcomeLoggerPanel({ token }: { token: string }) {
                     <td className="py-3 px-3 text-right">
                       <button
                         onClick={() => openModal(o)}
-                        className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                        className="px-3 py-1.5 text-xs font-medium text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors"
                       >
                         Log Outcome
                       </button>
@@ -671,7 +671,7 @@ function OutcomeLoggerPanel({ token }: { token: string }) {
                     value={weeksToHeal}
                     onChange={(e) => setWeeksToHeal(e.target.value)}
                     placeholder="e.g. 6"
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               )}
@@ -687,7 +687,7 @@ function OutcomeLoggerPanel({ token }: { token: string }) {
                   value={appCount}
                   onChange={(e) => setAppCount(e.target.value)}
                   placeholder="e.g. 8"
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
 
@@ -701,7 +701,7 @@ function OutcomeLoggerPanel({ token }: { token: string }) {
                   onChange={(e) => setComplications(e.target.value)}
                   rows={2}
                   placeholder="Any complications..."
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                 />
               </div>
 
@@ -719,7 +719,7 @@ function OutcomeLoggerPanel({ token }: { token: string }) {
                 <button
                   onClick={() => void handleSubmit()}
                   disabled={submitting}
-                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark disabled:opacity-50 transition-colors"
                 >
                   {submitting ? "Saving..." : "Save Outcome"}
                 </button>
@@ -835,7 +835,7 @@ function ThresholdSettingsPanel({ token }: { token: string }) {
                   onClick={() => void toggleBool(key)}
                   disabled={saving === key}
                   className={`relative w-11 h-6 rounded-full transition-colors ${
-                    values[key] === "true" ? "bg-blue-600" : "bg-slate-300"
+                    values[key] === "true" ? "bg-primary" : "bg-slate-300"
                   }`}
                 >
                   <span
@@ -850,7 +850,7 @@ function ThresholdSettingsPanel({ token }: { token: string }) {
                     type="number"
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
-                    className="w-20 px-2 py-1 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-20 px-2 py-1 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") void handleSave(key, editValue);
                       if (e.key === "Escape") setEditingKey(null);
@@ -859,7 +859,7 @@ function ThresholdSettingsPanel({ token }: { token: string }) {
                   <button
                     onClick={() => void handleSave(key, editValue)}
                     disabled={saving === key}
-                    className="px-2.5 py-1 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                    className="px-2.5 py-1 text-xs font-medium text-white bg-primary rounded-md hover:bg-primary-dark disabled:opacity-50"
                   >
                     {saving === key ? "..." : "Save"}
                   </button>
@@ -880,7 +880,7 @@ function ThresholdSettingsPanel({ token }: { token: string }) {
                       setEditValue(values[key] ?? "");
                       setEditingKey(key);
                     }}
-                    className="px-2 py-0.5 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded"
+                    className="px-2 py-0.5 text-xs font-medium text-primary hover:text-primary hover:bg-primary/5 rounded"
                   >
                     Edit
                   </button>

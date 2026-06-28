@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { apiGet } from "@/lib/apiClient";
@@ -309,7 +309,7 @@ export function ProductsManagementTab() {
     <div className="bg-white rounded-lg shadow p-4">
       <div className="flex items-start justify-between gap-4 mb-3">
         <div>
-          <div className="text-base font-semibold text-[#18192B]">Products</div>
+          <div className="text-base font-semibold text-brand-dark">Products</div>
           <div className="text-sm text-muted-foreground">
             Manage products and their details
           </div>
@@ -321,7 +321,7 @@ export function ProductsManagementTab() {
             setEditingProduct(null);
             setModalOpen(true);
           }}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors flex items-center gap-2"
+          className="px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-md transition-colors flex items-center gap-2"
         >
           <svg
             className="w-4 h-4"
@@ -360,14 +360,14 @@ export function ProductsManagementTab() {
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="max-w-sm px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="max-w-sm px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
 
         <div className="overflow-x-auto rounded-md border">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-[#18192B] text-white text-left">
+              <tr className="bg-brand-dark text-white text-left">
                 <th className="py-3 px-3 font-medium whitespace-nowrap">
                   Q Code
                 </th>
@@ -467,7 +467,7 @@ export function ProductsManagementTab() {
                                 [group.groupKey]: e.target.value,
                               }));
                             }}
-                            className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                           >
                             {group.variants.map((v) => (
                               <option key={v.id} value={v.id}>
@@ -514,7 +514,7 @@ export function ProductsManagementTab() {
                               setEditGroupVariants(group.variants);
                               setEditModalOpen(true);
                             }}
-                            className="px-3 py-1 rounded-md bg-blue-600 text-white text-sm font-medium shadow hover:bg-blue-700 transition-colors"
+                            className="px-3 py-1 rounded-md bg-primary text-white text-sm font-medium shadow hover:bg-primary-dark transition-colors"
                           >
                             Edit
                           </button>
@@ -770,7 +770,7 @@ function ProductFormModal({
                     setFormData({ ...formData, qCode: e.target.value })
                   }
                   placeholder="Q4169, MUE-148, etc."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
 
@@ -783,7 +783,7 @@ function ProductFormModal({
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -803,7 +803,7 @@ function ProductFormModal({
                     manufacturerId: "",
                   })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ height: "44px" }}
               >
                 <option value="false">
@@ -823,7 +823,7 @@ function ProductFormModal({
                   onChange={(e) =>
                     setFormData({ ...formData, manufacturerId: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                   style={{ height: "44px" }}
                 >
                   <option value="">Select manufacturer...</option>
@@ -851,7 +851,7 @@ function ProductFormModal({
                     onChange={(e) =>
                       setFormData({ ...formData, woundSizeId: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                     style={{ height: "44px" }}
                   >
                     <option value="">Select size...</option>
@@ -893,12 +893,12 @@ function ProductFormModal({
                             <div>
                               <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-1 py-1">Discs (Round)</div>
                               {discSizes.map((ws) => (
-                                <label key={ws.id} className="flex items-center gap-2 px-2 py-1 rounded hover:bg-blue-50 cursor-pointer text-sm">
+                                <label key={ws.id} className="flex items-center gap-2 px-2 py-1 rounded hover:bg-primary/5 cursor-pointer text-sm">
                                   <input
                                     type="checkbox"
                                     checked={selectedSizeIds.includes(ws.id)}
                                     onChange={() => toggleSize(ws.id)}
-                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    className="rounded border-gray-300 text-primary focus:ring-primary"
                                   />
                                   {ws.label}
                                 </label>
@@ -909,12 +909,12 @@ function ProductFormModal({
                             <div>
                               <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-1 py-1 mt-1">Square & Rectangular</div>
                               {rectSizes.map((ws) => (
-                                <label key={ws.id} className="flex items-center gap-2 px-2 py-1 rounded hover:bg-blue-50 cursor-pointer text-sm">
+                                <label key={ws.id} className="flex items-center gap-2 px-2 py-1 rounded hover:bg-primary/5 cursor-pointer text-sm">
                                   <input
                                     type="checkbox"
                                     checked={selectedSizeIds.includes(ws.id)}
                                     onChange={() => toggleSize(ws.id)}
-                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    className="rounded border-gray-300 text-primary focus:ring-primary"
                                   />
                                   {ws.label}
                                 </label>
@@ -925,7 +925,7 @@ function ProductFormModal({
                       );
                     })()}
                     {selectedSizeIds.length > 0 && (
-                      <div className="text-xs text-blue-600 font-medium mt-1 px-1">
+                      <div className="text-xs text-primary font-medium mt-1 px-1">
                         {selectedSizeIds.length} size{selectedSizeIds.length > 1 ? "s" : ""} selected
                       </div>
                     )}
@@ -944,7 +944,7 @@ function ProductFormModal({
                 value={formData.unitSize}
                 onChange={(e) => updateField("unitSize", e.target.value)}
                 placeholder="2, 4, 16, 32, etc."
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
@@ -959,7 +959,7 @@ function ProductFormModal({
                   value={formData.payRatePerCm2}
                   onChange={(e) => updateField("payRatePerCm2", e.target.value)}
                   placeholder="127.14"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
 
@@ -972,7 +972,7 @@ function ProductFormModal({
                   value={formData.costPerCm2}
                   onChange={(e) => updateField("costPerCm2", e.target.value)}
                   placeholder="76.28"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -987,7 +987,7 @@ function ProductFormModal({
                   value={formData.payRatePerGraft}
                   onChange={(e) => updateField("payRatePerGraft", e.target.value)}
                   placeholder="254.28"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
 
@@ -1000,7 +1000,7 @@ function ProductFormModal({
                   value={formData.costPerGraft}
                   onChange={(e) => updateField("costPerGraft", e.target.value)}
                   placeholder="178.00"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -1015,7 +1015,7 @@ function ProductFormModal({
                   value={formData.estAoc100}
                   onChange={(e) => updateField("estAoc100", e.target.value)}
                   placeholder="76.28"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
 
@@ -1028,7 +1028,7 @@ function ProductFormModal({
                   value={formData.estAoc80}
                   onChange={(e) => updateField("estAoc80", e.target.value)}
                   placeholder="25.43"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -1041,7 +1041,7 @@ function ProductFormModal({
                   <span className="text-sm text-gray-500">{formData.autoCalc ? "On" : "Off"}</span>
                   <div
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      formData.autoCalc ? "bg-blue-600" : "bg-gray-300"
+                      formData.autoCalc ? "bg-primary" : "bg-gray-300"
                     }`}
                     onClick={() => setFormData((prev) => ({ ...prev, autoCalc: !prev.autoCalc }))}
                   >
@@ -1064,7 +1064,7 @@ function ProductFormModal({
                     value={formData.commission}
                     onChange={(e) => updateField("commission", e.target.value)}
                     placeholder="e.g. 0.6 — enter 1 if no commission"
-                    className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-50"
+                    className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-blue-50"
                   />
                   <p className="text-xs text-gray-500 mt-1">
                     Cost, Graft, and AOC fields are auto-calculated based on Unit Size, Pay Rate / cm², and Commission.
@@ -1083,7 +1083,7 @@ function ProductFormModal({
                   setFormData({ ...formData, description: e.target.value })
                 }
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
@@ -1101,7 +1101,7 @@ function ProductFormModal({
                       quarter: Number(e.target.value),
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                   style={{ height: "44px" }}
                 >
                   <option value={1}>Q1</option>
@@ -1121,7 +1121,7 @@ function ProductFormModal({
                   onChange={(e) =>
                     setFormData({ ...formData, year: Number(e.target.value) })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -1138,7 +1138,7 @@ function ProductFormModal({
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark disabled:opacity-50"
               >
                 {submitting ? "Saving..." : "Save"}
               </button>
@@ -1485,7 +1485,7 @@ function ProductEditModal({
                     setSaveMsg(null);
                   }}
                   placeholder="Q4169, MUE-148, etc."
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
@@ -1500,7 +1500,7 @@ function ProductEditModal({
                     });
                     setSaveMsg(null);
                   }}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                   style={{ height: "38px" }}
                 >
                   <option value="false">Non-Commercial (Medicare / Medicaid)</option>
@@ -1515,7 +1515,7 @@ function ProductEditModal({
                     setSharedData({ ...sharedData, manufacturerId: e.target.value });
                     setSaveMsg(null);
                   }}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                   style={{ height: "38px" }}
                 >
                   <option value="">Select manufacturer...</option>
@@ -1533,7 +1533,7 @@ function ProductEditModal({
                       setSharedData({ ...sharedData, quarter: Number(e.target.value) });
                       setSaveMsg(null);
                     }}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                     style={{ height: "38px" }}
                   >
                     <option value={1}>Q1</option>
@@ -1552,7 +1552,7 @@ function ProductEditModal({
                       setSharedData({ ...sharedData, year: Number(e.target.value) });
                       setSaveMsg(null);
                     }}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </div>
@@ -1575,7 +1575,7 @@ function ProductEditModal({
                   }}
                   className={`px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors ${
                     activeVariantId === v.id
-                      ? "bg-blue-600 text-white border-blue-600"
+                      ? "bg-primary text-white border-blue-600"
                       : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
                   }`}
                 >
@@ -1588,7 +1588,7 @@ function ProductEditModal({
           {/* Per-Size Pricing Fields */}
           <div className="space-y-4 border border-gray-200 rounded-lg p-4 bg-white">
             <div className="text-sm font-semibold text-gray-700 border-b pb-2">
-              Pricing for: <span className="text-blue-600">{activeVariant.woundSizeLabel ?? "Unknown"}</span>
+              Pricing for: <span className="text-primary">{activeVariant.woundSizeLabel ?? "Unknown"}</span>
             </div>
 
             <div>
@@ -1598,7 +1598,7 @@ function ProductEditModal({
                 value={currentData.unitSize}
                 onChange={(e) => updateField("unitSize", e.target.value)}
                 placeholder="2, 4, 16..."
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
@@ -1610,7 +1610,7 @@ function ProductEditModal({
                   value={currentData.payRatePerCm2}
                   onChange={(e) => updateField("payRatePerCm2", e.target.value)}
                   placeholder="127.14"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
@@ -1620,7 +1620,7 @@ function ProductEditModal({
                   value={currentData.costPerCm2}
                   onChange={(e) => updateField("costPerCm2", e.target.value)}
                   placeholder="76.28"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -1633,7 +1633,7 @@ function ProductEditModal({
                   value={currentData.payRatePerGraft}
                   onChange={(e) => updateField("payRatePerGraft", e.target.value)}
                   placeholder="254.28"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
@@ -1643,7 +1643,7 @@ function ProductEditModal({
                   value={currentData.costPerGraft}
                   onChange={(e) => updateField("costPerGraft", e.target.value)}
                   placeholder="178.00"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -1656,7 +1656,7 @@ function ProductEditModal({
                   value={currentData.estAoc100}
                   onChange={(e) => updateField("estAoc100", e.target.value)}
                   placeholder="1500.00"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
@@ -1666,7 +1666,7 @@ function ProductEditModal({
                   value={currentData.estAoc80}
                   onChange={(e) => updateField("estAoc80", e.target.value)}
                   placeholder="1200.00"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -1677,7 +1677,7 @@ function ProductEditModal({
                 value={currentData.description}
                 onChange={(e) => updateField("description", e.target.value)}
                 rows={2}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary resize-none"
               />
             </div>
 
@@ -1689,7 +1689,7 @@ function ProductEditModal({
                   <span className="text-xs text-gray-500">{currentData.autoCalc ? "On" : "Off"}</span>
                   <div
                     className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                      currentData.autoCalc ? "bg-blue-600" : "bg-gray-300"
+                      currentData.autoCalc ? "bg-primary" : "bg-gray-300"
                     }`}
                     onClick={() => {
                       const newVal = !currentData.autoCalc;
@@ -1719,7 +1719,7 @@ function ProductEditModal({
                     value={currentData.commission}
                     onChange={(e) => updateField("commission", e.target.value)}
                     placeholder="e.g. 0.6 — enter 1 if no commission"
-                    className="w-full px-3 py-2 text-sm border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-50"
+                    className="w-full px-3 py-2 text-sm border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-blue-50"
                   />
                   <p className="text-xs text-gray-400 mt-1">
                     Cost, Graft, and AOC fields are auto-calculated based on Unit Size, Pay Rate / cm², and Commission. Toggle off to enter manually.
@@ -1734,7 +1734,7 @@ function ProductEditModal({
                 type="button"
                 onClick={handleApplyChanges}
                 disabled={saving || savingAll}
-                className="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                className="px-5 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark disabled:opacity-50 transition-colors"
               >
                 {saving ? "Saving..." : "Save This Size"}
               </button>
@@ -1838,7 +1838,7 @@ function ProductEditModal({
                                 {discSizes.map((ws) => (
                                   <label
                                     key={ws.id}
-                                    className="flex items-center gap-2 px-2 py-1 rounded hover:bg-blue-50 cursor-pointer text-sm"
+                                    className="flex items-center gap-2 px-2 py-1 rounded hover:bg-primary/5 cursor-pointer text-sm"
                                   >
                                     <input
                                       type="checkbox"
@@ -1850,7 +1850,7 @@ function ProductEditModal({
                                             : [...prev, ws.id],
                                         )
                                       }
-                                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                      className="rounded border-gray-300 text-primary focus:ring-primary"
                                     />
                                     {ws.label}
                                   </label>
@@ -1865,7 +1865,7 @@ function ProductEditModal({
                                 {rectSizes.map((ws) => (
                                   <label
                                     key={ws.id}
-                                    className="flex items-center gap-2 px-2 py-1 rounded hover:bg-blue-50 cursor-pointer text-sm"
+                                    className="flex items-center gap-2 px-2 py-1 rounded hover:bg-primary/5 cursor-pointer text-sm"
                                   >
                                     <input
                                       type="checkbox"
@@ -1877,7 +1877,7 @@ function ProductEditModal({
                                             : [...prev, ws.id],
                                         )
                                       }
-                                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                      className="rounded border-gray-300 text-primary focus:ring-primary"
                                     />
                                     {ws.label}
                                   </label>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { apiGet } from "@/lib/apiClient";
@@ -171,7 +171,7 @@ export function InsuranceRoutingTab() {
     <div className="bg-white rounded-lg shadow p-4">
       <div className="flex items-start justify-between gap-4 mb-3">
         <div>
-          <div className="text-base font-semibold text-[#18192B]">
+          <div className="text-base font-semibold text-brand-dark">
             Insurance Routing
           </div>
           <div className="text-sm text-muted-foreground">
@@ -201,14 +201,14 @@ export function InsuranceRoutingTab() {
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="max-w-sm px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="max-w-sm px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
 
         <div className="overflow-hidden rounded-md border">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-[#18192B] text-white text-left">
+              <tr className="bg-brand-dark text-white text-left">
                 <th className="py-3 px-3 font-medium">Insurance Name</th>
                 <th className="py-3 px-3 font-medium">Type</th>
                 <th className="py-3 px-3 font-medium">Mapped Manufacturers</th>
@@ -283,7 +283,7 @@ export function InsuranceRoutingTab() {
                         <button
                           type="button"
                           onClick={() => openEditModal(insurance)}
-                          className="px-3 py-1 rounded-md bg-blue-600 text-white text-sm font-medium shadow hover:bg-blue-700 transition-colors"
+                          className="px-3 py-1 rounded-md bg-primary text-white text-sm font-medium shadow hover:bg-primary-dark transition-colors"
                         >
                           Edit Routing
                         </button>
@@ -367,7 +367,7 @@ export function InsuranceRoutingTab() {
                       type="checkbox"
                       checked={selectedManufacturerIds.has(mfg.id)}
                       onChange={() => toggleManufacturer(mfg.id)}
-                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                     />
                     <span className="text-sm font-medium text-gray-900 flex-1">
                       {mfg.name}
@@ -400,7 +400,7 @@ export function InsuranceRoutingTab() {
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-primary hover:bg-primary-dark text-white"
             >
               {saving ? "Saving..." : "Save Routing"}
             </Button>

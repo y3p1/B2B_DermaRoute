@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
@@ -99,7 +99,7 @@ export default function PolicyAssistantClient() {
                 className={[
                   "px-4 py-2.5 text-sm font-medium border-b-2 transition-colors",
                   activeTab === tab
-                    ? "border-blue-600 text-blue-600"
+                    ? "border-blue-600 text-primary"
                     : "border-transparent text-slate-500 hover:text-slate-700",
                 ].join(" ")}
               >
@@ -148,13 +148,13 @@ export default function PolicyAssistantClient() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask about policy coverage, requirements, or guidelines..."
-                className="flex-1 px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 disabled={loading}
               />
               <button
                 type="submit"
                 disabled={loading || !input.trim()}
-                className="px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                className="px-4 py-2.5 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary-dark disabled:opacity-50 transition-colors"
               >
                 Send
               </button>

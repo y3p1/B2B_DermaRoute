@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import {
@@ -310,7 +310,7 @@ export default function ProductOrderModal({
         onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogHeader className="px-6 pt-6">
-          <DialogTitle className="text-2xl font-bold text-[#18192B]">
+          <DialogTitle className="text-2xl font-bold text-brand-dark">
             Create Product Order
           </DialogTitle>
         </DialogHeader>
@@ -350,7 +350,7 @@ export default function ProductOrderModal({
                   id="bvRequest"
                   value={selectedBvId}
                   onChange={(e) => handleBvRequestChange(e.target.value)}
-                  className="w-full h-10 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full h-10 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   required
                 >
                   <option value="">Select an approved BV form...</option>
@@ -607,7 +607,7 @@ export default function ProductOrderModal({
                           onChange={(e) =>
                             setSelectedManufacturerId(e.target.value)
                           }
-                          className="w-full h-10 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full h-10 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                           required
                         >
                           <option value="">Select a manufacturer...</option>
@@ -648,7 +648,7 @@ export default function ProductOrderModal({
                           id="product"
                           value={selectedProductId}
                           onChange={(e) => setSelectedProductId(e.target.value)}
-                          className="w-full h-10 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full h-10 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                           disabled={!selectedManufacturerId}
                           required
                         >
@@ -695,7 +695,7 @@ export default function ProductOrderModal({
                     !selectedManufacturerId ||
                     !selectedProductId
                   }
-                  className="px-6 bg-blue-600 hover:bg-blue-700 text-white"
+                  className="px-6 bg-primary hover:bg-primary-dark text-white"
                 >
                   {isSubmitting ? "Creating..." : "Submit"}
                 </Button>

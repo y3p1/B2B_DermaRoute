@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { Plus, RefreshCw, Archive, Pencil, X, Check } from "lucide-react";
@@ -45,7 +45,7 @@ const EMPTY_FORM: FormState = {
 };
 
 const inputCls =
-  "w-full text-xs border border-slate-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500";
+  "w-full text-xs border border-slate-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary";
 
 function FormRow({
   form,
@@ -215,7 +215,7 @@ export function LymphedemaProductsCatalogTab() {
           </button>
           <button
             onClick={() => { setAddingNew(true); setNewForm(EMPTY_FORM); }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-primary text-white hover:bg-primary-dark"
           >
             <Plus className="w-3.5 h-3.5" />
             Add Product
@@ -255,7 +255,7 @@ export function LymphedemaProductsCatalogTab() {
                       <button
                         onClick={() => void createProduct()}
                         disabled={saving || !newForm.name}
-                        className="flex items-center gap-1 px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                        className="flex items-center gap-1 px-3 py-1.5 text-xs bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50"
                       >
                         <Check className="w-3.5 h-3.5" /> Save
                       </button>
@@ -296,7 +296,7 @@ export function LymphedemaProductsCatalogTab() {
                           <button
                             onClick={() => void saveEdit()}
                             disabled={saving}
-                            className="flex items-center gap-1 px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                            className="flex items-center gap-1 px-3 py-1.5 text-xs bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50"
                           >
                             <Check className="w-3.5 h-3.5" /> Save
                           </button>
@@ -326,7 +326,7 @@ export function LymphedemaProductsCatalogTab() {
                         <div className="flex items-center gap-1 justify-end">
                           <button
                             onClick={() => startEdit(p)}
-                            className="p-1.5 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                            className="p-1.5 rounded text-slate-400 hover:text-primary hover:bg-primary/5 transition-colors"
                             title="Edit"
                           >
                             <Pencil className="w-3.5 h-3.5" />

@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import {
   Table,
   TableHeader,
@@ -43,7 +43,7 @@ export default function DashboardTable({
   return (
     <Table className="bg-white rounded-xl">
       <TableHeader>
-        <TableRow className="bg-[#18192B] text-white text-left !hover:bg-[#18192B]">
+        <TableRow className="bg-brand-dark text-white text-left !hover:bg-brand-dark">
           <TableHead className="px-6 py-3 font-semibold text-white">
             Date
           </TableHead>

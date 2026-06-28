@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
@@ -22,7 +22,7 @@ const DashboardFilters: React.FC = () => (
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className="w-48 justify-between bg-white border border-gray-300 rounded-lg px-4 py-2 text-base font-medium text-[#18192B] shadow-none focus:ring-2 focus:ring-[#00C48C] focus:border-[#00C48C]"
+            className="w-48 justify-between bg-white border border-gray-300 rounded-lg px-4 py-2 text-base font-medium text-brand-dark shadow-none focus:ring-2 focus:ring-brand-cta focus:border-[#00C48C]"
           >
             All Practices
             <svg className="ml-2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -41,7 +41,7 @@ const DashboardFilters: React.FC = () => (
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className="w-40 justify-between bg-white border border-gray-300 rounded-lg px-4 py-2 text-base font-medium text-[#18192B] shadow-none focus:ring-2 focus:ring-[#00C48C] focus:border-[#00C48C]"
+            className="w-40 justify-between bg-white border border-gray-300 rounded-lg px-4 py-2 text-base font-medium text-brand-dark shadow-none focus:ring-2 focus:ring-brand-cta focus:border-[#00C48C]"
           >
             All Status
             <svg className="ml-2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

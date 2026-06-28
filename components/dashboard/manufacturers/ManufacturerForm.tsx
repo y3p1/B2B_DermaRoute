@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 
 export interface Manufacturer {
   id: number;
@@ -75,7 +75,7 @@ export default function ManufacturerForm({
       <div className="flex gap-2">
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-1 rounded"
+          className="bg-primary text-white px-4 py-1 rounded"
         >
           Save
         </button>

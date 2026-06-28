@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { Users, RefreshCw, ChevronDown } from "lucide-react";
@@ -102,8 +102,8 @@ export function ProviderAccountsTab() {
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div>
-          <div className="text-base font-semibold text-[#18192B] flex items-center gap-2">
-            <Users className="w-5 h-5 text-blue-600" />
+          <div className="text-base font-semibold text-brand-dark flex items-center gap-2">
+            <Users className="w-5 h-5 text-primary" />
             Provider Accounts
           </div>
           <div className="text-sm text-slate-500">
@@ -118,7 +118,7 @@ export function ProviderAccountsTab() {
             type="button"
             onClick={() => { void refresh(); }}
             disabled={loading}
-            className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 transition-colors"
           >
             <RefreshCw className={`w-4 h-4 inline mr-1 ${loading ? "animate-spin" : ""}`} />
             Refresh
@@ -138,7 +138,7 @@ export function ProviderAccountsTab() {
           placeholder="Search by practice name, email, or NPI…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full max-w-sm px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className="w-full max-w-sm px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white"
         />
       </div>
 
@@ -151,7 +151,7 @@ export function ProviderAccountsTab() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[#18192B] text-white text-left">
+                <tr className="bg-brand-dark text-white text-left">
                   <th className="py-3 px-4 font-medium">Practice Name</th>
                   <th className="py-3 px-4 font-medium hidden sm:table-cell">Email</th>
                   <th className="py-3 px-4 font-medium hidden md:table-cell">NPI</th>
@@ -165,7 +165,7 @@ export function ProviderAccountsTab() {
                 {filtered.map((provider, idx) => (
                   <React.Fragment key={provider.id}>
                     <tr
-                      className={`${idx % 2 === 0 ? "bg-white" : "bg-slate-50"} hover:bg-blue-50/40 transition-colors cursor-pointer`}
+                      className={`${idx % 2 === 0 ? "bg-white" : "bg-slate-50"} hover:bg-primary/5 transition-colors cursor-pointer`}
                       onClick={() => setExpandedId(expandedId === provider.id ? null : provider.id)}
                     >
                       <td className="py-3 px-4 font-semibold text-slate-900">{provider.clinicName}</td>

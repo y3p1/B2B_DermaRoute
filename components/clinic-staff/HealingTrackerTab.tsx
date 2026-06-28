@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { apiGet, apiPost } from "@/lib/apiClient";
@@ -65,7 +65,7 @@ const BENCHMARK_CARDS: Array<{
     label: "Diabetic Foot Ulcer (DFU)",
     target: "50% at Week 4",
     blurb: "Primary endpoint in most studies",
-    accent: "text-blue-600",
+    accent: "text-primary",
   },
   {
     label: "Venous Leg Ulcer (VLU)",
@@ -288,7 +288,7 @@ export function HealingTrackerTab() {
       {/* Benchmarks */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200">
         <div className="p-5 bg-linear-to-r from-indigo-50 to-blue-50 rounded-xl">
-          <div className="text-sm font-semibold text-[#18192B] mb-3">
+          <div className="text-sm font-semibold text-brand-dark mb-3">
             Healing Rate Benchmarks (Grafts/Tissue Only)
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -308,7 +308,7 @@ export function HealingTrackerTab() {
 
       {/* Live entry */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-        <div className="text-sm font-semibold text-[#18192B] mb-3">
+        <div className="text-sm font-semibold text-brand-dark mb-3">
           Record Wound Measurement
         </div>
         <form
@@ -318,7 +318,7 @@ export function HealingTrackerTab() {
           <select
             value={selectedBv}
             onChange={(e) => setSelectedBv(e.target.value)}
-            className="h-10 rounded-lg border border-slate-300 px-3 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="h-10 rounded-lg border border-slate-300 px-3 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="">Select patient / wound case…</option>
             {options.map((o) => (
@@ -333,18 +333,18 @@ export function HealingTrackerTab() {
             onChange={(e) => setSizeInput(e.target.value)}
             inputMode="decimal"
             placeholder="Wound size (cm²)"
-            className="h-10 rounded-lg border border-slate-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="h-10 rounded-lg border border-slate-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           />
           <input
             type="date"
             value={dateInput}
             onChange={(e) => setDateInput(e.target.value)}
-            className="h-10 rounded-lg border border-slate-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="h-10 rounded-lg border border-slate-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           />
           <button
             type="submit"
             disabled={submitting}
-            className="h-10 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium transition-colors"
+            className="h-10 rounded-lg bg-primary hover:bg-primary-dark disabled:opacity-50 text-white text-sm font-medium transition-colors"
           >
             {submitting ? "Recording…" : "Record Measurement"}
           </button>
@@ -361,7 +361,7 @@ export function HealingTrackerTab() {
       {/* All cases table */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200">
         <div className="p-4 border-b border-slate-200 flex items-center justify-between gap-3 flex-wrap">
-          <div className="text-sm font-semibold text-[#18192B]">
+          <div className="text-sm font-semibold text-brand-dark">
             Wound Cases
           </div>
           <div className="flex items-center gap-2 text-xs">
@@ -476,7 +476,7 @@ export function HealingTrackerTab() {
                             <button
                               type="button"
                               onClick={() => void toggleExpanded(row.bvRequestId)}
-                              className="text-blue-600 hover:underline text-xs font-medium"
+                              className="text-primary hover:underline text-xs font-medium"
                             >
                               {isExpanded ? "Hide" : "View"}
                             </button>
@@ -596,7 +596,7 @@ export function HealingTrackerTab() {
                 <button
                   type="button"
                   onClick={() => void toggleExpanded(c.bvRequestId)}
-                  className="text-xs text-blue-600 hover:underline font-medium"
+                  className="text-xs text-primary hover:underline font-medium"
                 >
                   {expandedBv === c.bvRequestId ? "Hide" : "View alternatives"}
                 </button>

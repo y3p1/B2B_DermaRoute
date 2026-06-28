@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
@@ -80,7 +80,7 @@ export default function BaaProvidersEmbeddedClient({
     <div className="bg-white rounded-lg shadow p-4">
       <div className="flex items-start justify-between gap-4 mb-3">
         <div>
-          <div className="text-base font-semibold text-[#18192B]">
+          <div className="text-base font-semibold text-brand-dark">
             BAA Provider Agreements
           </div>
           <div className="text-sm text-muted-foreground">

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { z } from "zod";
@@ -296,7 +296,7 @@ export function Step3Recommendation({
         <span className="text-sm text-muted-foreground">Step 3 of 3</span>
       </div>
       <div className="mb-4 w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-        <div className="h-full bg-blue-600" style={{ width: "100%" }} />
+        <div className="h-full bg-primary" style={{ width: "100%" }} />
       </div>
       <h2 className="text-2xl font-bold mb-2">Recommended Product</h2>
 
@@ -358,7 +358,7 @@ export function Step3Recommendation({
             {allDownloaded ? (
               <CheckCircle2 className="w-5 h-5 text-green-600" />
             ) : (
-              <AlertCircle className={`w-5 h-5 ${hasDownloadedForms ? "text-blue-600" : "text-amber-600"}`} />
+              <AlertCircle className={`w-5 h-5 ${hasDownloadedForms ? "text-primary" : "text-amber-600"}`} />
             )}
           </div>
           <div className="flex-1 min-w-0">
@@ -416,7 +416,7 @@ export function Step3Recommendation({
                         className={`flex items-center gap-2 w-full text-left px-3 py-2 rounded-md text-sm transition-colors border ${
                           isDownloaded
                             ? "bg-green-100 border-green-300 text-green-800 hover:bg-green-200"
-                            : "bg-white border-gray-200 text-gray-700 hover:bg-blue-50 hover:border-blue-300"
+                            : "bg-white border-gray-200 text-gray-700 hover:bg-primary/5 hover:border-blue-300"
                         } disabled:opacity-60 disabled:cursor-not-allowed`}
                       >
                         {isDownloaded ? (
@@ -426,7 +426,7 @@ export function Step3Recommendation({
                         )}
                         <span className="flex-1 truncate font-medium">{f.name}</span>
                         {isDownloadingThis ? (
-                          <span className="text-xs text-blue-600 shrink-0">Downloading…</span>
+                          <span className="text-xs text-primary shrink-0">Downloading…</span>
                         ) : isDownloaded ? (
                           <span className="text-xs text-green-600 shrink-0">Downloaded</span>
                         ) : (

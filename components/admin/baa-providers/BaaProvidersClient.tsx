@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import Link from "next/link";
@@ -59,15 +59,15 @@ export default function BaaProvidersClient() {
   }, [refresh, role, status]);
 
   if (status === "idle" || status === "loading") {
-    return <div className="min-h-screen bg-[#F8F9FB]" />;
+    return <div className="min-h-screen bg-slate-50" />;
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FB]">
+    <div className="min-h-screen bg-slate-50">
       <header className="border-b bg-white">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold text-[#18192B]">
+            <h1 className="text-xl font-semibold text-brand-dark">
               BAA Provider Agreements
             </h1>
             <p className="text-sm text-muted-foreground">

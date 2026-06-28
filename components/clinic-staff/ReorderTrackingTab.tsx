@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { apiGet } from "@/lib/apiClient";
@@ -174,7 +174,7 @@ export function ReorderTrackingTab({ role }: ReorderTrackingTabProps) {
                 min={1}
                 value={thresholdInput}
                 onChange={(e) => setThresholdInput(e.target.value)}
-                className="w-20 px-2 py-1 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-20 px-2 py-1 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") void handleSaveThreshold();
                   if (e.key === "Escape") setEditingThreshold(false);
@@ -184,7 +184,7 @@ export function ReorderTrackingTab({ role }: ReorderTrackingTabProps) {
               <button
                 onClick={() => void handleSaveThreshold()}
                 disabled={savingThreshold}
-                className="px-2.5 py-1 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                className="px-2.5 py-1 text-xs font-medium text-white bg-primary rounded-md hover:bg-primary-dark disabled:opacity-50"
               >
                 {savingThreshold ? "Saving..." : "Save"}
               </button>
@@ -206,7 +206,7 @@ export function ReorderTrackingTab({ role }: ReorderTrackingTabProps) {
                     setThresholdInput(String(threshold));
                     setEditingThreshold(true);
                   }}
-                  className="px-2 py-0.5 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded"
+                  className="px-2 py-0.5 text-xs font-medium text-primary hover:text-primary hover:bg-primary/5 rounded"
                 >
                   Edit
                 </button>
@@ -229,7 +229,7 @@ export function ReorderTrackingTab({ role }: ReorderTrackingTabProps) {
             placeholder="Search by patient initials or clinic..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="px-3 py-2 text-sm border border-slate-300 rounded-lg w-full sm:w-72 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 text-sm border border-slate-300 rounded-lg w-full sm:w-72 focus:outline-none focus:ring-2 focus:ring-primary"
           />
           <span className="text-xs text-slate-500">
             {filtered.length} patient{filtered.length !== 1 ? "s" : ""}
@@ -301,7 +301,7 @@ export function ReorderTrackingTab({ role }: ReorderTrackingTabProps) {
                               const rowKey = `${row.initials}-${row.providerId}`;
                               setContactRowId(contactRowId === rowKey ? null : rowKey);
                             }}
-                            className="px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-medium shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                            className="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-medium shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
                           >
                             View Contact
                           </button>
@@ -326,7 +326,7 @@ export function ReorderTrackingTab({ role }: ReorderTrackingTabProps) {
                                   <span className="text-slate-500 w-20 shrink-0">Email</span>
                                   <a
                                     href={`mailto:${row.providerEmail}`}
-                                    className="text-blue-600 hover:underline break-all"
+                                    className="text-primary hover:underline break-all"
                                   >
                                     {row.providerEmail || "N/A"}
                                   </a>
@@ -335,7 +335,7 @@ export function ReorderTrackingTab({ role }: ReorderTrackingTabProps) {
                                   <span className="text-slate-500 w-20 shrink-0">Phone</span>
                                   <a
                                     href={`tel:${row.providerPhone}`}
-                                    className="text-blue-600 hover:underline"
+                                    className="text-primary hover:underline"
                                   >
                                     {row.providerPhone || "N/A"}
                                   </a>
@@ -363,7 +363,7 @@ export function ReorderTrackingTab({ role }: ReorderTrackingTabProps) {
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
@@ -372,7 +372,7 @@ export function ReorderTrackingTab({ role }: ReorderTrackingTabProps) {
                   setCurrentPage((p) => Math.min(totalPages, p + 1))
                 }
                 disabled={currentPage === totalPages}
-                className="px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
               </button>

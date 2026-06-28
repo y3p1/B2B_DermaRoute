@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -410,7 +410,7 @@ export default function BvVerificationModal({
               <section className="bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="p-2 bg-blue-100 rounded-lg">
-                    <FileText className="w-5 h-5 text-blue-600" />
+                    <FileText className="w-5 h-5 text-primary" />
                   </div>
                   <h3 className="text-lg font-bold text-slate-900 tracking-tight">
                     Manufacturer Proof Review
@@ -449,7 +449,7 @@ export default function BvVerificationModal({
                         rel="noreferrer"
                         className="flex items-center gap-2.5 px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg text-sm font-bold shadow-sm hover:shadow hover:bg-slate-50 transition-all group"
                       >
-                        <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
+                        <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-primary transition-colors" />
                         View Uploaded Proof
                       </a>
                     ) : (
@@ -473,7 +473,7 @@ export default function BvVerificationModal({
                           type="button"
                           onClick={() => handleVerifyProof("verified")}
                           disabled={verifyingProof || bv.proofStatus === "verified"}
-                          className="px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm flex items-center gap-2"
+                          className="px-4 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm flex items-center gap-2"
                         >
                           {verifyingProof ? "Reviewing..." : "Approve Proof"}
                         </button>
@@ -513,7 +513,7 @@ export default function BvVerificationModal({
                   <button
                     type="button"
                     onClick={() => setIsEditing(true)}
-                    className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                    className="px-6 py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-lg transition-colors"
                   >
                     Edit
                   </button>

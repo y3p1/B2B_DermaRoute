@@ -250,7 +250,7 @@ export default function AdminBaaAgreementPage6(
                   <button
                     type="button"
                     onClick={onClearSignature}
-                    className="text-blue-600 text-xs underline mt-2"
+                    className="text-primary text-xs underline mt-2"
                   >
                     Clear
                   </button>

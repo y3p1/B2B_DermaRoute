@@ -176,7 +176,7 @@ export default function SignupStep3Agreement({
             <button
               type="button"
               onClick={downloadPDFAndContinue}
-              className="flex items-center gap-2 px-5 py-2 font-semibold rounded shadow mt-2 bg-blue-600 hover:bg-blue-700 text-white"
+              className="flex items-center gap-2 px-5 py-2 font-semibold rounded shadow mt-2 bg-primary hover:bg-primary-dark text-white"
             >
               <Download size={20} /> Print Document
             </button>

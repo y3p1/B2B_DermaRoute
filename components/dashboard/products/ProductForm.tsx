@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import type { Product } from "./ProductList";
 
 type ProductFormProps = {
@@ -94,7 +94,7 @@ export default function ProductForm({
       <div className="flex gap-2">
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-1 rounded"
+          className="bg-primary text-white px-4 py-1 rounded"
         >
           Save
         </button>

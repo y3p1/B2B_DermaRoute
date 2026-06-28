@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import {
@@ -99,7 +99,7 @@ export default function BaaProviderViewModal({
         onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogHeader className="px-6 pt-6 shrink-0">
-          <DialogTitle className="text-2xl font-bold text-[#18192B]">
+          <DialogTitle className="text-2xl font-bold text-brand-dark">
             BAA Provider Agreement
           </DialogTitle>
         </DialogHeader>
@@ -166,7 +166,7 @@ export default function BaaProviderViewModal({
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="px-6 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                  className="px-6 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
                 >
                   Close
                 </button>

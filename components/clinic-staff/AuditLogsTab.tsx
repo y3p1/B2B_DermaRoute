@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { useAuthStore } from "@/store/auth";
@@ -347,7 +347,7 @@ export function AuditLogsTab() {
                     setFilterTable(e.target.value);
                     setPage(1);
                   }}
-                  className="px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">All tables</option>
                   {tableNames.map((t) => (
@@ -368,7 +368,7 @@ export function AuditLogsTab() {
                     setFilterAction(e.target.value);
                     setPage(1);
                   }}
-                  className="px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">All actions</option>
                   <option value="INSERT">Insert</option>
@@ -391,7 +391,7 @@ export function AuditLogsTab() {
                       setPage(1);
                     }}
                     placeholder="Search by ID..."
-                    className="pl-7 pr-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-48"
+                    className="pl-7 pr-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary w-48"
                   />
                 </div>
               </div>

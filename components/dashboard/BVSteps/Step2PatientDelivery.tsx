@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { useForm } from "react-hook-form";
@@ -79,7 +79,7 @@ export function Step2PatientDelivery({
         <span className="text-sm text-gray-600">Step 2 of 3</span>
       </div>
       <div className="mb-4 w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-        <div className="h-full bg-blue-600" style={{ width: "66%" }} />
+        <div className="h-full bg-primary" style={{ width: "66%" }} />
       </div>
       <h2 className="text-2xl font-bold mb-4">Patient & Delivery Info</h2>
       <div className="bg-red-100 border border-red-300 rounded-lg p-3 mb-6 text-red-800 font-semibold">
@@ -216,7 +216,7 @@ export function Step2PatientDelivery({
             </Button>
             <Button
               type="submit"
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+              className="flex-1 bg-primary hover:bg-primary-dark text-white"
             >
               Get Product Recommendation
             </Button>

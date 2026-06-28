@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import {
@@ -72,7 +72,7 @@ export default function DataTable<TData, TValue>({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
                 key={headerGroup.id}
-                className="bg-[#18192B] text-white text-left !hover:bg-[#18192B]"
+                className="bg-brand-dark text-white text-left !hover:bg-brand-dark"
               >
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id}>

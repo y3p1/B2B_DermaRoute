@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 
 export interface Product {
   id: number;
@@ -55,7 +55,7 @@ export default function ProductList({
               <td className="border px-2 py-1">{p.year}</td>
               <td className="border px-2 py-1">
                 <button
-                  className="text-blue-600 mr-2"
+                  className="text-primary mr-2"
                   onClick={() => onEdit?.(p)}
                 >
                   Edit

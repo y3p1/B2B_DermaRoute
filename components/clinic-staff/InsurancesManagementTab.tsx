@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { apiGet } from "@/lib/apiClient";
@@ -158,7 +158,7 @@ export function InsurancesManagementTab() {
     <div className="bg-white rounded-lg shadow p-4">
       <div className="flex items-start justify-between gap-4 mb-3">
         <div>
-          <div className="text-base font-semibold text-[#18192B]">
+          <div className="text-base font-semibold text-brand-dark">
             Insurances
           </div>
           <div className="text-sm text-muted-foreground">
@@ -172,7 +172,7 @@ export function InsurancesManagementTab() {
             setEditingInsurance(null);
             setModalOpen(true);
           }}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors flex items-center gap-2"
+          className="px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-md transition-colors flex items-center gap-2"
         >
           <svg
             className="w-4 h-4"
@@ -212,7 +212,7 @@ export function InsurancesManagementTab() {
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="max-w-sm px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="max-w-sm px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
           <select
             value={commercialFilter}
@@ -222,7 +222,7 @@ export function InsurancesManagementTab() {
               );
               setCurrentPage(1);
             }}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             style={{ height: "38px" }}
           >
             <option value="all">All Types</option>
@@ -235,7 +235,7 @@ export function InsurancesManagementTab() {
         <div className="overflow-hidden rounded-md border">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-[#18192B] text-white text-left">
+              <tr className="bg-brand-dark text-white text-left">
                 <th className="py-3 px-3 font-medium">Name</th>
                 <th className="py-3 px-3 font-medium">Commercial</th>
                 <th className="py-3 px-3 font-medium">Actions</th>
@@ -298,7 +298,7 @@ export function InsurancesManagementTab() {
                             setEditingInsurance(insurance);
                             setModalOpen(true);
                           }}
-                          className="px-3 py-1 rounded-md bg-blue-600 text-white text-sm font-medium shadow hover:bg-blue-700 transition-colors"
+                          className="px-3 py-1 rounded-md bg-primary text-white text-sm font-medium shadow hover:bg-primary-dark transition-colors"
                         >
                           Edit
                         </button>
@@ -446,7 +446,7 @@ function InsuranceFormModal({
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="e.g. Aetna, UnitedHealthcare…"
               />
             </div>
@@ -495,7 +495,7 @@ function InsuranceFormModal({
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark disabled:opacity-50"
               >
                 {submitting ? "Saving..." : "Save"}
               </button>
