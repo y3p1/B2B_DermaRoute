@@ -538,12 +538,12 @@ export default function ClinicStaffDashboardClient({
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="h-screen bg-slate-50 flex flex-col">
       <DashboardNavbar onMenuToggle={() => setSidebarOpen(true)} />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Desktop sidebar */}
-        <aside className="hidden lg:flex flex-col w-64 bg-brand-dark border-r border-white/10 shrink-0 sticky top-18 h-[calc(100vh-72px)] overflow-y-auto">
+        <aside className="hidden lg:flex flex-col w-64 bg-brand-dark border-r border-white/10 shrink-0 h-full overflow-y-auto">
           {renderSidebar()}
         </aside>
 

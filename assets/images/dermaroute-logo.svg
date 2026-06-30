@@ -5,12 +5,15 @@
       <stop offset="100%" stop-color="#C5573A"/>
     </linearGradient>
   </defs>
-  <!-- Icon mark: rounded square with orange gradient -->
-  <rect x="0" y="5" width="40" height="40" rx="11" fill="url(#iconGrad)"/>
-  <!-- Hexagon shape (scaled to fit 40x40 icon, centered) -->
-  <path d="M20 11L27.5 16V26L20 31L12.5 26V16L20 11Z" stroke="white" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
-  <!-- Cross mark inside hexagon -->
-  <path d="M14 21H26M20 15V27" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Icon mark: rounded hexagon with orange gradient -->
+  <path d="M10.5 7 L29.5 7 L39 25 L29.5 43 L10.5 43 L1 25 Z" fill="url(#iconGrad)" stroke="url(#iconGrad)" stroke-width="4" stroke-linejoin="round"/>
+  <!-- Atom / molecule mark inside hexagon -->
+  <circle cx="20" cy="16" r="2.1" fill="none" stroke="white" stroke-width="1.4"/>
+  <circle cx="13.5" cy="30" r="2.1" fill="none" stroke="white" stroke-width="1.4"/>
+  <circle cx="26.5" cy="30" r="2.1" fill="none" stroke="white" stroke-width="1.4"/>
+  <path d="M20 18.1V23M20 23L13.5 27.9M20 23L26.5 27.9" stroke="white" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M11.5 17C9 19.5 8.5 23 9.8 26.5" stroke="white" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M28.5 17C31 19.5 31.5 23 30.2 26.5" stroke="white" stroke-width="1.2" fill="none" stroke-linecap="round"/>
   <!-- Wordmark "DermaRoute" -->
   <text x="50" y="33"
     font-family="Georgia, 'Times New Roman', serif"
