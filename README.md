@@ -4,8 +4,6 @@ DermaRoute is a **public demonstration and portfolio adaptation** of a privately
 
 The system centralizes provider ordering operations across three clinical service lines — wound care tissue products, lymphedema/compression devices, and ocular therapeutics — automating benefits verification, managing medical product fulfillment, capturing compliance agreements electronically, and giving administrators full operational visibility across the procurement lifecycle.
 
-> See [`SYSTEM_OVERVIEW.md`](./SYSTEM_OVERVIEW.md) for complete technical documentation: schema, API routes, middleware pipeline, email triggers, and more.
-
 ---
 
 ## Live Demo
