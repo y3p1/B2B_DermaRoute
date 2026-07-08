@@ -2,7 +2,7 @@ import type { Request, Response } from "../http/types";
 
 import { getProviderProfileByUserId } from "../services/bvRequests.service";
 import { getAdminProfileByUserId } from "../services/adminAcct.service";
-import { getClinicStaffProfileByUserId } from "../services/clinicStaffAcct.service";
+import { getClinicStaffProfileByUserId, getClinicStaffById } from "../services/clinicStaffAcct.service";
 import {
   updateProviderProfile,
   updateProviderProfileSchema,
@@ -82,6 +82,10 @@ export async function meController(_req: Request, res: Response) {
         }
       : null;
 
+    const assignedRep = isProvider
+      ? { firstName: "Alex", lastName: "Patel", accountPhone: "+15550001003", email: "demo-clinicstaff@dermaroute-demo.example.com" }
+      : null;
+
     return res.json({
       success: true,
       data: {
@@ -90,6 +94,7 @@ export async function meController(_req: Request, res: Response) {
         role: isProvider ? "provider" : demoRole === "admin" ? "admin" : "clinic_staff",
         provider: providerMock,
         admin: adminMock,
+        assignedRep,
         enabledTracks: tracks,
       },
     });
@@ -135,6 +140,10 @@ export async function meController(_req: Request, res: Response) {
 
   const enabledTracks = provider ? await getEnabledTracks(provider.id) : [];
 
+  const assignedRep = provider?.assignedRepId
+    ? await getClinicStaffById(provider.assignedRepId)
+    : null;
+
   return res.json({
     success: true,
     data: {
@@ -148,6 +157,7 @@ export async function meController(_req: Request, res: Response) {
       role,
       provider,
       admin: adminLike,
+      assignedRep,
       enabledTracks,
     },
   });

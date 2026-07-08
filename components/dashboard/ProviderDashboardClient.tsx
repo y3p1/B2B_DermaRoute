@@ -1036,7 +1036,16 @@ export default function ProviderDashboardClient() {
                               </span>
                             </td>
                             <td className="px-4 py-3 text-right">
-                              <LymphedemaOrderPdfButton orderId={order.id} token={token} />
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => router.push(`/medical-devices/orders/${order.id}/pdf`)}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+                                >
+                                  View PDF
+                                </button>
+                                <LymphedemaOrderPdfButton orderId={order.id} token={token} />
+                              </div>
                             </td>
                           </tr>
                         ))}

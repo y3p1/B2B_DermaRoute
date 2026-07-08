@@ -308,6 +308,7 @@ export default function MedicalDevicesNewOrderPage() {
   const router = useRouter();
   const token = useAuthStore((s) => s.jwt);
   const provider = useAuthStore((s) => s.provider);
+  const assignedRep = useAuthStore((s) => s.assignedRep);
 
   const [screen, setScreen] = React.useState<Screen>("selector");
   const [step, setStep] = React.useState(0);
@@ -495,8 +496,8 @@ export default function MedicalDevicesNewOrderPage() {
             lastName,
             fullName: formData.patientFullName,
             dob: "",
-            salesRepName: provider?.clinicName ?? "",
-            salesRepPhone: provider?.clinicPhone ?? provider?.accountPhone ?? "",
+            salesRepName: assignedRep ? `${assignedRep.firstName} ${assignedRep.lastName}` : "",
+            salesRepPhone: assignedRep?.accountPhone ?? "",
             faxOrderTo: formData.faxOrderTo || undefined,
             orderDate: formData.orderDate,
             orderType: formData.orderType,
@@ -686,16 +687,16 @@ export default function MedicalDevicesNewOrderPage() {
                   <div>
                     <Label className="text-xs text-slate-600 mb-1 block">Sales Rep Name</Label>
                     <div className="h-9 flex items-center gap-2 px-3 rounded-md border border-slate-200 bg-slate-50 text-sm text-slate-600">
-                      🔒 {provider?.clinicName ?? "—"}
+                      🔒 {assignedRep ? `${assignedRep.firstName} ${assignedRep.lastName}` : "—"}
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-1">Auto-filled from your account</p>
+                    <p className="text-[10px] text-slate-400 mt-1">Auto-filled from your assigned DR Representative</p>
                   </div>
                   <div>
                     <Label className="text-xs text-slate-600 mb-1 block">Sales Rep Phone</Label>
                     <div className="h-9 flex items-center gap-2 px-3 rounded-md border border-slate-200 bg-slate-50 text-sm text-slate-600">
-                      🔒 {provider?.clinicPhone ?? provider?.accountPhone ?? "—"}
+                      🔒 {assignedRep?.accountPhone ?? "—"}
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-1">Auto-filled from your account</p>
+                    <p className="text-[10px] text-slate-400 mt-1">Auto-filled from your assigned DR Representative</p>
                   </div>
                 </div>
               </div>
@@ -1122,8 +1123,8 @@ export default function MedicalDevicesNewOrderPage() {
               <ReviewSection title="Order Information">
                 <ReviewRow label="Patient" value={formData.patientFullName} />
                 <ReviewRow label="Order Date" value={formData.orderDate} />
-                <ReviewRow label="Sales Rep" value={provider?.clinicName ?? "—"} />
-                <ReviewRow label="Rep Phone" value={provider?.clinicPhone ?? provider?.accountPhone ?? "—"} />
+                <ReviewRow label="Sales Rep" value={assignedRep ? `${assignedRep.firstName} ${assignedRep.lastName}` : "—"} />
+                <ReviewRow label="Rep Phone" value={assignedRep?.accountPhone ?? "—"} />
                 {formData.faxOrderTo && <ReviewRow label="Fax To" value={formData.faxOrderTo} />}
               </ReviewSection>
 

@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, FileText } from "lucide-react";
 import { apiGet } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
 
@@ -168,6 +168,16 @@ export default function MedicalDevicesOrderDetailPage() {
             <Field label="Submitted" value={order.submittedAt ? new Date(order.submittedAt).toLocaleString() : "Pending"} />
             <Field label="Email Sent To" value={order.submissionEmailUsed} />
           </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/medical-devices/orders/${id}/pdf`}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 transition-colors"
+          >
+            <FileText className="w-4 h-4" />
+            View PDF
+          </Link>
         </div>
       </div>
     </div>

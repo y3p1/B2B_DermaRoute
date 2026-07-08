@@ -741,7 +741,7 @@ export function ReMarxOrderDocument({ data }: { data: LymphedemaFormData }) {
   );
 }
 
-type LymphedemaOrderForPdf = {
+export type LymphedemaOrderForPdf = {
   id: string;
   status: string;
   patient: {
@@ -770,7 +770,7 @@ type LymphedemaOrderForPdf = {
   createdAt: string | null;
 };
 
-function orderToFormData(order: LymphedemaOrderForPdf): LymphedemaFormData {
+export function orderToFormData(order: LymphedemaOrderForPdf): LymphedemaFormData {
   return {
     insurance: order.insurance ?? "",
     placeOfService: order.placeOfService ?? "",

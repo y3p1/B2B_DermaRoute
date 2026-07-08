@@ -141,6 +141,11 @@ export async function seedDemoLymphedemaOrders(): Promise<number> {
 
   const rows = ORDERS.map((o) => ({
     ...o,
+    diagnosis: Object.values(o.diagnosis),
+    extremity: Object.values(o.extremity),
+    skinChanges: Object.entries(o.skinChanges)
+      .filter(([, v]) => v)
+      .map(([k]) => k),
     providerId,
     submittedBy: providerId,
     orderingProviderId: providerId,

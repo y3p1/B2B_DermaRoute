@@ -53,6 +53,13 @@ type MeResponse = {
       createdAt: string | null;
       updatedAt: string | null;
     } | null;
+    assignedRep: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      accountPhone: string;
+      email: string;
+    } | null;
   };
 };
 
@@ -69,6 +76,7 @@ interface AuthState {
   user: MeResponse["data"]["user"] | null;
   provider: MeResponse["data"]["provider"] | null;
   admin: MeResponse["data"]["admin"] | null;
+  assignedRep: MeResponse["data"]["assignedRep"] | null;
   role: string | null;
   accountType: MeResponse["data"]["accountType"] | null;
   enabledTracks: TrackKey[];
@@ -80,6 +88,7 @@ interface AuthState {
     user: MeResponse["data"]["user"];
     provider: MeResponse["data"]["provider"];
     admin: MeResponse["data"]["admin"];
+    assignedRep: MeResponse["data"]["assignedRep"];
     role: string;
     accountType: MeResponse["data"]["accountType"];
     enabledTracks: TrackKey[];
@@ -97,19 +106,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   provider: null,
   admin: null,
+  assignedRep: null,
   role: null,
   accountType: null,
   enabledTracks: [],
   error: null,
 
   setJwt: (jwt) => set({ jwt }),
-  setAuthenticated: ({ jwt, user, provider, admin, role, accountType, enabledTracks }) =>
+  setAuthenticated: ({ jwt, user, provider, admin, assignedRep, role, accountType, enabledTracks }) =>
     set({
       status: "authenticated",
       jwt,
       user,
       provider,
       admin,
+      assignedRep,
       role,
       accountType,
       enabledTracks,
@@ -122,6 +133,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       user: null,
       provider: null,
       admin: null,
+      assignedRep: null,
       role: null,
       accountType: null,
       enabledTracks: [],
@@ -143,6 +155,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           user: me.data.user,
           provider: me.data.provider,
           admin: me.data.admin,
+          assignedRep: me.data.assignedRep ?? null,
           role: me.data.role,
           accountType: me.data.accountType,
           enabledTracks: me.data.enabledTracks ?? [],
@@ -155,6 +168,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           user: null,
           provider: null,
           admin: null,
+          assignedRep: null,
           role: null,
           accountType: null,
           enabledTracks: [],
@@ -180,6 +194,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: null,
         provider: null,
         admin: null,
+        assignedRep: null,
         role: null,
         accountType: null,
         enabledTracks: [],
@@ -196,6 +211,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: null,
         provider: null,
         admin: null,
+        assignedRep: null,
         role: null,
         accountType: null,
         enabledTracks: [],
@@ -213,6 +229,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: me.data.user,
         provider: me.data.provider,
         admin: me.data.admin,
+        assignedRep: me.data.assignedRep ?? null,
         role: me.data.role,
         accountType: me.data.accountType,
         enabledTracks: me.data.enabledTracks ?? [],
@@ -226,6 +243,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           user: null,
           provider: null,
           admin: null,
+          assignedRep: null,
           role: null,
           accountType: null,
           enabledTracks: [],
@@ -242,6 +260,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: null,
         provider: null,
         admin: null,
+        assignedRep: null,
         role: null,
         accountType: null,
         enabledTracks: [],
@@ -259,6 +278,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       user: null,
       provider: null,
       admin: null,
+      assignedRep: null,
       role: null,
       accountType: null,
       enabledTracks: [],
@@ -281,6 +301,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       user: null,
       provider: null,
       admin: null,
+      assignedRep: null,
       role: null,
       accountType: null,
       enabledTracks: [],

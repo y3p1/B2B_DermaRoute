@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Wind, RefreshCw, ChevronDown } from "lucide-react";
 import { apiGet, apiPatch } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
@@ -53,6 +54,7 @@ function patientName(patient: Patient | null): string {
 }
 
 export function LymphedemaOrdersTab() {
+  const router = useRouter();
   const token = useAuthStore((s) => s.jwt);
   const [rows, setRows] = React.useState<LymphedemaOrderRow[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -217,6 +219,12 @@ export function LymphedemaOrdersTab() {
                           <div><span className="font-medium">Order ID:</span> <span className="font-mono">{row.id}</span></div>
                         </div>
                         <div className="flex items-center gap-2 pt-2 border-t border-slate-200">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); router.push(`/medical-devices/orders/${row.id}/pdf`); }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+                          >
+                            View PDF
+                          </button>
                           <button
                             onClick={(e) => { e.stopPropagation(); void handleSendEmail(row.id); }}
                             disabled={sendingEmailId === row.id}

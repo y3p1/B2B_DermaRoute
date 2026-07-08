@@ -14,6 +14,23 @@ export async function getClinicStaffProfileByUserId(userId: string) {
   return rows[0] ?? null;
 }
 
+export async function getClinicStaffById(id: string) {
+  const db = getDb();
+  const rows = await db
+    .select({
+      id: clinicStaffAcct.id,
+      firstName: clinicStaffAcct.firstName,
+      lastName: clinicStaffAcct.lastName,
+      accountPhone: clinicStaffAcct.accountPhone,
+      email: clinicStaffAcct.email,
+    })
+    .from(clinicStaffAcct)
+    .where(eq(clinicStaffAcct.id, id))
+    .limit(1);
+
+  return rows[0] ?? null;
+}
+
 /**
  * Get all active clinic staff email addresses for sending notifications
  */
