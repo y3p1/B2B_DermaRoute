@@ -5,6 +5,7 @@ import {
   text,
   jsonb,
   timestamp,
+  index,
 } from "drizzle-orm/pg-core";
 
 // Audit Logs — captures every INSERT, UPDATE, DELETE on audited tables.
@@ -19,4 +20,8 @@ export const auditLogs = pgTable("audit_logs", {
   oldData: jsonb("old_data"), // row snapshot before change (null for INSERT)
   newData: jsonb("new_data"), // row snapshot after change (null for DELETE)
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-});
+}, (t) => [
+  index("audit_logs_table_name_idx").on(t.tableName),
+  index("audit_logs_action_idx").on(t.action),
+  index("audit_logs_created_at_idx").on(t.createdAt),
+]);

@@ -11,6 +11,7 @@ import {
 import { providerAcct } from "./provider";
 import { ocularProducts } from "./ocular-products";
 
+// RLS policies: supabase/rls/ocular_orders.sql (finding #12)
 export const ocularOrders = pgTable("ocular_orders", {
   id: uuid("id").primaryKey().defaultRandom(),
   providerId: uuid("provider_id").references(() => providerAcct.id, {

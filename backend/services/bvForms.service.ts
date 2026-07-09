@@ -3,6 +3,7 @@ import { eq, ilike, or, and, isNull, inArray, SQL, sql, exists } from "drizzle-o
 import { getDb } from "./db";
 import { bvForms } from "../../db/bv-forms";
 import { manufacturers } from "../../db/manufacturers";
+import { escapeLikeWildcards } from "../utils/sanitize";
 import { getSupabaseAdminClient } from "./supabaseAdmin";
 
 // ─── Validation schemas ──────────────────────────────────────────────────────
@@ -47,9 +48,10 @@ export async function listBvForms(filters?: {
     conditions.push(eq(bvForms.manufacturer, filters.manufacturer));
   } else if (filters?.search) {
     // Simple full-text search across name and manufacturer
+    const escaped = escapeLikeWildcards(filters.search);
     const searchCond = or(
-      ilike(bvForms.name, `%${filters.search}%`),
-      ilike(bvForms.manufacturer, `%${filters.search}%`),
+      ilike(bvForms.name, `%${escaped}%`),
+      ilike(bvForms.manufacturer, `%${escaped}%`),
     );
     if (searchCond) conditions.push(searchCond);
   }

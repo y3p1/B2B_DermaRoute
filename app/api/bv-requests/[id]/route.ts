@@ -171,3 +171,11 @@ export async function PATCH(
     errorHandler,
   });
 }
+
+export async function OPTIONS(request: NextRequest) {
+  return runServerPipeline(request, {
+    middlewares: [cors],
+    handler: (_req, res) => res.status(204).end(),
+    errorHandler,
+  });
+}

@@ -167,7 +167,7 @@ export async function createCmsPolicyUpdate(data: {
       sourceName: data.sourceName || null,
       publishedAt: data.publishedAt ? new Date(data.publishedAt) : null,
       summary: data.summary || null,
-      keywords: data.keywords ? JSON.stringify(data.keywords) : null,
+      keywords: data.keywords ?? null,
       impactLevel: data.impactLevel || "medium",
     })
     .returning();

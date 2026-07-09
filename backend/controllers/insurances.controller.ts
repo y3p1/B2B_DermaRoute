@@ -8,6 +8,7 @@ import {
   createInsuranceSchema,
   updateInsuranceSchema,
 } from "../services/insurances.service";
+import { isHttpError } from "../utils/httpError";
 
 type PostgresErrorLike = {
   code?: unknown;
@@ -91,32 +92,19 @@ export async function createInsuranceController(req: Request, res: Response) {
         });
       }
 
-      // Surface the underlying Postgres cause (useful for debugging staging env mismatches)
+      console.error("Postgres error creating insurance:", pg.code, pg.message);
       return res.status(500).json({
         success: false,
         error: "Failed to create insurance",
-        details: {
-          code: pg.code,
-          message: typeof pg.message === "string" ? pg.message : null,
-          detail: typeof pg.detail === "string" ? pg.detail : null,
-          constraint:
-            typeof pg.constraint_name === "string" ? pg.constraint_name : null,
-          table: typeof pg.table_name === "string" ? pg.table_name : null,
-          column: typeof pg.column_name === "string" ? pg.column_name : null,
-          schema: typeof pg.schema_name === "string" ? pg.schema_name : null,
-        },
       });
     }
 
-    const message =
-      error instanceof Error ? error.message : "Failed to create insurance";
-    return res
-      .status(500)
-      .json({
-        success: false,
-        error: "Failed to create insurance",
-        details: message,
-      });
+    // Finding #34: don't leak raw internal error details (e.g. DB messages) to the client.
+    console.error("Error creating insurance:", error);
+    return res.status(500).json({
+      success: false,
+      error: "Failed to create insurance",
+    });
   }
 }
 
@@ -160,6 +148,11 @@ export async function deleteInsuranceController(req: Request, res: Response) {
 
     return res.json({ success: true, data: insurance });
   } catch (error) {
+    if (isHttpError(error)) {
+      return res
+        .status(error.status)
+        .json({ success: false, error: error.message });
+    }
     const message =
       error instanceof Error ? error.message : "Failed to delete insurance";
     return res.status(500).json({ success: false, error: message });

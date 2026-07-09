@@ -86,10 +86,14 @@ export function LymphedemaOrdersTab() {
     if (!token) return;
     setSendingEmailId(id);
     try {
-      await fetch(`/api/lymphedema-orders/${id}/send-email`, {
+      const res = await fetch(`/api/lymphedema-orders/${id}/send-email`, {
         method: "POST",
         headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
       });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `Email failed (${res.status})`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to send email");
     } finally {

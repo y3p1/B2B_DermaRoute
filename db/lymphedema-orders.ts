@@ -11,6 +11,7 @@ import {
 import { providerAcct } from "./provider";
 import { lymphedemaProducts } from "./lymphedema-products";
 
+// RLS policies: supabase/rls/lymphedema_orders.sql (finding #12)
 export const lymphedemaOrders = pgTable("lymphedema_orders", {
   id: uuid("id").primaryKey().defaultRandom(),
   providerId: uuid("provider_id").references(() => providerAcct.id, {

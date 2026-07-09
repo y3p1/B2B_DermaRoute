@@ -299,7 +299,8 @@ export async function getWoundCases(): Promise<WoundCaseRow[]> {
         eq(bvRequests.status, "approved"),
         eq(bvRequests.healingTrackerActive, true)
       )
-    );
+    )
+    .limit(1000);
 
   if (bvRows.length === 0) return [];
 
@@ -570,18 +571,18 @@ export async function listApprovedBvOptions(): Promise<WoundCaseOption[]> {
  */
 export async function deleteWoundCase(bvRequestId: string) {
   const db = getDb();
-  
-  // Set the healing tracker flag to false to hide it
-  await db
-    .update(bvRequests)
-    .set({ healingTrackerActive: false })
-    .where(eq(bvRequests.id, bvRequestId));
 
-  // Also delete its measurements history so it's clean if reactivated later
-  const deleted = await db
-    .delete(woundMeasurements)
-    .where(eq(woundMeasurements.bvRequestId, bvRequestId))
-    .returning();
-    
-  return { deletedCount: deleted.length, hidden: true };
+  return db.transaction(async (tx) => {
+    await tx
+      .update(bvRequests)
+      .set({ healingTrackerActive: false })
+      .where(eq(bvRequests.id, bvRequestId));
+
+    const deleted = await tx
+      .delete(woundMeasurements)
+      .where(eq(woundMeasurements.bvRequestId, bvRequestId))
+      .returning();
+
+    return { deletedCount: deleted.length, hidden: true };
+  });
 }

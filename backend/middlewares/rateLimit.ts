@@ -8,6 +8,13 @@ type RateLimitOptions = {
 
 type Entry = { count: number; resetAt: number };
 
+// KNOWN LIMITATION (finding #10): this store is an in-memory Map scoped to a single
+// serverless function instance. On Vercel, each cold start / concurrent instance gets
+// its own Map, so counters do not persist or share state across instances. This limiter
+// is a best-effort defense-in-depth layer only — the authoritative rate limiting for this
+// deployment is enforced externally at Vercel's Edge/WAF layer. A durable fix would swap
+// this Map for a shared store (e.g. Upstash Redis) if per-instance limiting proves
+// insufficient.
 export function rateLimit(options: RateLimitOptions) {
   const store = new Map<string, Entry>();
 

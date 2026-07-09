@@ -3,6 +3,7 @@ import { getDb } from "./db";
 import { coveragePlans, policyMonitors } from "../../db/coverage-plans";
 import { insurances } from "../../db/insurances";
 import { createHash } from "crypto";
+import { isUrlSafe } from "../utils/sanitize";
 
 // ─── Coverage Plans CRUD ────────────────────────────────────────────────────
 
@@ -165,6 +166,9 @@ export async function deleteCoveragePlan(id: string) {
 // ─── Policy Monitor URL Check ───────────────────────────────────────────────
 
 export async function addPolicyMonitor(coveragePlanId: string, monitorUrl: string) {
+  if (!isUrlSafe(monitorUrl)) {
+    throw new Error("Invalid or blocked monitor URL");
+  }
   const db = getDb();
   const [monitor] = await db
     .insert(policyMonitors)
@@ -193,6 +197,10 @@ export async function checkPolicyUrl(monitorId: string): Promise<{
 
   if (!monitor) {
     return { changed: false, status: 0, error: "Monitor not found" };
+  }
+
+  if (!isUrlSafe(monitor.monitorUrl)) {
+    return { changed: false, status: 0, error: "Blocked URL" };
   }
 
   try {

@@ -1,5 +1,17 @@
 ﻿import sgMail, { MailDataRequired } from "@sendgrid/mail";
 import { isDemoMode } from "../../lib/demoMode";
+import { escapeHtml } from "../utils/sanitize";
+
+function escapeStringFields<T>(obj: T): T {
+  if (typeof obj !== "object" || obj === null) return obj;
+  const result = { ...obj } as Record<string, unknown>;
+  for (const key of Object.keys(result)) {
+    if (typeof result[key] === "string") {
+      result[key] = escapeHtml(result[key] as string);
+    }
+  }
+  return result as T;
+}
 
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 
@@ -14,7 +26,6 @@ export interface SendEmailParams {
   subject: string;
   text?: string;
   html?: string;
-  from?: string;
 }
 
 export async function sendEmail(params: SendEmailParams) {
@@ -27,12 +38,11 @@ export async function sendEmail(params: SendEmailParams) {
     throw new Error("SendGrid API key is not configured");
   }
 
-  const { to, subject, text, html, from } = params;
+  const { to, subject, text, html } = params;
 
   const msg: MailDataRequired = {
     to,
-    from:
-      from || process.env.SENDGRID_FROM_EMAIL || "noreply@integritytissue.com",
+    from: process.env.SENDGRID_FROM_EMAIL || "noreply@integritytissue.com",
     subject,
     text: text || "",
     html: html || "",
@@ -93,13 +103,7 @@ export async function sendTestEmail(to: string) {
 export async function sendBatchEmail(
   params: Omit<SendEmailParams, "to"> & { recipients: string[] },
 ) {
-  console.log("📬 [sendBatchEmail] Function called");
-  console.log(
-    "📬 [sendBatchEmail] Recipients count:",
-    params.recipients.length,
-  );
-  console.log("📬 [sendBatchEmail] Recipients:", params.recipients);
-  console.log("📬 [sendBatchEmail] Subject:", params.subject);
+  console.log(`📬 [sendBatchEmail] ${params.recipients.length} recipient(s)`);
 
   if (isDemoMode()) {
     console.log("[DEMO] Batch email suppressed:", { recipients: params.recipients.length, subject: params.subject });
@@ -111,14 +115,14 @@ export async function sendBatchEmail(
     throw new Error("SendGrid API key is not configured");
   }
 
-  const { recipients: rawRecipients, subject, text, html, from } = params;
+  const { recipients: rawRecipients, subject, text, html } = params;
 
   // Filter out invalid email addresses to prevent SendGrid 400 errors
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const recipients = rawRecipients.filter((email) => {
     const isValid = emailRegex.test(email);
     if (!isValid) {
-      console.warn(`⚠️ [sendBatchEmail] Skipping invalid email address: "${email}"`);
+      console.warn(`⚠️ [sendBatchEmail] Skipping 1 invalid email address`);
     }
     return isValid;
   });
@@ -136,21 +140,14 @@ export async function sendBatchEmail(
   // Each recipient will receive their own email (they won't see other recipients)
   const msg: MailDataRequired = {
     to: recipients,
-    from:
-      from || process.env.SENDGRID_FROM_EMAIL || "noreply@integritytissue.com",
+    from: process.env.SENDGRID_FROM_EMAIL || "noreply@integritytissue.com",
     subject,
     text: text || "",
     html: html || "",
   };
 
   try {
-    console.log(`🚀 [SendGrid-Batch] Sending email via SendGrid API...`);
     const response = await sgMail.send(msg);
-    console.log(`✅ [SendGrid-Batch] Email sent successfully!`);
-    console.log(`✅ [SendGrid-Batch] Status code: ${response[0].statusCode}`);
-    console.log(
-      `✅ [SendGrid-Batch] Message ID: ${response[0].headers["x-message-id"]}`,
-    );
     return {
       success: true,
       sent: recipients.length,
@@ -194,10 +191,8 @@ export async function sendBvRequestNotification(
   recipients: string[],
   data: BvNotificationData,
 ) {
+  data = escapeStringFields(data);
   console.log(`📨 [SendGrid] Preparing BV Request notification email...`);
-  console.log(`📨 [SendGrid] Recipients: ${recipients.join(", ")}`);
-  console.log(`📨 [SendGrid] BV Request ID: ${data.bvRequestId}`);
-  console.log(`📨 [SendGrid] Practice: ${data.practiceName}`);
 
   const subject = `New Benefits Verification Request - ${data.patientInitials}`;
   console.log(`📨 [SendGrid] Subject: ${subject}`);
@@ -405,6 +400,7 @@ export async function sendBvStatusNotification(
   recipientEmail: string,
   data: BvStatusNotificationData,
 ) {
+  data = escapeStringFields(data);
   const isApproved = data.status === "approved";
   const statusLabel = isApproved ? "Approved ✅" : "Denied ❌";
   const subject = `BV Request ${isApproved ? "Approved" : "Denied"} - ${data.patientInitials}`;
@@ -613,6 +609,7 @@ export async function sendProviderAccountCreatedNotification(
   recipients: string[],
   data: ProviderAccountCreatedNotificationData & { dashboardUrl: string },
 ) {
+  data = escapeStringFields(data);
   const subject = `New Provider Account Created - ${data.clinicName}`;
 
   const createdAtFormatted = new Date(data.createdAt).toLocaleDateString(
@@ -756,8 +753,6 @@ export async function sendProviderAccountCreatedNotification(
         <div class="footer">
           <p><strong>Derma Route</strong></p>
           <p>This is an automated notification. Please do not reply to this email.</p>
-          ${data.providerAcctId ? `<p>Provider Account ID: ${data.providerAcctId}</p>` : ""}
-          <p>User ID: ${data.providerUserId}</p>
           <p style="margin-top: 12px; font-size: 12px; color: #9ca3af;">Confidential & HIPAA Compliant Communication</p>
         </div>
       </div>
@@ -811,6 +806,7 @@ export async function sendBaaStatusNotificationToProvider(
   recipientEmail: string,
   data: BaaStatusNotificationToProviderData,
 ) {
+  data = escapeStringFields(data);
   const isApproved = data.status === "approved";
   const statusLabel = isApproved ? "Approved ✅" : "Cancelled ❌";
   const subject = `Your Business Associate Agreement has been ${isApproved ? "Approved" : "Cancelled"} - ${data.clinicName}`;
@@ -992,10 +988,7 @@ export async function sendBaaAgreementNotification(
   recipients: string[],
   data: BaaNotificationData,
 ) {
-  console.log(`📨 [SendGrid] Preparing BAA notification email...`);
-  console.log(`📨 [SendGrid] Recipients: ${recipients.join(", ")}`);
-  console.log(`📨 [SendGrid] BAA ID: ${data.baaId}`);
-  console.log(`📨 [SendGrid] Clinic: ${data.clinicName}`);
+  data = escapeStringFields(data);
 
   const subject = `New Business Associate Agreement - ${data.clinicName}`;
   console.log(`📨 [SendGrid] Subject: ${subject}`);
@@ -1193,11 +1186,7 @@ export async function sendOrderSubmissionNotification(
   recipients: string[],
   data: OrderSubmissionNotificationData,
 ) {
-  console.log(`📨 [SendGrid] Preparing Order Submission notification email...`);
-  console.log(`📨 [SendGrid] Recipients: ${recipients.join(", ")}`);
-  console.log(`📨 [SendGrid] Order ID: ${data.orderId}`);
-  console.log(`📨 [SendGrid] Practice: ${data.practiceName}`);
-
+  data = escapeStringFields(data);
   const subject = `New Product Order - ${data.patientInitials} | ${data.productName}`;
 
   const deliveryAddressFull = [
@@ -1405,6 +1394,7 @@ export async function sendOrderSubmissionConfirmationToProvider(
   recipientEmail: string,
   data: OrderSubmissionNotificationData,
 ) {
+  data = escapeStringFields(data);
   const subject = `Order Received - Patient ${data.patientInitials} | ${data.productName}`;
 
   const deliveryAddressFull = [
@@ -1677,6 +1667,7 @@ export async function sendOrderStatusNotificationToProvider(
   recipientEmail: string,
   data: OrderStatusNotificationData,
 ) {
+  data = escapeStringFields(data);
   const cfg = ORDER_STATUS_CONFIG[data.status];
   const statusCapitalized = data.status.charAt(0).toUpperCase() + data.status.slice(1);
   const subject = `Product Order ${statusCapitalized} - Patient ${data.patientInitials}`;
@@ -1800,6 +1791,7 @@ export async function sendPendingItsRepNotification(
   adminEmails: string[],
   data: { name: string; email: string; phone: string },
 ) {
+  data = escapeStringFields(data);
   if (adminEmails.length === 0) return;
 
   const subject = `New ITS Representative Pending Approval - ${data.name}`;

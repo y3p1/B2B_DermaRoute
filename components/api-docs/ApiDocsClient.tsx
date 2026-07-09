@@ -6,11 +6,27 @@ export default function ApiDocsClient() {
 
   useEffect(() => {
     fetch("/api/api-documentation")
-      .then((res) => res.text())
-      .then(async (md) => {
-        const marked = (await import("marked")).marked;
-        setHtml(marked.parse(md));
-      });
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch docs");
+        return res.json();
+      })
+      .then(async (data) => {
+        const { marked } = await import("marked");
+        const raw = marked.parse(data.content || "");
+        const clean = typeof raw === "string" ? raw : await raw;
+        // Finding #16: 'marked' does not sanitize HTML output by default. The source
+        // content is a repo-local markdown file (API_DOCUMENTATION.md) rather than
+        // arbitrary user input, and the endpoint that serves it now requires
+        // requireAuth + requireAdmin (finding #42), which substantially narrows the
+        // attack surface. As defense-in-depth we still strip <script> tags and inline
+        // event-handler attributes before rendering via dangerouslySetInnerHTML.
+        setHtml(
+          clean
+            .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
+            .replace(/\bon\w+\s*=/gi, "data-removed="),
+        );
+      })
+      .catch(() => setHtml("<p>Could not load documentation.</p>"));
   }, []);
 
   return (

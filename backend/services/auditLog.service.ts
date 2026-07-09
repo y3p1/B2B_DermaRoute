@@ -1,6 +1,7 @@
 import { desc, eq, and, gte, lte, sql, ilike } from "drizzle-orm";
 import { getDb } from "./db";
 import { auditLogs } from "../../db/audit-logs";
+import { escapeLikeWildcards } from "../utils/sanitize";
 
 export type AuditLogFilters = {
   tableName?: string;
@@ -53,7 +54,7 @@ export async function getAuditLogs(filters: AuditLogFilters = {}): Promise<{
     conditions.push(lte(auditLogs.createdAt, new Date(filters.endDate)));
   }
   if (filters.search) {
-    conditions.push(ilike(auditLogs.recordId, `%${filters.search}%`));
+    conditions.push(ilike(auditLogs.recordId, `%${escapeLikeWildcards(filters.search)}%`));
   }
 
   const where = conditions.length > 0 ? and(...conditions) : undefined;

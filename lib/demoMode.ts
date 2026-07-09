@@ -36,27 +36,9 @@ export function getDemoRoleFromRequest(req: {
   headers: Record<string, string | undefined>;
   url: string;
 }): DemoRole {
-  // 1. Cookie
   const fromCookie = parseCookieValue(req.headers["cookie"], DEMO_ROLE_COOKIE);
   if (fromCookie && VALID_ROLES.includes(fromCookie as DemoRole)) {
     return fromCookie as DemoRole;
-  }
-
-  // 2. ?role= query param
-  try {
-    const url = new URL(req.url, "http://localhost");
-    const fromQuery = url.searchParams.get("role");
-    if (fromQuery && VALID_ROLES.includes(fromQuery as DemoRole)) {
-      return fromQuery as DemoRole;
-    }
-  } catch {
-    // ignore malformed URLs
-  }
-
-  // 3. X-Demo-Role header
-  const fromHeader = req.headers["x-demo-role"];
-  if (fromHeader && VALID_ROLES.includes(fromHeader as DemoRole)) {
-    return fromHeader as DemoRole;
   }
 
   return "provider";

@@ -1,0 +1,20 @@
+# DermaRoute
+> B2B wound care procurement portal: benefit verification, product ordering, BAA e-signing, and a RAG-powered CMS policy assistant.
+
+## What it does
+DermaRoute streamlines wound care procurement for healthcare providers. It routes benefit verification requests, manages product ordering across tissue biologics, ocular products, and medical devices, and includes an AI-powered CMS policy assistant built on RAG (Retrieval-Augmented Generation).
+
+## Key features
+- Benefit verification request submission and tracking
+- Multi-track product ordering (wound care, ocular, medical devices)
+- BAA (Business Associate Agreement) e-signing
+- Healing tracker with wound measurement logging
+- RAG-powered CMS policy assistant (Gemini + pgvector)
+- Role-based access: provider, clinic staff, admin
+
+## Tech stack
+Next.js (App Router), TypeScript, Supabase/Postgres, Drizzle ORM, pgvector, Gemini RAG, Tailwind CSS, Vercel.
+
+## Links
+- Live demo: https://derma-route.vercel.app/demo
+- Source: https://github.com/y3p1/B2B_DermaRoute

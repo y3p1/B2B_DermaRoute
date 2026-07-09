@@ -16,6 +16,13 @@ Each file corresponds to one table (or a group of related tables):
 | [bv_products.sql](bv_products.sql)             | `wound_sizes`, `order_products` | BV product-related tables RLS policies             |
 | [manufacturers.sql](manufacturers.sql)         | `manufacturers`                 | Manufacturers RLS policies                         |
 | [products.sql](products.sql)                   | `products`                      | Products RLS policies                              |
+| [lymphedema_orders.sql](lymphedema_orders.sql) | `lymphedema_orders`             | Lymphedema orders RLS policies                     |
+| [ocular_orders.sql](ocular_orders.sql)         | `ocular_orders`                 | Ocular orders RLS policies                         |
+| [lymphedema_products.sql](lymphedema_products.sql) | `lymphedema_products`       | Lymphedema products catalog RLS policies           |
+| [ocular_products.sql](ocular_products.sql)     | `ocular_products`               | Ocular products catalog RLS policies               |
+| [practice_tracks.sql](practice_tracks.sql)     | `practice_tracks`               | Provider practice-track enrollment RLS policies    |
+| [system_settings.sql](system_settings.sql)     | `system_settings`               | Global system settings RLS policies (admin-only)   |
+| [document_chunks.sql](document_chunks.sql)     | `document_chunks`               | RAG vector-store RLS policies (admin-only)         |
 
 ## Applying RLS Policies
 

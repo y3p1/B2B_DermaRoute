@@ -6,6 +6,7 @@ import {
   varchar,
   text,
   timestamp,
+  index,
 } from "drizzle-orm/pg-core";
 import { bvRequests } from "./bv-requests";
 
@@ -24,4 +25,6 @@ export const woundMeasurements = pgTable("wound_measurements", {
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (t) => [
+  index("wound_measurements_bv_request_id_idx").on(t.bvRequestId),
+]);

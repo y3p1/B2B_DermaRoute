@@ -15,9 +15,27 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DermaRoute Demo",
+  metadataBase: new URL("https://derma-route.vercel.app"),
+  title: {
+    default: "DermaRoute — B2B Wound Care Procurement Portal",
+    template: "%s | DermaRoute",
+  },
   description:
-    "Demo environment for the DermaRoute B2B portal. Routing benefit verifications at the speed of care.",
+    "DermaRoute routes benefit verifications, product ordering, and CMS policy intelligence for wound care providers. Built with Next.js, Supabase, and a RAG-powered policy assistant.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: "https://derma-route.vercel.app",
+    title: "DermaRoute — B2B Wound Care Procurement Portal",
+    description:
+      "Benefit verification, ordering, and AI policy assistant for wound care providers.",
+    siteName: "DermaRoute",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DermaRoute",
+    description: "B2B wound care portal with an AI policy assistant.",
+  },
 };
 
 export default function RootLayout({
@@ -28,7 +46,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%232563eb'/><text x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='Arial' font-weight='bold' font-size='20' fill='white'>D</text></svg>" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

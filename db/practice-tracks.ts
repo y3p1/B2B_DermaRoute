@@ -1,6 +1,7 @@
 import { pgTable, uuid, text, boolean, timestamp, unique } from "drizzle-orm/pg-core";
 import { providerAcct } from "./provider";
 
+// RLS policies: supabase/rls/practice_tracks.sql (finding #12)
 export const practiceTracks = pgTable(
   "practice_tracks",
   {

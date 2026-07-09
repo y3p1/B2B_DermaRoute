@@ -5,6 +5,8 @@ import {
 import { corsMiddleware } from "../../../backend/middlewares/cors";
 import { errorHandler } from "../../../backend/middlewares/errorHandler";
 import { rateLimit } from "../../../backend/middlewares/rateLimit";
+import { requireAuth } from "../../../backend/middlewares/requireAuth";
+import { requireAdmin } from "../../../backend/middlewares/requireAdmin";
 import { getAllowedOrigins } from "../../../backend/config/env";
 import { runServerPipeline } from "../../../backend/serverPipeline";
 
@@ -12,12 +14,11 @@ const cors = corsMiddleware({ allowedOrigins: getAllowedOrigins() });
 const baseRateLimit = rateLimit({ windowMs: 60_000, max: 120 });
 const signupLimit = rateLimit({ windowMs: 60_000, max: 10 });
 
-// Reuse the adminAccountCreateSchema but omit role (we force role=admin)
 const publicAdminSignupSchema = adminAccountCreateSchema.omit({ role: true });
 
 export async function POST(request: Request) {
   return runServerPipeline(request, {
-    middlewares: [cors, baseRateLimit, signupLimit],
+    middlewares: [cors, baseRateLimit, signupLimit, requireAuth, requireAdmin],
     handler: async (req, res) => {
       const parsed = publicAdminSignupSchema.safeParse(req.body);
       if (!parsed.success) {

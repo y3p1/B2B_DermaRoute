@@ -3,6 +3,7 @@ import { getDb } from "./db";
 import { manufacturers } from "../../db/manufacturers";
 import { products } from "../../db/products";
 import { orderProducts } from "../../db/bv-products";
+import { insuranceRouting } from "../../db/insurance-routing";
 import { eq, and } from "drizzle-orm";
 import { HttpError } from "../utils/httpError";
 
@@ -94,6 +95,18 @@ export async function deleteManufacturer(id: string) {
 
   if (linkedOrders.length > 0) {
     throw new HttpError(409, "Existing Product Record linked to this Manufacturer exists.");
+  }
+
+  // Restrict: block delete if any insurance-routing rules reference this manufacturer
+  // (FK has no onDelete action) to avoid an unhandled Postgres 23503 error.
+  const linkedRouting = await db
+    .select({ id: insuranceRouting.id })
+    .from(insuranceRouting)
+    .where(eq(insuranceRouting.manufacturerId, id))
+    .limit(1);
+
+  if (linkedRouting.length > 0) {
+    throw new HttpError(409, "Cannot delete this Manufacturer: existing insurance routing rules reference it.");
   }
 
   // Unlink catalog products before deleting to avoid FK constraint violation

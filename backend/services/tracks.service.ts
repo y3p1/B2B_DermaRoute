@@ -74,25 +74,26 @@ export async function updateProviderTracks(
 ): Promise<void> {
   const db = getDb();
 
-  // Disable all existing tracks, then enable the specified ones
-  await db
-    .update(practiceTracks)
-    .set({ enabled: false, updatedAt: new Date() })
-    .where(eq(practiceTracks.providerId, providerId));
+  await db.transaction(async (tx) => {
+    await tx
+      .update(practiceTracks)
+      .set({ enabled: false, updatedAt: new Date() })
+      .where(eq(practiceTracks.providerId, providerId));
 
-  if (tracks.length === 0) return;
+    if (tracks.length === 0) return;
 
-  await db
-    .insert(practiceTracks)
-    .values(
-      tracks.map((track) => ({
-        providerId,
-        track,
-        enabled: true,
-      })),
-    )
-    .onConflictDoUpdate({
-      target: [practiceTracks.providerId, practiceTracks.track],
-      set: { enabled: true, updatedAt: new Date() },
-    });
+    await tx
+      .insert(practiceTracks)
+      .values(
+        tracks.map((track) => ({
+          providerId,
+          track,
+          enabled: true,
+        })),
+      )
+      .onConflictDoUpdate({
+        target: [practiceTracks.providerId, practiceTracks.track],
+        set: { enabled: true, updatedAt: new Date() },
+      });
+  });
 }

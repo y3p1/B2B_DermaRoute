@@ -33,29 +33,26 @@ export async function createOrderProduct(
 ) {
   const db = getDb();
 
-  // Fetch the product to snapshot its data into the order
-  const [product] = await db
-    .select()
-    .from(products)
-    .where(eq(products.id, input.productId));
+  const [newOrder] = await db.transaction(async (tx) => {
+    const [product] = await tx
+      .select()
+      .from(products)
+      .where(eq(products.id, input.productId));
 
-  if (!product) {
-    throw new Error("Product not found");
-  }
+    if (!product) {
+      throw new Error("Product not found");
+    }
 
-  // Fetch the BV request to snapshot insurance, wound, and proof URL data
-  const [bvRequest] = await db
-    .select()
-    .from(bvRequests)
-    .where(eq(bvRequests.id, input.bvRequestId));
+    const [bvRequest] = await tx
+      .select()
+      .from(bvRequests)
+      .where(eq(bvRequests.id, input.bvRequestId));
 
-  if (!bvRequest) {
-    throw new Error("BV Request not found");
-  }
+    if (!bvRequest) {
+      throw new Error("BV Request not found");
+    }
 
-  const [newOrder] = await db
-    .insert(orderProducts)
-    .values({
+    return tx.insert(orderProducts).values({
       bvRequestId: input.bvRequestId,
       manufacturerId: input.manufacturerId,
       productId: input.productId,
@@ -86,6 +83,7 @@ export async function createOrderProduct(
       riskTier: riskTier ?? null,
     })
     .returning();
+  });
 
   return newOrder;
 }
@@ -115,8 +113,9 @@ export async function listAllOrderProducts() {
     .leftJoin(providerAcct, eq(bvRequests.providerId, providerAcct.id))
     .leftJoin(manufacturers, eq(orderProducts.manufacturerId, manufacturers.id))
     .leftJoin(products, eq(orderProducts.productId, products.id))
-    .where(isNotNull(orderProducts.bvRequestId)) // Only get actual orders, not templates
-    .orderBy(desc(orderProducts.createdAt), orderProducts.id);
+    .where(isNotNull(orderProducts.bvRequestId))
+    .orderBy(desc(orderProducts.createdAt), orderProducts.id)
+    .limit(1000);
 
   return rows;
 }

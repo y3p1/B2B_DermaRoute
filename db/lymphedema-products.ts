@@ -1,5 +1,6 @@
 import { pgTable, uuid, text, boolean, timestamp } from "drizzle-orm/pg-core";
 
+// RLS policies: supabase/rls/lymphedema_products.sql (finding #12)
 export const lymphedemaProducts = pgTable("lymphedema_products", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),

@@ -25,7 +25,7 @@ export const baaSignatureSchema = z.object({
 
 export type BaaSignatureInput = z.infer<typeof baaSignatureSchema>;
 
-export type BaaStatus = "pending" | "signed";
+export type BaaStatus = "pending" | "signed" | "approved" | "cancelled";
 
 export function mapAgreementStatusToBaaStatus(
   status: BaaSignatureInput["agreementStatus"],

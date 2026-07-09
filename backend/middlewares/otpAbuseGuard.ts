@@ -1,5 +1,12 @@
 import type { NextFunction, Request, Response } from "../http/types";
 
+// KNOWN LIMITATION (finding #10): verifyStore/sendStore below are in-memory Maps scoped
+// to a single serverless function instance. On Vercel, cold starts and concurrent
+// instances each get their own Map, so lockout counters do not reliably persist or share
+// state across instances/deploys. This guard is a best-effort defense-in-depth layer;
+// the authoritative rate limiting for this deployment is enforced externally at Vercel's
+// Edge/WAF layer. A durable fix would move this state to a shared store (e.g. Upstash
+// Redis) if per-instance limiting proves insufficient.
 type VerifyEntry = {
   failures: number;
   lockUntil: number; // epoch ms

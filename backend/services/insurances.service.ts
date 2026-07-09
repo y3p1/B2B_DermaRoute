@@ -2,7 +2,9 @@ import { randomUUID } from "crypto";
 import { z } from "zod";
 import { getDb } from "./db";
 import { insurances } from "../../db/insurances";
+import { insuranceRouting } from "../../db/insurance-routing";
 import { eq, asc } from "drizzle-orm";
+import { HttpError } from "../utils/httpError";
 
 export const createInsuranceSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -57,6 +59,19 @@ export async function updateInsurance(id: string, input: UpdateInsuranceInput) {
 
 export async function deleteInsurance(id: string) {
   const db = getDb();
+
+  // Restrict: block delete if any insurance-routing rules reference this insurance
+  // (FK has no onDelete action) to avoid an unhandled Postgres 23503 error.
+  const linkedRouting = await db
+    .select({ id: insuranceRouting.id })
+    .from(insuranceRouting)
+    .where(eq(insuranceRouting.insuranceId, id))
+    .limit(1);
+
+  if (linkedRouting.length > 0) {
+    throw new HttpError(409, "Cannot delete this Insurance: existing routing rules reference it.");
+  }
+
   const deleted = await db
     .delete(insurances)
     .where(eq(insurances.id, id))

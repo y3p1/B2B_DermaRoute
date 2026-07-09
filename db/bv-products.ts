@@ -8,6 +8,7 @@ import {
   timestamp,
   jsonb,
   varchar,
+  index,
 } from "drizzle-orm/pg-core";
 import { products } from "./products";
 import { manufacturers } from "./manufacturers";
@@ -61,4 +62,8 @@ export const orderProducts = pgTable("order_products", {
   riskTier: varchar("risk_tier", { length: 16 }), // 'critical' | 'high' | 'standard' | 'low'
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (t) => [
+  index("order_products_bv_request_id_idx").on(t.bvRequestId),
+  index("order_products_status_idx").on(t.status),
+  index("order_products_created_at_idx").on(t.createdAt),
+]);

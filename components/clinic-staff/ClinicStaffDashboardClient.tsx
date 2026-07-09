@@ -340,25 +340,26 @@ export default function ClinicStaffDashboardClient({
         }
       });
 
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        void refreshBvRequests();
-        void refreshProductOrders();
-      }
-    };
-
-    const handleWindowFocus = () => {
+    let lastRefresh = 0;
+    const debouncedRefresh = () => {
+      const now = Date.now();
+      if (now - lastRefresh < 2000) return;
+      lastRefresh = now;
       void refreshBvRequests();
       void refreshProductOrders();
     };
 
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") debouncedRefresh();
+    };
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("focus", handleWindowFocus);
+    window.addEventListener("focus", debouncedRefresh);
 
     return () => {
       supabase.removeChannel(channel);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("focus", handleWindowFocus);
+      window.removeEventListener("focus", debouncedRefresh);
     };
   }, [status, token, refreshBvRequests, refreshProductOrders]);
 

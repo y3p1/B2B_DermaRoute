@@ -1,4 +1,3 @@
-import fs from "fs";
 import type { NextFunction, Request, Response } from "../http/types";
 import { ZodError } from "zod";
 import { isHttpError } from "../utils/httpError";
@@ -9,9 +8,6 @@ export function errorHandler(
   res: Response,
   _next: NextFunction,
 ) {
-  // Log to file for deep debugging
-  const logMsg = `--- ERROR: ${new Date().toISOString()} ---\nURL: ${req.url}\n${err instanceof Error ? err.stack : JSON.stringify(err)}\n\n`;
-  try { fs.appendFileSync("error_logs.txt", logMsg); } catch(e) { console.error("Logger failed", e); }
   if (err instanceof ZodError) {
     return res.status(400).json({
       error: "Validation failed",

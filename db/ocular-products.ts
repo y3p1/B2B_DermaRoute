@@ -1,5 +1,6 @@
 import { pgTable, uuid, text, integer, boolean, timestamp } from "drizzle-orm/pg-core";
 
+// RLS policies: supabase/rls/ocular_products.sql (finding #12)
 export const ocularProducts = pgTable("ocular_products", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),

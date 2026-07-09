@@ -20,6 +20,13 @@ function getHeader(req: Request, name: string): string | null {
   return req.headers.get(name);
 }
 
+// Finding #35: trusts the first X-Forwarded-For entry (and falls back to X-Real-IP) as
+// the client IP for rate limiting. On Vercel, the platform's edge network overwrites
+// X-Forwarded-For with the real client IP before the request reaches this function, so
+// client-supplied spoofed headers are not honored in production. This becomes unsafe
+// only if the app is deployed behind a different/untrusted proxy topology that forwards
+// client-controlled headers verbatim — in that case this should be replaced with a
+// platform-provided trusted-IP header (e.g. a signed header from the edge layer).
 function getClientIp(req: Request): string {
   const xff = getHeader(req, "x-forwarded-for");
   if (xff) {

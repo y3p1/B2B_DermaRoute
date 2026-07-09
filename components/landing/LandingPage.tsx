@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Activity, Wind, Eye, Lock } from "lucide-react";
+import { Activity, Wind, Eye, Lock, ChevronDown } from "lucide-react";
 import { useAuthStore, type TrackKey } from "@/store/auth";
 import { isClientDemoMode } from "@/lib/demoMode";
 
@@ -179,9 +179,66 @@ export function LandingPage() {
         </button>
       )}
 
+      {!isAuthenticated && <FaqSection />}
+
       <p className="mt-12 text-xs text-gray-400">
         DermaRoute Provider Portal
       </p>
     </div>
+  );
+}
+
+const FAQ_ITEMS = [
+  {
+    q: "What is DermaRoute?",
+    a: "DermaRoute is a B2B wound care procurement portal that streamlines benefit verifications, product ordering, and CMS policy lookups for healthcare providers. It supports tissue biologics, ocular products, and medical devices.",
+  },
+  {
+    q: "What is a benefit verification?",
+    a: "A benefit verification (BV) confirms a patient’s insurance coverage for specific wound care products before ordering. DermaRoute automates the BV submission and tracking workflow between providers and distributors.",
+  },
+  {
+    q: "What technology does DermaRoute use?",
+    a: "DermaRoute is built with Next.js (App Router), TypeScript, Supabase/Postgres, Drizzle ORM, and Tailwind CSS. Its AI policy assistant uses Retrieval-Augmented Generation (RAG) with Google Gemini and pgvector.",
+  },
+  {
+    q: "Who uses DermaRoute?",
+    a: "DermaRoute serves three user roles: healthcare providers who submit benefit verifications and orders, clinic staff who manage multi-provider practices, and admin users who oversee operations, products, and analytics.",
+  },
+];
+
+function FaqSection() {
+  const [open, setOpen] = useState<number | null>(null);
+
+  return (
+    <section className="w-full max-w-2xl mt-16">
+      <h2 className="text-lg font-bold text-gray-900 mb-4 text-center">
+        Frequently Asked Questions
+      </h2>
+      <div className="space-y-2">
+        {FAQ_ITEMS.map((item, i) => (
+          <div
+            key={i}
+            className="border rounded-xl bg-white overflow-hidden"
+            style={{ borderColor: "oklch(0.88 0.08 35)" }}
+          >
+            <button
+              onClick={() => setOpen(open === i ? null : i)}
+              className="w-full flex items-center justify-between px-5 py-3.5 text-left text-sm font-semibold text-gray-800 hover:bg-gray-50 transition-colors"
+            >
+              {item.q}
+              <ChevronDown
+                className={`w-4 h-4 text-gray-400 shrink-0 transition-transform ${open === i ? "rotate-180" : ""}`}
+              />
+            </button>
+            {open === i && (
+              <div className="px-5 pb-4 text-sm text-gray-600 leading-relaxed">
+                {item.a}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }

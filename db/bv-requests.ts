@@ -7,10 +7,10 @@ import {
   uuid,
   numeric,
   timestamp,
+  index,
 } from "drizzle-orm/pg-core";
 import { providerAcct } from "./provider";
 
-// BV Requests table
 export const bvRequests = pgTable("bv_requests", {
   id: uuid("id").primaryKey().defaultRandom(),
   providerId: uuid("provider_id").references(() => providerAcct.id, {
@@ -47,4 +47,8 @@ export const bvRequests = pgTable("bv_requests", {
   healingTrackerActive: boolean("healing_tracker_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (t) => [
+  index("bv_requests_provider_id_idx").on(t.providerId),
+  index("bv_requests_status_idx").on(t.status),
+  index("bv_requests_created_at_idx").on(t.createdAt),
+]);

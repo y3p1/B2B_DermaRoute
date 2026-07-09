@@ -31,3 +31,11 @@ export async function POST(request: Request) {
     errorHandler,
   });
 }
+
+export async function OPTIONS(request: Request) {
+  return runServerPipeline(request, {
+    middlewares: [cors],
+    handler: (_req, res) => res.status(204).end(),
+    errorHandler,
+  });
+}

@@ -3,7 +3,9 @@ import { desc, eq, and } from "drizzle-orm";
 
 import { bvRequests } from "../../db/bv-requests";
 import { providerAcct } from "../../db/provider";
+import { orderProducts } from "../../db/bv-products";
 import { getDb } from "./db";
+import { HttpError } from "../utils/httpError";
 
 export const createBvRequestSchema = z.object({
   provider: z.string().min(1),
@@ -104,7 +106,8 @@ export async function listAllBvRequests() {
     })
     .from(bvRequests)
     .leftJoin(providerAcct, eq(bvRequests.providerId, providerAcct.id))
-    .orderBy(desc(bvRequests.createdAt), bvRequests.id);
+    .orderBy(desc(bvRequests.createdAt), bvRequests.id)
+    .limit(1000);
 
   return rows;
 }
@@ -347,6 +350,19 @@ export async function updateBvRequestProof(
 
 export async function deleteBvRequest(id: string): Promise<boolean> {
   const db = getDb();
+
+  // Restrict: block delete if any product orders reference this BV request (FK has no onDelete action).
+  // Prevents deleteBvRequest() from throwing an unhandled Postgres 23503 error.
+  const linkedOrders = await db
+    .select({ id: orderProducts.id })
+    .from(orderProducts)
+    .where(eq(orderProducts.bvRequestId, id))
+    .limit(1);
+
+  if (linkedOrders.length > 0) {
+    throw new HttpError(409, "Cannot delete this BV Request: existing product orders reference it.");
+  }
+
   const result = await db
     .delete(bvRequests)
     .where(eq(bvRequests.id, id))

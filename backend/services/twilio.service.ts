@@ -16,7 +16,7 @@ function getClient() {
 
 export async function sendOtpSms(phone: string): Promise<void> {
   if (isDemoMode()) {
-    console.log("[DEMO] OTP SMS suppressed for", phone);
+    console.log("[DEMO] OTP SMS suppressed");
     return;
   }
 
@@ -31,7 +31,7 @@ export async function sendOtpSms(phone: string): Promise<void> {
 
 export async function verifyOtp(phone: string, code: string): Promise<boolean> {
   if (isDemoMode()) {
-    console.log("[DEMO] OTP verify accepted for", phone, code);
+    console.log("[DEMO] OTP verify accepted");
     return true;
   }
 

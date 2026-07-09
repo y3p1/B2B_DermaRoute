@@ -7,6 +7,11 @@ import { closeDb, getDb } from "../../services/db";
 import { getSupabaseAdminClient } from "../../services/supabaseAdmin";
 import { DEMO_USER_IDS } from "../../../lib/demoMode";
 
+// Finding #30: these are intentionally hardcoded, non-production demo credentials.
+// They authenticate only against dermaroute-demo.example.com accounts in the isolated
+// demo Supabase project/environment (never a production tenant), and DEMO_MODE gates
+// which environments this seed script is meant to run against. Do not reuse these
+// passwords for real accounts.
 const USERS = [
   {
     role: "provider" as const,

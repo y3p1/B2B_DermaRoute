@@ -580,6 +580,15 @@ export async function providerSignup(
       createdProviderAcctId = inserted[0]?.id;
     }
   } catch (e) {
+    // Finding #15: this signup flow spans an external Supabase Auth API call, a storage
+    // upload, and two DB inserts (provider_acct, baa_provider). It can't be wrapped in a
+    // single db.transaction() because Postgres transactions can't span external HTTP
+    // calls (auth user creation / signature upload) — holding a DB transaction open
+    // across that I/O would block a pooled connection for the duration of those calls.
+    // Instead this uses a compensating-transaction pattern: on any failure below, we
+    // best-effort roll back the auth user and provider_acct row that were already
+    // created, so a crash mid-flow doesn't leave a permanently orphaned auth user.
+    //
     // Avoid leaving orphaned auth users that later cause "phone already registered".
     try {
       await supabase.auth.admin.deleteUser(createdUserId);

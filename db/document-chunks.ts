@@ -17,6 +17,7 @@ const vector = customType<{
   },
 });
 
+// RLS policies: supabase/rls/document_chunks.sql (finding #12)
 export const documentChunks = pgTable("document_chunks", {
   id: uuid("id").primaryKey().defaultRandom(),
   content: text("content").notNull(),
