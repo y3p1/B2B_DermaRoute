@@ -4,6 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 export type BaaProviderRow = {
   id: string;
@@ -54,27 +55,12 @@ export function getBaaProviderColumns(
     {
       accessorKey: "status",
       header: "Status",
-      cell: ({ row }) => {
-        const v = row.original.status;
-        if (!v) return <span className="text-slate-400">—</span>;
-        const colorClass =
-          v === "approved"
-            ? "bg-green-100 text-green-800 border border-green-200"
-            : v === "signed"
-              ? "bg-blue-100 text-blue-800 border border-blue-200"
-              : v === "pending"
-                ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
-                : v === "cancelled"
-                  ? "bg-red-100 text-red-800 border border-red-200"
-                  : "bg-slate-100 text-slate-700 border border-slate-200";
-        return (
-          <span
-            className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium capitalize ${colorClass}`}
-          >
-            {v.replace(/_/g, " ")}
-          </span>
-        );
-      },
+      cell: ({ row }) =>
+        row.original.status ? (
+          <StatusBadge status={row.original.status} viewer="staff" />
+        ) : (
+          <span className="text-slate-400">—</span>
+        ),
     },
     {
       id: "actions",

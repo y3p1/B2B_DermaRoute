@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { RefreshCw, ClipboardCheck, Wind, Eye } from "lucide-react";
 import { apiGet } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
+import { StatusBadge, statusMeta } from "@/components/ui/status-badge";
+import { humanizeLabel } from "@/lib/format";
 
 type SubmissionType = "bv_request" | "medical_device" | "ocular";
 
@@ -23,30 +25,20 @@ const TYPE_META: Record<SubmissionType, { label: string; tab: string; icon: Reac
     label: "Wound Care",
     tab: "bv_requests",
     icon: <ClipboardCheck className="w-3.5 h-3.5" />,
-    color: "bg-blue-100 text-blue-700",
+    color: "bg-emerald-50 text-emerald-800 ring-1 ring-inset ring-emerald-600/20",
   },
   medical_device: {
     label: "Medical Device",
     tab: "lymphedema_orders",
     icon: <Wind className="w-3.5 h-3.5" />,
-    color: "bg-purple-100 text-purple-700",
+    color: "bg-purple-50 text-purple-800 ring-1 ring-inset ring-purple-600/20",
   },
   ocular: {
     label: "Ocular",
     tab: "ocular_orders",
     icon: <Eye className="w-3.5 h-3.5" />,
-    color: "bg-teal-100 text-teal-700",
+    color: "bg-teal-50 text-teal-800 ring-1 ring-inset ring-teal-600/20",
   },
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-700",
-  approved: "bg-green-100 text-green-700",
-  shipped: "bg-blue-100 text-blue-700",
-  completed: "bg-green-100 text-green-800",
-  denied: "bg-red-100 text-red-700",
-  cancelled: "bg-slate-100 text-slate-500",
-  downloaded: "bg-slate-100 text-slate-600",
 };
 
 type BvRow = { id: string; status: string; practice: string | null; insurance: string | null; woundType: string | null; createdAt: string | null };
@@ -84,7 +76,7 @@ export function AllSubmissionsTab() {
         status: r.status,
         practice: r.practice,
         patient: null,
-        detail: [r.insurance, r.woundType].filter(Boolean).join(" · ") || null,
+        detail: [r.insurance, r.woundType ? humanizeLabel(r.woundType) : null].filter(Boolean).join(" · ") || null,
         createdAt: r.createdAt,
       }));
 
@@ -105,7 +97,7 @@ export function AllSubmissionsTab() {
         practice: r.clinicName,
         patient: patientStr(r.patient),
         detail: r.productVariant && r.sizeMm
-          ? `VisiDisc ${r.productVariant.charAt(0).toUpperCase() + r.productVariant.slice(1)} ${r.sizeMm}mm`
+          ? `VisiDisc ${humanizeLabel(r.productVariant)} ${r.sizeMm}mm`
           : null,
         createdAt: r.createdAt,
       }));
@@ -182,7 +174,7 @@ export function AllSubmissionsTab() {
         >
           <option value="all">All Statuses</option>
           {allStatuses.map((s) => (
-            <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+            <option key={s} value={s}>{statusMeta(s, "staff").label}</option>
           ))}
         </select>
       </div>
@@ -226,9 +218,7 @@ export function AllSubmissionsTab() {
                     <td className="px-4 py-3 text-slate-500">{row.patient ?? "—"}</td>
                     <td className="px-4 py-3 text-slate-500 max-w-48 truncate">{row.detail ?? "—"}</td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium capitalize ${STATUS_COLORS[row.status] ?? "bg-slate-100 text-slate-500"}`}>
-                        {row.status}
-                      </span>
+                      <StatusBadge status={row.status} viewer="staff" />
                     </td>
                     <td className="px-4 py-3 text-slate-400 text-xs">
                       {row.createdAt ? new Date(row.createdAt).toLocaleDateString() : "—"}

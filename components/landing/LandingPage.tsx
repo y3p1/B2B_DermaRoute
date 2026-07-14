@@ -14,6 +14,9 @@ type ServiceCard = {
   icon: React.FC<{ className?: string; style?: React.CSSProperties }>;
 };
 
+const NOISE_BG =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
+
 const SERVICES: ServiceCard[] = [
   {
     track: "wound_care",
@@ -72,32 +75,49 @@ export function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-white to-[oklch(0.96_0.03_160)] px-4 py-16">
-      <div className="mb-2 flex items-center gap-2">
+    <div
+      className="relative min-h-screen flex flex-col items-center justify-center px-4 py-16 overflow-hidden"
+      style={{
+        background: [
+          "radial-gradient(60rem 40rem at 15% -10%, oklch(0.95 0.04 160 / 0.9), transparent 60%)",
+          "radial-gradient(50rem 35rem at 110% 15%, oklch(0.96 0.03 40 / 0.7), transparent 55%)",
+          "radial-gradient(45rem 30rem at 50% 115%, oklch(0.94 0.04 160 / 0.55), transparent 60%)",
+          "oklch(0.985 0.005 160)",
+        ].join(", "),
+      }}
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.05] mix-blend-multiply"
+        style={{ backgroundImage: NOISE_BG }}
+      />
+
+      <div className="relative mb-2 flex items-center gap-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/dermaroute-logo.svg" alt="DermaRoute" className="h-12" />
       </div>
 
       <p
-        className="text-sm mb-10 font-medium"
+        className="relative text-sm mb-10 font-medium"
         style={{ color: "oklch(0.50 0.08 160)" }}
       >
         Routing benefit verifications at the speed of care.
       </p>
 
-      <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">
+      <h1 className="relative text-2xl font-bold text-gray-900 mb-2 text-center tracking-[-0.02em]">
         {isAuthenticated ? "Your Services" : "Provider Portal"}
       </h1>
-      <p className="text-sm text-gray-500 mb-10 text-center max-w-sm">
+      <p className="relative text-sm text-gray-500 mb-10 text-center max-w-sm">
         {isAuthenticated
           ? "Select a service to get started."
           : "Sign in to access your practice's enabled services."}
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 w-full max-w-3xl">
+      <div className="relative grid grid-cols-1 sm:grid-cols-3 gap-5 w-full max-w-3xl">
         {SERVICES.map((service) => {
           const enabled = isEnabled(service.track);
           const Icon = service.icon;
+          const interactive = enabled || !isAuthenticated;
 
           return (
             <button
@@ -105,30 +125,31 @@ export function LandingPage() {
               onClick={() => handleServiceClick(service)}
               disabled={isAuthenticated && !enabled}
               className={[
-                "group flex flex-col items-center text-center gap-4 p-7 rounded-2xl border bg-white transition-all focus:outline-none focus:ring-2",
-                enabled || !isAuthenticated
-                  ? "shadow-sm hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
-                  : "opacity-50 cursor-not-allowed",
+                "group flex flex-col items-center text-center gap-4 p-7 rounded-2xl bg-white ring-1 ring-inset ring-[oklch(0.45_0.12_160/0.14)]",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-[oklch(0.65_0.167_35)] focus-visible:ring-offset-2",
+                interactive
+                  ? [
+                      "cursor-pointer",
+                      "transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                      "shadow-[0_1px_2px_oklch(0.45_0.12_160/0.05),0_12px_32px_-12px_oklch(0.45_0.12_160/0.18)]",
+                      "hover:shadow-[0_2px_4px_oklch(0.45_0.12_160/0.06),0_20px_48px_-16px_oklch(0.45_0.12_160/0.28)]",
+                      "hover:-translate-y-1 active:translate-y-0 active:scale-[0.99]",
+                    ].join(" ")
+                  : "opacity-60 saturate-0 cursor-not-allowed shadow-[0_1px_2px_oklch(0.45_0.12_160/0.04)]",
               ].join(" ")}
-              style={
-                {
-                  borderColor: "oklch(0.88 0.08 35)",
-                  "--tw-ring-color": "oklch(0.65 0.167 35)",
-                } as React.CSSProperties
-              }
             >
               <div
-                className="flex items-center justify-center w-14 h-14 rounded-full relative"
+                className="flex items-center justify-center w-14 h-14 rounded-full relative ring-1 ring-inset ring-[oklch(0.45_0.12_160/0.10)]"
                 style={{
-                  background: enabled || !isAuthenticated
-                    ? "oklch(0.92 0.06 160)"
+                  background: interactive
+                    ? "oklch(0.94 0.05 160)"
                     : "oklch(0.93 0.01 160)",
                 }}
               >
                 <Icon
                   className="w-7 h-7"
                   style={{
-                    color: enabled || !isAuthenticated
+                    color: interactive
                       ? "oklch(0.45 0.12 160)"
                       : "oklch(0.60 0.02 160)",
                   } as React.CSSProperties}
@@ -151,18 +172,26 @@ export function LandingPage() {
               </div>
 
               <span
-                className="text-xs font-semibold mt-auto"
+                className="text-xs font-semibold mt-auto inline-flex items-center gap-1"
                 style={{
-                  color: enabled || !isAuthenticated
+                  color: interactive
                     ? "oklch(0.45 0.12 160)"
                     : "oklch(0.60 0.02 160)",
                 }}
               >
-                {!isAuthenticated
-                  ? "Sign in →"
-                  : enabled
-                    ? "Open →"
-                    : "Not enabled"}
+                {!isAuthenticated ? (
+                  <>
+                    Sign in
+                    <span aria-hidden className="transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0.5">→</span>
+                  </>
+                ) : enabled ? (
+                  <>
+                    Open
+                    <span aria-hidden className="transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0.5">→</span>
+                  </>
+                ) : (
+                  "Not enabled"
+                )}
               </span>
             </button>
           );
@@ -172,7 +201,7 @@ export function LandingPage() {
       {!isAuthenticated && (
         <button
           onClick={() => router.push("/auth")}
-          className="mt-10 px-6 py-2.5 rounded-lg text-sm font-semibold text-white transition-colors"
+          className="relative mt-10 px-6 py-2.5 rounded-lg text-sm font-semibold text-white transition-colors hover:bg-[oklch(0.40_0.11_160)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[oklch(0.65_0.167_35)] focus-visible:ring-offset-2 active:bg-[oklch(0.37_0.10_160)]"
           style={{ background: "oklch(0.45 0.12 160)" }}
         >
           Sign in to your account
@@ -181,7 +210,7 @@ export function LandingPage() {
 
       {!isAuthenticated && <FaqSection />}
 
-      <p className="mt-12 text-xs text-gray-400">
+      <p className="relative mt-12 text-xs text-gray-400">
         DermaRoute Provider Portal
       </p>
     </div>
@@ -211,24 +240,24 @@ function FaqSection() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section className="w-full max-w-2xl mt-16">
-      <h2 className="text-lg font-bold text-gray-900 mb-4 text-center">
+    <section className="relative w-full max-w-2xl mt-16">
+      <h2 className="text-lg font-bold text-gray-900 mb-4 text-center tracking-[-0.01em]">
         Frequently Asked Questions
       </h2>
       <div className="space-y-2">
         {FAQ_ITEMS.map((item, i) => (
           <div
             key={i}
-            className="border rounded-xl bg-white overflow-hidden"
-            style={{ borderColor: "oklch(0.88 0.08 35)" }}
+            className="rounded-xl bg-white overflow-hidden ring-1 ring-inset ring-[oklch(0.45_0.12_160/0.14)] shadow-[0_1px_2px_oklch(0.45_0.12_160/0.04)]"
           >
             <button
               onClick={() => setOpen(open === i ? null : i)}
-              className="w-full flex items-center justify-between px-5 py-3.5 text-left text-sm font-semibold text-gray-800 hover:bg-gray-50 transition-colors"
+              aria-expanded={open === i}
+              className="w-full flex items-center justify-between px-5 py-3.5 text-left text-sm font-semibold text-gray-800 hover:bg-[oklch(0.97_0.01_160)] active:bg-[oklch(0.95_0.02_160)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[oklch(0.65_0.167_35)]"
             >
               {item.q}
               <ChevronDown
-                className={`w-4 h-4 text-gray-400 shrink-0 transition-transform ${open === i ? "rotate-180" : ""}`}
+                className={`w-4 h-4 text-gray-400 shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${open === i ? "rotate-180" : ""}`}
               />
             </button>
             {open === i && (

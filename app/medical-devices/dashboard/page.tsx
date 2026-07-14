@@ -2,10 +2,14 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Plus, ClipboardList, CheckCircle, Clock, Wind, Gauge } from "lucide-react";
+import { Plus, ClipboardList, CheckCircle, CheckCheck, Clock, Wind } from "lucide-react";
 import { apiGet } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
 import { isClientDemoMode } from "@/lib/demoMode";
+import { StatusBadge, canonicalStatus } from "@/components/ui/status-badge";
+import { StatCard } from "@/components/ui/stat-card";
+import { BreakdownCard } from "@/components/dashboard/BreakdownCard";
+import { humanizeLabel } from "@/lib/format";
 
 type LymphedemaOrderRow = {
   id: string;
@@ -17,20 +21,23 @@ type LymphedemaOrderRow = {
   createdAt: string | null;
 };
 
-const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-700",
-  approved: "bg-blue-100 text-blue-700",
-  shipped: "bg-purple-100 text-purple-700",
-  completed: "bg-green-100 text-green-700",
-  denied: "bg-red-100 text-red-700",
-  cancelled: "bg-slate-100 text-slate-500",
+const DEVICE_PILL_CLASSES: Record<string, string> = {
+  "AIROS 6": "bg-sky-50 text-sky-800 ring-sky-600/20",
+  "AIROS 8": "bg-violet-50 text-violet-800 ring-violet-600/20",
+  "AIROS 6P": "bg-indigo-50 text-indigo-800 ring-indigo-600/20",
 };
 
-const DEVICE_COLORS: Record<string, string> = {
-  "AIROS 6": "bg-blue-100 text-blue-700",
-  "AIROS 8": "bg-purple-100 text-purple-700",
-  "AIROS 6P": "bg-indigo-100 text-indigo-700",
-};
+function DevicePill({ device }: { device: string }) {
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${
+        DEVICE_PILL_CLASSES[device] ?? "bg-slate-50 text-slate-600 ring-slate-400/20"
+      }`}
+    >
+      {device}
+    </span>
+  );
+}
 
 export default function MedicalDevicesDashboardPage() {
   const token = useAuthStore((s) => s.jwt);
@@ -48,8 +55,10 @@ export default function MedicalDevicesDashboardPage() {
   }, [token]);
 
   const recentOrders = orders.slice(0, 5);
-  const pendingCount = orders.filter((o) => o.status === "pending").length;
-  const approvedCount = orders.filter((o) => o.status === "approved").length;
+  const statusOf = (o: LymphedemaOrderRow) => canonicalStatus(o.status, "provider");
+  const pendingCount = orders.filter((o) => statusOf(o) === "pending").length;
+  const approvedCount = orders.filter((o) => statusOf(o) === "approved").length;
+  const completedCount = orders.filter((o) => statusOf(o) === "completed").length;
 
   const deviceCounts = React.useMemo(() => {
     const counts: Record<string, number> = {};
@@ -64,7 +73,8 @@ export default function MedicalDevicesDashboardPage() {
     const counts: Record<string, number> = {};
     for (const o of orders) {
       for (const ex of Array.isArray(o.extremity) ? o.extremity : []) {
-        counts[ex] = (counts[ex] ?? 0) + 1;
+        const label = humanizeLabel(ex);
+        counts[label] = (counts[label] ?? 0) + 1;
       }
     }
     return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
@@ -73,7 +83,7 @@ export default function MedicalDevicesDashboardPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-purple-900">
+        <h1 className="text-2xl font-bold text-purple-900 tracking-tight">
           Welcome{provider?.clinicName ? `, ${provider.clinicName}` : ""}
         </h1>
         <p className="text-purple-600 text-sm mt-1">
@@ -82,34 +92,39 @@ export default function MedicalDevicesDashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white rounded-xl border border-purple-100 p-5 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center">
-              <ClipboardList className="w-5 h-5 text-purple-600" />
-            </div>
-            <span className="text-sm font-medium text-slate-600">Total Orders</span>
-          </div>
-          <p className="text-2xl font-bold text-purple-900">{loading ? "…" : orders.length}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-purple-100 p-5 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 rounded-lg bg-yellow-50 flex items-center justify-center">
-              <Clock className="w-5 h-5 text-yellow-600" />
-            </div>
-            <span className="text-sm font-medium text-slate-600">Pending</span>
-          </div>
-          <p className="text-2xl font-bold text-yellow-700">{loading ? "…" : pendingCount}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-purple-100 p-5 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
-              <CheckCircle className="w-5 h-5 text-blue-600" />
-            </div>
-            <span className="text-sm font-medium text-slate-600">Approved</span>
-          </div>
-          <p className="text-2xl font-bold text-blue-700">{loading ? "…" : approvedCount}</p>
-        </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <StatCard
+          label="Total Orders"
+          value={orders.length}
+          loading={loading}
+          icon={ClipboardList}
+          iconClassName="bg-purple-50 text-purple-600"
+          valueClassName="text-purple-900"
+        />
+        <StatCard
+          label="Pending"
+          value={pendingCount}
+          loading={loading}
+          icon={Clock}
+          iconClassName="bg-amber-50 text-amber-600"
+          valueClassName="text-amber-700"
+        />
+        <StatCard
+          label="Approved"
+          value={approvedCount}
+          loading={loading}
+          icon={CheckCircle}
+          iconClassName="bg-sky-50 text-sky-600"
+          valueClassName="text-sky-700"
+        />
+        <StatCard
+          label="Completed"
+          value={completedCount}
+          loading={loading}
+          icon={CheckCheck}
+          iconClassName="bg-emerald-50 text-emerald-700"
+          valueClassName="text-emerald-700"
+        />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
@@ -131,56 +146,38 @@ export default function MedicalDevicesDashboardPage() {
         </div>
 
         {/* Device breakdown */}
-        <div className="bg-white rounded-xl border border-purple-100 p-5 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <Wind className="w-5 h-5 text-purple-600" />
-            <h2 className="font-semibold text-slate-800 text-sm">Device Breakdown</h2>
-          </div>
-          {loading ? (
-            <p className="text-sm text-slate-400">Loading…</p>
-          ) : deviceCounts.length === 0 ? (
-            <p className="text-sm text-slate-400">No orders yet</p>
-          ) : (
-            <div className="space-y-3">
-              {deviceCounts.map(([device, count]) => (
-                <div key={device} className="flex items-center justify-between">
-                  <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${DEVICE_COLORS[device] ?? "bg-slate-100 text-slate-600"}`}>
-                    {device}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-20 h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-purple-400 rounded-full"
-                        style={{ width: `${Math.min(100, (count / orders.length) * 100)}%` }}
-                      />
-                    </div>
-                    <span className="text-xs font-medium text-slate-500 w-8 text-right">{count}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {extremityCounts.length > 0 && (
-            <div className="mt-4 pt-3 border-t border-slate-100">
-              <div className="flex items-center gap-2 mb-2">
-                <Gauge className="w-4 h-4 text-purple-500" />
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Extremities</span>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
+        <BreakdownCard
+          title="Device Breakdown"
+          icon={Wind}
+          iconClassName="text-purple-600"
+          barClassName="bg-purple-400"
+          loading={loading}
+          total={orders.length}
+          items={deviceCounts.map(([device, count]) => ({
+            key: device,
+            label: <DevicePill device={device} />,
+            count,
+          }))}
+          footer={
+            extremityCounts.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
                 {extremityCounts.map(([ext, count]) => (
-                  <span key={ext} className="text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded-md">
-                    {ext} ({count})
+                  <span
+                    key={ext}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-purple-50 text-purple-800 ring-1 ring-inset ring-purple-600/20 px-2.5 py-1 text-xs font-medium"
+                  >
+                    {ext}
+                    <span className="text-purple-600 tabular-nums">{count}</span>
                   </span>
                 ))}
               </div>
-            </div>
-          )}
-        </div>
+            ) : null
+          }
+        />
       </div>
 
       {/* Recent orders */}
-      <div className="bg-white rounded-xl border border-purple-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl ring-1 ring-slate-900/5 shadow-[0_1px_2px_rgb(15_23_42/0.04),0_4px_12px_-4px_rgb(15_23_42/0.06)] overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
           <h2 className="font-semibold text-slate-800">Recent Orders</h2>
           <Link href="/medical-devices/orders" className="text-sm text-purple-600 hover:text-purple-700 font-medium">
@@ -217,18 +214,16 @@ export default function MedicalDevicesDashboardPage() {
                       : "—"}
                   </td>
                   <td className="px-5 py-3">
-                    {order.device ? (
-                      <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${DEVICE_COLORS[order.device] ?? "bg-slate-100 text-slate-600"}`}>
-                        {order.device}
-                      </span>
-                    ) : "—"}
+                    {order.device ? <DevicePill device={order.device} /> : "—"}
                   </td>
-                  <td className="px-5 py-3 text-slate-600 text-xs">{Array.isArray(order.extremity) ? order.extremity.join(", ") : "—"}</td>
+                  <td className="px-5 py-3 text-slate-600 text-xs">
+                    {Array.isArray(order.extremity)
+                      ? order.extremity.map((ex) => humanizeLabel(ex)).join(", ")
+                      : "—"}
+                  </td>
                   <td className="px-5 py-3 text-slate-600 text-xs">{order.insurance ?? "—"}</td>
                   <td className="px-5 py-3">
-                    <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium capitalize ${STATUS_COLORS[order.status] ?? "bg-slate-100 text-slate-500"}`}>
-                      {order.status}
-                    </span>
+                    <StatusBadge status={order.status} />
                   </td>
                   <td className="px-5 py-3 text-slate-400 text-xs">
                     {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "—"}

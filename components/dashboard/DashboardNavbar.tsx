@@ -166,12 +166,12 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
 
   return (
     <>
-    <nav className="w-full bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40 shadow-sm">
+    <nav className="w-full bg-white border-b border-slate-200/80 px-4 py-3 flex items-center justify-between sticky top-0 z-40 shadow-[0_1px_2px_rgb(15_23_42/0.04)]">
       <div className="flex items-center gap-2">
         {onMenuToggle && (
           <Button
             variant="ghost"
-            className="text-slate-700 hover:bg-slate-200 p-2 lg:hidden"
+            className="text-slate-700 hover:bg-slate-100 p-2 lg:hidden focus-visible:ring-2 focus-visible:ring-primary"
             size="icon"
             aria-label="Toggle menu"
             onClick={onMenuToggle}
@@ -187,7 +187,7 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
           <Button
             variant="outline"
             size="sm"
-            className="text-slate-600 hover:text-slate-800 border-slate-300 hover:bg-slate-100"
+            className="text-slate-600 hover:text-slate-800 border-slate-200 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-primary"
             onClick={() => { window.location.href = "/demo"; }}
           >
             <ArrowLeftRight className="w-4 h-4 mr-1.5" />
@@ -198,7 +198,7 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="text-slate-700 hover:bg-slate-200 p-2 flex items-center gap-2"
+              className="text-slate-700 hover:bg-slate-100 p-2 flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary"
               aria-label="User Menu"
             >
               <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">

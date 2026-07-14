@@ -6,6 +6,8 @@ import { useParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { apiGet } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { humanizeLabel } from "@/lib/format";
 
 type BvDetail = {
   id: string;
@@ -26,14 +28,6 @@ type BvDetail = {
   practice: string | null;
   proofStatus: string | null;
   createdAt: string | null;
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-700",
-  approved: "bg-green-100 text-green-700",
-  denied: "bg-red-100 text-red-700",
-  downloaded: "bg-slate-100 text-slate-600",
-  cancelled: "bg-slate-100 text-slate-500",
 };
 
 function Field({ label, value }: { label: string; value?: string | number | null }) {
@@ -79,9 +73,7 @@ export default function WoundCareOrderDetailPage() {
           <h1 className="text-2xl font-bold text-emerald-900">BV Request Detail</h1>
           <p className="text-xs text-slate-400 font-mono mt-1">{order.id}</p>
         </div>
-        <span className={`inline-flex px-3 py-1.5 rounded-full text-sm font-medium capitalize ${STATUS_COLORS[order.status] ?? "bg-slate-100 text-slate-500"}`}>
-          {order.status}
-        </span>
+        <StatusBadge status={order.status} size="md" />
       </div>
 
       <div className="space-y-5">
@@ -98,7 +90,7 @@ export default function WoundCareOrderDetailPage() {
           <h2 className="font-semibold text-slate-800 mb-4">Clinical</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             <Field label="Insurance" value={order.insurance} />
-            <Field label="Wound Type" value={order.woundType} />
+            <Field label="Wound Type" value={order.woundType ? humanizeLabel(order.woundType) : null} />
             <Field label="Wound Size" value={order.woundSize} />
             <Field label="Wound Location" value={order.woundLocation} />
             <Field label="ICD-10" value={order.icd10} />
@@ -119,7 +111,7 @@ export default function WoundCareOrderDetailPage() {
           <h2 className="font-semibold text-slate-800 mb-4">Submission</h2>
           <div className="grid grid-cols-2 gap-4">
             <Field label="Submitted" value={order.createdAt ? new Date(order.createdAt).toLocaleString() : null} />
-            <Field label="Proof Status" value={order.proofStatus} />
+            <Field label="Proof Status" value={order.proofStatus ? humanizeLabel(order.proofStatus) : null} />
           </div>
         </div>
       </div>

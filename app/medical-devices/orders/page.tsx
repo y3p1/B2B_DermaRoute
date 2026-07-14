@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Plus, RefreshCw } from "lucide-react";
 import { apiGet } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { humanizeLabel } from "@/lib/format";
 
 type LymphedemaOrderRow = {
   id: string;
@@ -16,15 +18,6 @@ type LymphedemaOrderRow = {
   garmentStyle: string | null;
   garmentType: string | null;
   createdAt: string | null;
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-700",
-  approved: "bg-blue-100 text-blue-700",
-  shipped: "bg-purple-100 text-purple-700",
-  completed: "bg-green-100 text-green-700",
-  denied: "bg-red-100 text-red-700",
-  cancelled: "bg-slate-100 text-slate-500",
 };
 
 export default function MedicalDevicesOrdersPage() {
@@ -137,11 +130,13 @@ export default function MedicalDevicesOrdersPage() {
                         : "—"}
                   </td>
                   <td className="px-5 py-3 text-slate-600">{order.insurance ?? "—"}</td>
-                  <td className="px-5 py-3 text-slate-600 text-xs">{Array.isArray(order.extremity) ? order.extremity.join(", ") : "—"}</td>
+                  <td className="px-5 py-3 text-slate-600 text-xs">
+                    {Array.isArray(order.extremity)
+                      ? order.extremity.map((ex) => humanizeLabel(ex)).join(", ")
+                      : "—"}
+                  </td>
                   <td className="px-5 py-3">
-                    <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium capitalize ${STATUS_COLORS[order.status] ?? "bg-slate-100 text-slate-500"}`}>
-                      {order.status}
-                    </span>
+                    <StatusBadge status={order.status} />
                   </td>
                   <td className="px-5 py-3 text-slate-400 text-xs">
                     {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "—"}

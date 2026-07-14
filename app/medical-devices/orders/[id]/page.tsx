@@ -6,6 +6,8 @@ import { useParams } from "next/navigation";
 import { ArrowLeft, FileText } from "lucide-react";
 import { apiGet } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { humanizeLabel } from "@/lib/format";
 
 type LymphedemaOrderDetail = {
   id: string;
@@ -33,15 +35,6 @@ type LymphedemaOrderDetail = {
   submittedAt: string | null;
   submissionEmailUsed: string | null;
   createdAt: string | null;
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-700",
-  approved: "bg-blue-100 text-blue-700",
-  shipped: "bg-purple-100 text-purple-700",
-  completed: "bg-green-100 text-green-700",
-  denied: "bg-red-100 text-red-700",
-  cancelled: "bg-slate-100 text-slate-500",
 };
 
 function Field({ label, value }: { label: string; value?: string | number | boolean | null }) {
@@ -87,9 +80,7 @@ export default function MedicalDevicesOrderDetailPage() {
           <h1 className="text-2xl font-bold text-purple-900">Order Detail</h1>
           <p className="text-xs text-slate-400 font-mono mt-1">{order.id}</p>
         </div>
-        <span className={`inline-flex px-3 py-1.5 rounded-full text-sm font-medium capitalize ${STATUS_COLORS[order.status] ?? "bg-slate-100 text-slate-500"}`}>
-          {order.status}
-        </span>
+        <StatusBadge status={order.status} size="md" />
       </div>
 
       <div className="space-y-5">
@@ -123,8 +114,8 @@ export default function MedicalDevicesOrderDetailPage() {
           <div className="grid grid-cols-2 gap-4">
             <Field label="Diagnosis" value={order.diagnosis?.join(", ")} />
             <Field label="Conservative Therapy" value={order.conservativeTherapyCompleted ? "Yes (≥4 weeks)" : order.conservativeTherapyCompleted === false ? "No" : null} />
-            <Field label="Skin Changes" value={order.skinChanges?.join(", ")} />
-            <Field label="Extremity" value={Array.isArray(order.extremity) ? order.extremity.join(", ") : null} />
+            <Field label="Skin Changes" value={order.skinChanges?.map((s) => humanizeLabel(s)).join(", ")} />
+            <Field label="Extremity" value={Array.isArray(order.extremity) ? order.extremity.map((ex) => humanizeLabel(ex)).join(", ") : null} />
           </div>
           {order.measurements && Object.keys(order.measurements).length > 0 && (
             <div className="mt-3">

@@ -5,6 +5,7 @@ import { apiGet } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
 import { isClientDemoMode } from "@/lib/demoMode";
 import EnhancedOrderModal from "@/components/dashboard/EnhancedOrderModal";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 type ProductOrderRow = {
   id: string;
@@ -22,14 +23,6 @@ type BvEligibilityRow = {
   id: string;
   status: string;
   proofStatus: string | null;
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-700",
-  approved: "bg-green-100 text-green-700",
-  shipped: "bg-blue-100 text-blue-700",
-  delivered: "bg-emerald-100 text-emerald-700",
-  cancelled: "bg-slate-100 text-slate-500",
 };
 
 export default function WoundCareOrderProductsPage() {
@@ -161,9 +154,7 @@ export default function WoundCareOrderProductsPage() {
                   <td className="px-5 py-3 font-medium text-slate-700">{row.patientInitials ?? "—"}</td>
                   <td className="px-5 py-3 text-slate-600 text-xs hidden md:table-cell">{row.woundSize ?? "—"}</td>
                   <td className="px-5 py-3">
-                    <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium capitalize ${STATUS_COLORS[row.status] ?? "bg-slate-100 text-slate-500"}`}>
-                      {row.status}
-                    </span>
+                    <StatusBadge status={row.status} />
                   </td>
                 </tr>
               ))}

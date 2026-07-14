@@ -47,6 +47,7 @@
   --radius-4xl: calc(var(--radius) + 16px);
   /* Brand color extensions */
   --color-brand-dark: var(--brand-dark);
+  --color-brand-dark-elevated: var(--brand-dark-elevated);
   --color-brand-cta: var(--brand-cta);
   --color-brand-cta-dark: var(--brand-cta-dark);
   --color-primary-dark: var(--primary-dark);
@@ -87,7 +88,8 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.65 0.167 35);
   /* Brand palette */
-  --brand-dark: oklch(0.15 0.025 30);
+  --brand-dark: oklch(0.17 0.012 285);
+  --brand-dark-elevated: oklch(0.21 0.012 285);
   --brand-cta: oklch(0.74 0.17 162);
   --brand-cta-dark: oklch(0.60 0.155 162);
 }

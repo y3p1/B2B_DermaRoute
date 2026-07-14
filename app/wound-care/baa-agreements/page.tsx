@@ -5,6 +5,7 @@ import Link from "next/link";
 import { apiGet } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
 import { isClientDemoMode } from "@/lib/demoMode";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 type BaaRow = {
   id: string;
@@ -15,13 +16,6 @@ type BaaRow = {
   coveredEntity: string;
   coveredEntityName: string;
   businessAssociateName: string | null;
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  signed: "bg-green-100 text-green-700",
-  pending: "bg-yellow-100 text-yellow-700",
-  expired: "bg-red-100 text-red-700",
-  revoked: "bg-slate-100 text-slate-500",
 };
 
 export default function WoundCareBaaAgreementsPage() {
@@ -91,9 +85,7 @@ export default function WoundCareBaaAgreementsPage() {
                   <td className="px-5 py-3 text-slate-600 hidden sm:table-cell">{row.coveredEntityName ?? "—"}</td>
                   <td className="px-5 py-3 text-slate-600 hidden md:table-cell">{row.businessAssociateName ?? "—"}</td>
                   <td className="px-5 py-3">
-                    <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium capitalize ${STATUS_COLORS[row.status] ?? "bg-slate-100 text-slate-500"}`}>
-                      {row.status}
-                    </span>
+                    <StatusBadge status={row.status} />
                   </td>
                   <td className="px-5 py-3">
                     <Link

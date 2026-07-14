@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Plus, RefreshCw } from "lucide-react";
 import { apiGet } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { humanizeLabel } from "@/lib/format";
 
 type BvRow = {
   id: string;
@@ -15,14 +17,6 @@ type BvRow = {
   initials: string | null;
   practice: string | null;
   createdAt: string | null;
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-700",
-  approved: "bg-green-100 text-green-700",
-  denied: "bg-red-100 text-red-700",
-  downloaded: "bg-slate-100 text-slate-600",
-  cancelled: "bg-slate-100 text-slate-500",
 };
 
 export default function WoundCareOrdersPage() {
@@ -121,12 +115,10 @@ export default function WoundCareOrdersPage() {
                 <tr key={order.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-5 py-3 font-medium text-slate-800">{order.initials ?? "—"}</td>
                   <td className="px-5 py-3 text-slate-600">{order.insurance ?? "—"}</td>
-                  <td className="px-5 py-3 text-slate-600">{order.woundType ?? "—"}</td>
+                  <td className="px-5 py-3 text-slate-600">{humanizeLabel(order.woundType)}</td>
                   <td className="px-5 py-3 text-slate-600">{order.woundSize ?? "—"}</td>
                   <td className="px-5 py-3">
-                    <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium capitalize ${STATUS_COLORS[order.status] ?? "bg-slate-100 text-slate-500"}`}>
-                      {order.status}
-                    </span>
+                    <StatusBadge status={order.status} />
                   </td>
                   <td className="px-5 py-3 text-slate-400 text-xs">
                     {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "—"}

@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Plus, RefreshCw } from "lucide-react";
 import { apiGet } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { humanizeLabel } from "@/lib/format";
 
 type OcularOrderRow = {
   id: string;
@@ -17,15 +19,6 @@ type OcularOrderRow = {
   patient: { firstName?: string; lastName?: string; dob?: string } | null;
   primaryDiagnosis: string | null;
   createdAt: string | null;
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-700",
-  approved: "bg-blue-100 text-blue-700",
-  shipped: "bg-purple-100 text-purple-700",
-  completed: "bg-green-100 text-green-700",
-  denied: "bg-red-100 text-red-700",
-  cancelled: "bg-slate-100 text-slate-500",
 };
 
 export default function OcularOrdersPage() {
@@ -131,15 +124,13 @@ export default function OcularOrdersPage() {
                   </td>
                   <td className="px-5 py-3 text-slate-600">
                     {order.productVariant && order.sizeMm
-                      ? `VisiDisc ${order.productVariant.charAt(0).toUpperCase() + order.productVariant.slice(1)} ${order.sizeMm}mm`
+                      ? `VisiDisc ${humanizeLabel(order.productVariant)} ${order.sizeMm}mm`
                       : order.sku ?? "—"}
                   </td>
-                  <td className="px-5 py-3 text-slate-600 capitalize">{order.eye ?? "—"}</td>
+                  <td className="px-5 py-3 text-slate-600">{humanizeLabel(order.eye)}</td>
                   <td className="px-5 py-3 text-slate-600">{order.quantity ?? "—"}</td>
                   <td className="px-5 py-3">
-                    <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium capitalize ${STATUS_COLORS[order.status] ?? "bg-slate-100 text-slate-500"}`}>
-                      {order.status}
-                    </span>
+                    <StatusBadge status={order.status} />
                   </td>
                   <td className="px-5 py-3 text-slate-400 text-xs">
                     {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "—"}

@@ -62,7 +62,7 @@ export default function OcularLayout({ children }: { children: React.ReactNode }
             href={item.href}
             onClick={() => setMobileOpen(false)}
             className={[
-              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
+              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2",
               isActive
                 ? "bg-teal-600 text-white shadow-sm"
                 : "text-teal-800 hover:bg-teal-100",
@@ -81,7 +81,7 @@ export default function OcularLayout({ children }: { children: React.ReactNode }
       {/* Top bar */}
       <header className="h-16 bg-white border-b border-teal-100 flex items-center px-4 gap-3 shrink-0 shadow-sm">
         <button
-          className="lg:hidden p-2 rounded-md text-teal-700 hover:bg-teal-50"
+          className="lg:hidden p-2 rounded-md text-teal-700 hover:bg-teal-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
           onClick={() => setMobileOpen(true)}
         >
           <Menu className="w-5 h-5" />
@@ -96,7 +96,7 @@ export default function OcularLayout({ children }: { children: React.ReactNode }
         </span>
         <button
           onClick={() => { void handleSignOut(); }}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-teal-700 hover:bg-teal-50 rounded-lg transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-teal-700 hover:bg-teal-50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
         >
           <LogOut className="w-4 h-4" />
           <span className="hidden sm:inline">Sign out</span>

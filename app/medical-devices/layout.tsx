@@ -58,7 +58,7 @@ export default function MedicalDevicesLayout({ children }: { children: React.Rea
             href={item.href}
             onClick={() => setMobileOpen(false)}
             className={[
-              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
+              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2",
               isActive
                 ? "bg-purple-600 text-white shadow-sm"
                 : "text-purple-800 hover:bg-purple-100",
@@ -76,7 +76,7 @@ export default function MedicalDevicesLayout({ children }: { children: React.Rea
     <div className="min-h-screen bg-purple-50 flex flex-col">
       <header className="h-16 bg-white border-b border-purple-100 flex items-center px-4 gap-3 shrink-0 shadow-sm">
         <button
-          className="lg:hidden p-2 rounded-md text-purple-700 hover:bg-purple-50"
+          className="lg:hidden p-2 rounded-md text-purple-700 hover:bg-purple-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
           onClick={() => setMobileOpen(true)}
         >
           <Menu className="w-5 h-5" />
@@ -91,7 +91,7 @@ export default function MedicalDevicesLayout({ children }: { children: React.Rea
         </span>
         <button
           onClick={() => { void handleSignOut(); }}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-purple-700 hover:bg-purple-50 rounded-lg transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-purple-700 hover:bg-purple-50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
         >
           <LogOut className="w-4 h-4" />
           <span className="hidden sm:inline">Sign out</span>

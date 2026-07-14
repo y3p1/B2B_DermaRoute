@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useAuthStore } from "@/store/auth";
 import { apiGet, apiPost } from "@/lib/apiClient";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -586,15 +587,7 @@ function OutcomeLoggerPanel({ token }: { token: string }) {
                       {o.product ?? "—"}
                     </td>
                     <td className="py-3 px-3">
-                      <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium capitalize ${
-                        o.status === "completed"
-                          ? "bg-green-50 text-green-700 border border-green-200"
-                          : o.status === "shipped"
-                            ? "bg-blue-50 text-blue-700 border border-blue-200"
-                            : "bg-yellow-50 text-yellow-700 border border-yellow-200"
-                      }`}>
-                        {o.status}
-                      </span>
+                      <StatusBadge status={o.status ?? "pending"} viewer="staff" />
                     </td>
                     <td className="py-3 px-3 text-right">
                       <button

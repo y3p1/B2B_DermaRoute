@@ -4,6 +4,8 @@ import * as React from "react";
 import { Eye, RefreshCw, ChevronDown } from "lucide-react";
 import { apiGet, apiPatch } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
+import { statusMeta } from "@/components/ui/status-badge";
+import { humanizeLabel } from "@/lib/format";
 
 type Patient = {
   firstName?: string;
@@ -33,16 +35,6 @@ type OcularOrderRow = {
 };
 
 const STATUS_OPTIONS = ["pending_review", "pending", "approved", "shipped", "completed", "denied", "cancelled"];
-
-const STATUS_COLORS: Record<string, string> = {
-  pending_review: "bg-orange-100 text-orange-700",
-  pending: "bg-yellow-100 text-yellow-700",
-  approved: "bg-blue-100 text-blue-700",
-  shipped: "bg-purple-100 text-purple-700",
-  completed: "bg-green-100 text-green-700",
-  denied: "bg-red-100 text-red-700",
-  cancelled: "bg-slate-100 text-slate-500",
-};
 
 function patientName(patient: Patient | null): string {
   if (!patient) return "—";
@@ -167,10 +159,10 @@ export function OcularOrdersTab() {
                     <td className="px-4 py-3 text-slate-500">{row.clinicName ?? "—"}</td>
                     <td className="px-4 py-3 text-slate-500">
                       {row.productVariant && row.sizeMm
-                        ? `VisiDisc ${row.productVariant.charAt(0).toUpperCase() + row.productVariant.slice(1)} ${row.sizeMm}mm`
+                        ? `VisiDisc ${humanizeLabel(row.productVariant)} ${row.sizeMm}mm`
                         : row.sku ?? "—"}
                     </td>
-                    <td className="px-4 py-3 text-slate-500 capitalize">{row.eye ?? "—"}</td>
+                    <td className="px-4 py-3 text-slate-500">{humanizeLabel(row.eye)}</td>
                     <td className="px-4 py-3 text-slate-500">{row.quantity ?? "—"}</td>
                     <td className="px-4 py-3">
                       <select
@@ -179,12 +171,12 @@ export function OcularOrdersTab() {
                         onChange={(e) => { void handleStatusChange(row.id, e.target.value); }}
                         disabled={updatingId === row.id}
                         className={[
-                          "text-xs font-medium px-2 py-1 rounded-full border-0 cursor-pointer",
-                          STATUS_COLORS[row.status] ?? "bg-slate-100 text-slate-500",
+                          "text-xs font-medium px-2 py-1 rounded-full border-0 ring-1 ring-inset cursor-pointer",
+                          statusMeta(row.status, "staff").classes,
                         ].join(" ")}
                       >
                         {STATUS_OPTIONS.map((s) => (
-                          <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+                          <option key={s} value={s}>{statusMeta(s, "staff").label}</option>
                         ))}
                       </select>
                     </td>

@@ -2,10 +2,14 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Plus, ClipboardList, Eye, Package } from "lucide-react";
+import { Plus, ClipboardList, CheckCircle, CheckCheck, Clock, Layers } from "lucide-react";
 import { apiGet } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
 import { isClientDemoMode } from "@/lib/demoMode";
+import { StatusBadge, canonicalStatus } from "@/components/ui/status-badge";
+import { StatCard } from "@/components/ui/stat-card";
+import { BreakdownCard } from "@/components/dashboard/BreakdownCard";
+import { humanizeLabel } from "@/lib/format";
 
 type OcularOrderSummary = {
   id: string;
@@ -15,15 +19,6 @@ type OcularOrderSummary = {
   sizeMm: number | null;
   patient: { firstName?: string; lastName?: string } | null;
   createdAt: string | null;
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-700",
-  approved: "bg-blue-100 text-blue-700",
-  shipped: "bg-purple-100 text-purple-700",
-  completed: "bg-green-100 text-green-700",
-  denied: "bg-red-100 text-red-700",
-  cancelled: "bg-slate-100 text-slate-500",
 };
 
 export default function OcularDashboardPage() {
@@ -42,13 +37,36 @@ export default function OcularDashboardPage() {
   }, [token]);
 
   const recentOrders = orders.slice(0, 5);
-  const pendingCount = orders.filter((o) => o.status === "pending").length;
-  const approvedCount = orders.filter((o) => o.status === "approved").length;
+  const statusOf = (o: OcularOrderSummary) => canonicalStatus(o.status, "provider");
+  const pendingCount = orders.filter((o) => statusOf(o) === "pending").length;
+  const approvedCount = orders.filter((o) => statusOf(o) === "approved").length;
+  const completedCount = orders.filter((o) => statusOf(o) === "completed").length;
+
+  const productMix = React.useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const o of orders) {
+      const key =
+        o.productVariant && o.sizeMm
+          ? `VisiDisc ${humanizeLabel(o.productVariant)} ${o.sizeMm}mm`
+          : "Unknown";
+      counts[key] = (counts[key] ?? 0) + 1;
+    }
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  }, [orders]);
+
+  const eyeCounts = React.useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const o of orders) {
+      const eye = humanizeLabel(o.eye, "Unknown");
+      counts[eye] = (counts[eye] ?? 0) + 1;
+    }
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  }, [orders]);
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-teal-900">
+        <h1 className="text-2xl font-bold text-teal-900 tracking-tight">
           Welcome{provider?.clinicName ? `, ${provider.clinicName}` : ""}
         </h1>
         <p className="text-teal-600 text-sm mt-1">
@@ -57,55 +75,88 @@ export default function OcularDashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white rounded-xl border border-teal-100 p-5 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 rounded-lg bg-teal-50 flex items-center justify-center">
-              <Package className="w-5 h-5 text-teal-600" />
-            </div>
-            <span className="text-sm font-medium text-slate-600">Total Orders</span>
-          </div>
-          <p className="text-2xl font-bold text-teal-900">{loading ? "…" : orders.length}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-teal-100 p-5 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 rounded-lg bg-yellow-50 flex items-center justify-center">
-              <ClipboardList className="w-5 h-5 text-yellow-600" />
-            </div>
-            <span className="text-sm font-medium text-slate-600">Pending</span>
-          </div>
-          <p className="text-2xl font-bold text-yellow-700">{loading ? "…" : pendingCount}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-teal-100 p-5 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
-              <Eye className="w-5 h-5 text-blue-600" />
-            </div>
-            <span className="text-sm font-medium text-slate-600">Approved</span>
-          </div>
-          <p className="text-2xl font-bold text-blue-700">{loading ? "…" : approvedCount}</p>
-        </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <StatCard
+          label="Total Orders"
+          value={orders.length}
+          loading={loading}
+          icon={ClipboardList}
+          iconClassName="bg-teal-50 text-teal-600"
+          valueClassName="text-teal-900"
+        />
+        <StatCard
+          label="Pending"
+          value={pendingCount}
+          loading={loading}
+          icon={Clock}
+          iconClassName="bg-amber-50 text-amber-600"
+          valueClassName="text-amber-700"
+        />
+        <StatCard
+          label="Approved"
+          value={approvedCount}
+          loading={loading}
+          icon={CheckCircle}
+          iconClassName="bg-sky-50 text-sky-600"
+          valueClassName="text-sky-700"
+        />
+        <StatCard
+          label="Completed"
+          value={completedCount}
+          loading={loading}
+          icon={CheckCheck}
+          iconClassName="bg-emerald-50 text-emerald-700"
+          valueClassName="text-emerald-700"
+        />
       </div>
 
-      {/* Quick action */}
-      <div className="bg-teal-600 rounded-xl p-6 text-white mb-8 flex items-center justify-between">
-        <div>
-          <h2 className="font-bold text-lg">Ready to order VisiDisc?</h2>
-          <p className="text-teal-100 text-sm mt-1">
-            Single-page form — takes under 2 minutes.
-          </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+        {/* Quick action */}
+        <div className="bg-teal-600 rounded-xl p-6 text-white flex flex-col justify-between">
+          <div>
+            <h2 className="font-bold text-lg">Ready to order VisiDisc?</h2>
+            <p className="text-teal-100 text-sm mt-1">
+              Single-page form — takes under 2 minutes.
+            </p>
+          </div>
+          <Link
+            href="/ocular/orders/new"
+            className="flex items-center justify-center gap-2 mt-4 px-5 py-2.5 bg-white text-teal-700 font-semibold rounded-lg hover:bg-teal-50 transition-colors text-sm"
+          >
+            <Plus className="w-4 h-4" />
+            New Order
+          </Link>
         </div>
-        <Link
-          href="/ocular/orders/new"
-          className="flex items-center gap-2 px-5 py-2.5 bg-white text-teal-700 font-semibold rounded-lg hover:bg-teal-50 transition-colors text-sm"
-        >
-          <Plus className="w-4 h-4" />
-          New Order
-        </Link>
+
+        {/* Product mix breakdown */}
+        <BreakdownCard
+          title="Product Mix"
+          icon={Layers}
+          iconClassName="text-teal-600"
+          barClassName="bg-teal-400"
+          loading={loading}
+          total={orders.length}
+          items={productMix.map(([label, count]) => ({ key: label, label, count }))}
+          footer={
+            eyeCounts.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {eyeCounts.map(([eye, count]) => (
+                  <span
+                    key={eye}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-teal-50 text-teal-800 ring-1 ring-inset ring-teal-600/20 px-2.5 py-1 text-xs font-medium"
+                  >
+                    {eye}
+                    <span className="text-teal-600 tabular-nums">{count}</span>
+                  </span>
+                ))}
+              </div>
+            ) : null
+          }
+        />
       </div>
 
       {/* Recent orders */}
-      <div className="bg-white rounded-xl border border-teal-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl ring-1 ring-slate-900/5 shadow-[0_1px_2px_rgb(15_23_42/0.04),0_4px_12px_-4px_rgb(15_23_42/0.06)] overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
           <h2 className="font-semibold text-slate-800">Recent Orders</h2>
           <Link href="/ocular/orders" className="text-sm text-teal-600 hover:text-teal-700 font-medium">
@@ -142,14 +193,12 @@ export default function OcularDashboardPage() {
                   </td>
                   <td className="px-5 py-3 text-slate-600">
                     {order.productVariant && order.sizeMm
-                      ? `VisiDisc ${order.productVariant.charAt(0).toUpperCase() + order.productVariant.slice(1)} ${order.sizeMm}mm`
+                      ? `VisiDisc ${humanizeLabel(order.productVariant)} ${order.sizeMm}mm`
                       : "—"}
                   </td>
-                  <td className="px-5 py-3 text-slate-600 capitalize">{order.eye ?? "—"}</td>
+                  <td className="px-5 py-3 text-slate-600">{humanizeLabel(order.eye)}</td>
                   <td className="px-5 py-3">
-                    <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium capitalize ${STATUS_COLORS[order.status] ?? "bg-slate-100 text-slate-500"}`}>
-                      {order.status}
-                    </span>
+                    <StatusBadge status={order.status} />
                   </td>
                   <td className="px-5 py-3 text-slate-400 text-xs">
                     {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "—"}

@@ -6,6 +6,8 @@ import { useParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { apiGet } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { humanizeLabel } from "@/lib/format";
 
 type OcularOrderDetail = {
   id: string;
@@ -26,15 +28,6 @@ type OcularOrderDetail = {
   submittedAt: string | null;
   submissionEmailUsed: string | null;
   createdAt: string | null;
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-700",
-  approved: "bg-blue-100 text-blue-700",
-  shipped: "bg-purple-100 text-purple-700",
-  completed: "bg-green-100 text-green-700",
-  denied: "bg-red-100 text-red-700",
-  cancelled: "bg-slate-100 text-slate-500",
 };
 
 function Field({ label, value }: { label: string; value?: string | number | null }) {
@@ -70,7 +63,7 @@ export default function OcularOrderDetailPage() {
   );
 
   const productLabel = order.productVariant && order.sizeMm
-    ? `VisiDisc ${order.productVariant.charAt(0).toUpperCase() + order.productVariant.slice(1)} ${order.sizeMm}mm`
+    ? `VisiDisc ${humanizeLabel(order.productVariant)} ${order.sizeMm}mm`
     : order.sku ?? "—";
 
   return (
@@ -84,9 +77,7 @@ export default function OcularOrderDetailPage() {
           <h1 className="text-2xl font-bold text-teal-900">Order Detail</h1>
           <p className="text-xs text-slate-400 font-mono mt-1">{order.id}</p>
         </div>
-        <span className={`inline-flex px-3 py-1.5 rounded-full text-sm font-medium capitalize ${STATUS_COLORS[order.status] ?? "bg-slate-100 text-slate-500"}`}>
-          {order.status}
-        </span>
+        <StatusBadge status={order.status} size="md" />
       </div>
 
       <div className="space-y-5">
@@ -116,7 +107,7 @@ export default function OcularOrderDetailPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <Field label="Product" value={productLabel} />
             <Field label="SKU" value={order.sku} />
-            <Field label="Eye" value={order.eye ? order.eye.charAt(0).toUpperCase() + order.eye.slice(1) : null} />
+            <Field label="Eye" value={order.eye ? humanizeLabel(order.eye) : null} />
             <Field label="Quantity" value={order.quantity} />
           </div>
         </div>

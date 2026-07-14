@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 export type ProductOrderRow = {
   id: string;
@@ -62,22 +63,7 @@ export const createProductOrderColumns = (
   {
     accessorKey: "status",
     header: "Status",
-    cell: (info) => {
-      const s = String(info.getValue());
-      const cls =
-        s === "completed"
-          ? "bg-green-100 text-green-800"
-          : s === "cancelled"
-            ? "bg-red-100 text-red-800"
-            : s === "shipped"
-              ? "bg-blue-100 text-blue-800"
-              : "bg-yellow-100 text-yellow-800";
-      return (
-        <span className={`${cls} text-xs font-medium px-3 py-1 rounded-full`}>
-          {s}
-        </span>
-      );
-    },
+    cell: (info) => <StatusBadge status={String(info.getValue())} viewer="staff" />,
   },
   {
     id: "actions",

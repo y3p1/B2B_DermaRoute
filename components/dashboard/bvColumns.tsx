@@ -3,6 +3,7 @@
 import * as React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 import ManufacturerProofUpload from "./ManufacturerProofUpload";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 export type BvRow = {
   id: string;
@@ -81,22 +82,7 @@ export const createBvColumns = (
   {
     accessorKey: "status",
     header: "Status",
-    cell: (info) => {
-      const s = String(info.getValue());
-      const cls =
-        s === "approved"
-          ? "bg-green-100 text-green-800"
-          : s === "rejected"
-            ? "bg-red-100 text-red-800"
-            : s === "downloaded"
-              ? "bg-blue-100 text-blue-800"
-              : "bg-yellow-100 text-yellow-800";
-      return (
-        <span className={`${cls} text-xs font-medium px-3 py-1 rounded-full`}>
-          {s}
-        </span>
-      );
-    },
+    cell: (info) => <StatusBadge status={String(info.getValue())} viewer="staff" />,
   },
   {
     id: "actions",
