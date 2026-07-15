@@ -6,6 +6,7 @@ import { apiGet, apiPatch } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
 import { supabase } from "@/lib/supabaseClient";
 import { CheckCircle2, FileText, ExternalLink, AlertCircle } from "lucide-react";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 type BvRow = {
   id: string;
@@ -216,19 +217,7 @@ export default function BvVerificationModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-b pb-4">
                 <div>
                   <div className="text-sm text-gray-500 mb-1">Status</div>
-                  <span
-                    className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
-                      bv.status === "pending"
-                        ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
-                        : bv.status === "approved"
-                          ? "bg-green-100 text-green-800 border border-green-200"
-                          : bv.status === "rejected"
-                            ? "bg-red-100 text-red-800 border border-red-200"
-                            : "bg-slate-100 text-slate-700 border border-slate-200"
-                    }`}
-                  >
-                    {bv.status}
-                  </span>
+                  <StatusBadge status={bv.status} viewer="staff" size="md" />
                 </div>
                 <div>
                   <div className="text-sm text-gray-500 mb-1">Request ID</div>

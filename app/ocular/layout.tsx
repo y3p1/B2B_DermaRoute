@@ -64,8 +64,8 @@ export default function OcularLayout({ children }: { children: React.ReactNode }
             className={[
               "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2",
               isActive
-                ? "bg-teal-600 text-white shadow-sm"
-                : "text-teal-800 hover:bg-teal-100",
+                ? "bg-teal-600 text-white shadow-sm active:bg-teal-700"
+                : "text-teal-800 hover:bg-teal-100 active:bg-teal-200",
             ].join(" ")}
           >
             <Icon className="w-5 h-5 shrink-0" />

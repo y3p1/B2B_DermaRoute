@@ -82,7 +82,7 @@ export const createBvColumns = (
   {
     accessorKey: "status",
     header: "Status",
-    cell: (info) => <StatusBadge status={String(info.getValue())} viewer="staff" />,
+    cell: (info) => <StatusBadge status={String(info.getValue())} />,
   },
   {
     id: "actions",

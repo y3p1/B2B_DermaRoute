@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Plus, RefreshCw } from "lucide-react";
 import { apiGet } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
-import { StatusBadge } from "@/components/ui/status-badge";
+import { StatusBadge, statusMeta } from "@/components/ui/status-badge";
 import { humanizeLabel } from "@/lib/format";
 
 type BvRow = {
@@ -44,7 +44,7 @@ export default function WoundCareOrdersPage() {
 
   const filtered = orders.filter((o) => {
     if (!search) return true;
-    const haystack = `${o.initials ?? ""} ${o.insurance ?? ""} ${o.woundType ?? ""} ${o.status}`.toLowerCase();
+    const haystack = `${o.initials ?? ""} ${o.insurance ?? ""} ${o.woundType ?? ""} ${humanizeLabel(o.woundType)} ${o.status} ${statusMeta(o.status).label}`.toLowerCase();
     return haystack.includes(search.toLowerCase());
   });
 

@@ -1,6 +1,7 @@
 import * as React from "react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { CARD_CHROME } from "@/lib/visual-constants";
 
 export type BreakdownItem = {
   key: string;
@@ -39,8 +40,8 @@ export function BreakdownCard({
   return (
     <div
       className={cn(
-        "bg-white rounded-xl p-5 ring-1 ring-slate-900/5",
-        "shadow-[0_1px_2px_rgb(15_23_42/0.04),0_4px_12px_-4px_rgb(15_23_42/0.06)]",
+        "bg-white rounded-xl p-5",
+        CARD_CHROME,
         className,
       )}
     >

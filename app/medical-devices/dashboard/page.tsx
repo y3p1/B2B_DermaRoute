@@ -2,12 +2,12 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Plus, ClipboardList, CheckCircle, CheckCheck, Clock, Wind } from "lucide-react";
+import { Plus, Wind } from "lucide-react";
 import { apiGet } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
 import { isClientDemoMode } from "@/lib/demoMode";
-import { StatusBadge, canonicalStatus } from "@/components/ui/status-badge";
-import { StatCard } from "@/components/ui/stat-card";
+import { StatusBadge, countByCanonicalStatus } from "@/components/ui/status-badge";
+import { DashboardStatsRow } from "@/components/dashboard/DashboardStatsRow";
 import { BreakdownCard } from "@/components/dashboard/BreakdownCard";
 import { humanizeLabel } from "@/lib/format";
 
@@ -55,10 +55,7 @@ export default function MedicalDevicesDashboardPage() {
   }, [token]);
 
   const recentOrders = orders.slice(0, 5);
-  const statusOf = (o: LymphedemaOrderRow) => canonicalStatus(o.status, "provider");
-  const pendingCount = orders.filter((o) => statusOf(o) === "pending").length;
-  const approvedCount = orders.filter((o) => statusOf(o) === "approved").length;
-  const completedCount = orders.filter((o) => statusOf(o) === "completed").length;
+  const counts = React.useMemo(() => countByCanonicalStatus(orders), [orders]);
 
   const deviceCounts = React.useMemo(() => {
     const counts: Record<string, number> = {};
@@ -91,40 +88,8 @@ export default function MedicalDevicesDashboardPage() {
         </p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard
-          label="Total Orders"
-          value={orders.length}
-          loading={loading}
-          icon={ClipboardList}
-          iconClassName="bg-purple-50 text-purple-600"
-          valueClassName="text-purple-900"
-        />
-        <StatCard
-          label="Pending"
-          value={pendingCount}
-          loading={loading}
-          icon={Clock}
-          iconClassName="bg-amber-50 text-amber-600"
-          valueClassName="text-amber-700"
-        />
-        <StatCard
-          label="Approved"
-          value={approvedCount}
-          loading={loading}
-          icon={CheckCircle}
-          iconClassName="bg-sky-50 text-sky-600"
-          valueClassName="text-sky-700"
-        />
-        <StatCard
-          label="Completed"
-          value={completedCount}
-          loading={loading}
-          icon={CheckCheck}
-          iconClassName="bg-emerald-50 text-emerald-700"
-          valueClassName="text-emerald-700"
-        />
+      <div className="mb-8">
+        <DashboardStatsRow total={orders.length} counts={counts} loading={loading} totalLabel="Total Orders" totalIconClassName="bg-purple-50 text-purple-600" totalValueClassName="text-purple-900" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
@@ -138,7 +103,7 @@ export default function MedicalDevicesDashboardPage() {
           </div>
           <Link
             href="/medical-devices/orders/new"
-            className="flex items-center justify-center gap-2 mt-4 px-5 py-2.5 bg-white text-purple-700 font-semibold rounded-lg hover:bg-purple-50 transition-colors text-sm"
+            className="flex items-center justify-center gap-2 mt-4 px-5 py-2.5 bg-white text-purple-700 font-semibold rounded-lg hover:bg-purple-50 active:bg-purple-100 transition-colors text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-purple-600"
           >
             <Plus className="w-4 h-4" />
             New Order

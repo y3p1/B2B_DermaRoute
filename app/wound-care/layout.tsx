@@ -62,8 +62,8 @@ export default function WoundCareLayout({ children }: { children: React.ReactNod
             className={[
               "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
               isActive
-                ? "bg-emerald-600 text-white shadow-sm"
-                : "text-emerald-800 hover:bg-emerald-100",
+                ? "bg-emerald-600 text-white shadow-sm active:bg-emerald-700"
+                : "text-emerald-800 hover:bg-emerald-100 active:bg-emerald-200",
             ].join(" ")}
           >
             <Icon className="w-5 h-5 shrink-0" />

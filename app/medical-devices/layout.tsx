@@ -60,8 +60,8 @@ export default function MedicalDevicesLayout({ children }: { children: React.Rea
             className={[
               "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2",
               isActive
-                ? "bg-purple-600 text-white shadow-sm"
-                : "text-purple-800 hover:bg-purple-100",
+                ? "bg-purple-600 text-white shadow-sm active:bg-purple-700"
+                : "text-purple-800 hover:bg-purple-100 active:bg-purple-200",
             ].join(" ")}
           >
             <Icon className="w-5 h-5 shrink-0" />

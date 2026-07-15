@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { RefreshCw, ClipboardCheck, Wind, Eye } from "lucide-react";
 import { apiGet } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
-import { StatusBadge, statusMeta } from "@/components/ui/status-badge";
+import { StatusBadge, statusMeta, canonicalStatus } from "@/components/ui/status-badge";
 import { humanizeLabel } from "@/lib/format";
 
 type SubmissionType = "bv_request" | "medical_device" | "ocular";
@@ -118,11 +118,15 @@ export function AllSubmissionsTab() {
 
   React.useEffect(() => { void refresh(); }, [refresh]);
 
-  const allStatuses = Array.from(new Set(rows.map((r) => r.status))).sort();
+  const allCanonicalStatuses = React.useMemo(() => {
+    const set = new Set<string>();
+    for (const r of rows) set.add(canonicalStatus(r.status, "staff"));
+    return Array.from(set).sort();
+  }, [rows]);
 
   const filtered = rows.filter((r) => {
     if (typeFilter !== "all" && r.type !== typeFilter) return false;
-    if (statusFilter !== "all" && r.status !== statusFilter) return false;
+    if (statusFilter !== "all" && canonicalStatus(r.status, "staff") !== statusFilter) return false;
     return true;
   });
 
@@ -173,7 +177,7 @@ export function AllSubmissionsTab() {
           className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 text-slate-600 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
         >
           <option value="all">All Statuses</option>
-          {allStatuses.map((s) => (
+          {allCanonicalStatuses.map((s) => (
             <option key={s} value={s}>{statusMeta(s, "staff").label}</option>
           ))}
         </select>

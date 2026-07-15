@@ -45,6 +45,18 @@ export function statusMeta(status: string, viewer: StatusViewer = "provider"): S
   return STATUS_META[canonical] ?? { label: humanizeLabel(status), classes: UNKNOWN_CLASSES };
 }
 
+export function countByCanonicalStatus(
+  items: { status: string }[],
+  viewer: StatusViewer = "provider",
+) {
+  const counts = { pending: 0, approved: 0, completed: 0 };
+  for (const item of items) {
+    const s = canonicalStatus(item.status, viewer);
+    if (s in counts) counts[s as keyof typeof counts]++;
+  }
+  return counts;
+}
+
 const SIZE_CLASSES = {
   sm: "px-2.5 py-1 text-xs",
   md: "px-3 py-1.5 text-sm",

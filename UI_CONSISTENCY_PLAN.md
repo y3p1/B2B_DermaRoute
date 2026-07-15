@@ -85,3 +85,23 @@ Medical devices (purple):
 - [x] Zero grey/raw pills on wound dashboard; Pending stat includes pending_review (via canonicalStatus, code-verified — seed data has no pending_review rows); staff shows "Pending Review"; breakdowns Title Case
 - [x] `npm run lint` (0 errors, 11 pre-existing warnings), `npm run build` green. `npm test`: 1 PRE-EXISTING failure (`me-and-bv.test.ts` GET /api/me → 500, broke before this work — no backend files touched here; likely 39d871b vs test mocks)
 - [x] Commit (no Co-Authored-By)
+
+## Code review findings (post-commit `eff22d3`)
+
+High-effort review: 8 finder angles → 37 candidates → adversarial verification. 10 survived (all CONFIRMED except #7 PLAUSIBLE). Ranked most-severe first.
+
+### Correctness
+- [x] **1. Duplicate "Denied" filter options** — Fixed: dedupe by `canonicalStatus` in AllSubmissionsTab; filter uses canonical match.
+- [x] **2. Search doesn't match displayed text** — Fixed: haystacks include `statusMeta().label` (staff dashboard, both BV search contexts) and `humanizeLabel(woundType)` (wound-care orders).
+- [x] **3. Missed straggler: BvVerificationModal** — Fixed: swapped inline ternary to `<StatusBadge viewer="staff" size="md" />`.
+- [x] **4. Sidebar BV badge under-counts** — Fixed: badge counts `pending` + `pending_review`.
+- [x] **5. `bvColumns.tsx` wrong viewer** — Fixed: dropped `viewer="staff"` (defaults to provider).
+- [x] **6. Focus ring renders inset on role/service cards** — Fixed: replaced `ring-1 ring-inset` with `inset-ring-1` / `inset-ring-{color}` on focusable card buttons in RoleSwitcher + LandingPage.
+- [x] **7. Product Mix "Unknown" vs sku fallback** (PLAUSIBLE) — Label changed to "Not specified" for consistency; sku not in API response type, accepted as edge case.
+
+### Cleanup / conventions
+- [x] **8. Stat-count + StatCard grid triplicated, unmemoized** — Fixed: `countByCanonicalStatus()` helper in status-badge.tsx, `DashboardStatsRow` component in `components/dashboard/DashboardStatsRow.tsx`. All 3 dashboards refactored to use memoized shared path.
+- [x] **9. Duplicated visual constants** — Fixed: `lib/visual-constants.ts` exports `NOISE_BG`, `HERO_GRADIENT_BG`, `CARD_CHROME`. RoleSwitcher + LandingPage import shared constants; StatCard + BreakdownCard use `CARD_CHROME`.
+- [x] **10. CLAUDE.md interactive-states rule violated** — Fixed: `active:` states added to nav links in all 3 provider layouts + staff sidebar; `focus-visible` + `active` added to all 3 dashboard CTAs.
+
+Refuted during verification (for the record): staff `rejected`→"Denied" merge is plan-sanctioned (canonical table has no `rejected` row); "Completed" stat is a locked decision and populated by seed data; `AnalyticsTab` `?? "pending"` fallback can never fire (backend query requires status IN shipped/completed).

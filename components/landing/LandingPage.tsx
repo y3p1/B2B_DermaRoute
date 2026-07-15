@@ -14,8 +14,7 @@ type ServiceCard = {
   icon: React.FC<{ className?: string; style?: React.CSSProperties }>;
 };
 
-const NOISE_BG =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
+import { NOISE_BG, HERO_GRADIENT_BG } from "@/lib/visual-constants";
 
 const SERVICES: ServiceCard[] = [
   {
@@ -77,14 +76,7 @@ export function LandingPage() {
   return (
     <div
       className="relative min-h-screen flex flex-col items-center justify-center px-4 py-16 overflow-hidden"
-      style={{
-        background: [
-          "radial-gradient(60rem 40rem at 15% -10%, oklch(0.95 0.04 160 / 0.9), transparent 60%)",
-          "radial-gradient(50rem 35rem at 110% 15%, oklch(0.96 0.03 40 / 0.7), transparent 55%)",
-          "radial-gradient(45rem 30rem at 50% 115%, oklch(0.94 0.04 160 / 0.55), transparent 60%)",
-          "oklch(0.985 0.005 160)",
-        ].join(", "),
-      }}
+      style={{ background: HERO_GRADIENT_BG }}
     >
       <div
         aria-hidden
@@ -125,7 +117,7 @@ export function LandingPage() {
               onClick={() => handleServiceClick(service)}
               disabled={isAuthenticated && !enabled}
               className={[
-                "group flex flex-col items-center text-center gap-4 p-7 rounded-2xl bg-white ring-1 ring-inset ring-[oklch(0.45_0.12_160/0.14)]",
+                "group flex flex-col items-center text-center gap-4 p-7 rounded-2xl bg-white inset-ring-1 inset-ring-[oklch(0.45_0.12_160/0.14)]",
                 "focus:outline-none focus-visible:ring-2 focus-visible:ring-[oklch(0.65_0.167_35)] focus-visible:ring-offset-2",
                 interactive
                   ? [

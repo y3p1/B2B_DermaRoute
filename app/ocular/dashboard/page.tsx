@@ -2,12 +2,12 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Plus, ClipboardList, CheckCircle, CheckCheck, Clock, Layers } from "lucide-react";
+import { Plus, Layers } from "lucide-react";
 import { apiGet } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
 import { isClientDemoMode } from "@/lib/demoMode";
-import { StatusBadge, canonicalStatus } from "@/components/ui/status-badge";
-import { StatCard } from "@/components/ui/stat-card";
+import { StatusBadge, countByCanonicalStatus } from "@/components/ui/status-badge";
+import { DashboardStatsRow } from "@/components/dashboard/DashboardStatsRow";
 import { BreakdownCard } from "@/components/dashboard/BreakdownCard";
 import { humanizeLabel } from "@/lib/format";
 
@@ -37,10 +37,7 @@ export default function OcularDashboardPage() {
   }, [token]);
 
   const recentOrders = orders.slice(0, 5);
-  const statusOf = (o: OcularOrderSummary) => canonicalStatus(o.status, "provider");
-  const pendingCount = orders.filter((o) => statusOf(o) === "pending").length;
-  const approvedCount = orders.filter((o) => statusOf(o) === "approved").length;
-  const completedCount = orders.filter((o) => statusOf(o) === "completed").length;
+  const counts = React.useMemo(() => countByCanonicalStatus(orders), [orders]);
 
   const productMix = React.useMemo(() => {
     const counts: Record<string, number> = {};
@@ -48,7 +45,7 @@ export default function OcularDashboardPage() {
       const key =
         o.productVariant && o.sizeMm
           ? `VisiDisc ${humanizeLabel(o.productVariant)} ${o.sizeMm}mm`
-          : "Unknown";
+          : "Not specified";
       counts[key] = (counts[key] ?? 0) + 1;
     }
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
@@ -74,40 +71,8 @@ export default function OcularDashboardPage() {
         </p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard
-          label="Total Orders"
-          value={orders.length}
-          loading={loading}
-          icon={ClipboardList}
-          iconClassName="bg-teal-50 text-teal-600"
-          valueClassName="text-teal-900"
-        />
-        <StatCard
-          label="Pending"
-          value={pendingCount}
-          loading={loading}
-          icon={Clock}
-          iconClassName="bg-amber-50 text-amber-600"
-          valueClassName="text-amber-700"
-        />
-        <StatCard
-          label="Approved"
-          value={approvedCount}
-          loading={loading}
-          icon={CheckCircle}
-          iconClassName="bg-sky-50 text-sky-600"
-          valueClassName="text-sky-700"
-        />
-        <StatCard
-          label="Completed"
-          value={completedCount}
-          loading={loading}
-          icon={CheckCheck}
-          iconClassName="bg-emerald-50 text-emerald-700"
-          valueClassName="text-emerald-700"
-        />
+      <div className="mb-8">
+        <DashboardStatsRow total={orders.length} counts={counts} loading={loading} totalLabel="Total Orders" totalIconClassName="bg-teal-50 text-teal-600" totalValueClassName="text-teal-900" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
@@ -121,7 +86,7 @@ export default function OcularDashboardPage() {
           </div>
           <Link
             href="/ocular/orders/new"
-            className="flex items-center justify-center gap-2 mt-4 px-5 py-2.5 bg-white text-teal-700 font-semibold rounded-lg hover:bg-teal-50 transition-colors text-sm"
+            className="flex items-center justify-center gap-2 mt-4 px-5 py-2.5 bg-white text-teal-700 font-semibold rounded-lg hover:bg-teal-50 active:bg-teal-100 transition-colors text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-teal-600"
           >
             <Plus className="w-4 h-4" />
             New Order

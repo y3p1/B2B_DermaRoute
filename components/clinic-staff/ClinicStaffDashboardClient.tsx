@@ -29,7 +29,7 @@ import { useAuthStore } from "@/store/auth";
 import { supabase } from "@/lib/supabaseClient";
 import { apiGet } from "@/lib/apiClient";
 import { isClientDemoMode } from "@/lib/demoMode";
-import { StatusBadge } from "@/components/ui/status-badge";
+import { StatusBadge, statusMeta } from "@/components/ui/status-badge";
 import PolicyAssistantClient from "@/components/policy-assistant/PolicyAssistantClient";
 import DashboardNavbar from "@/components/dashboard/DashboardNavbar";
 import BaaProvidersEmbeddedClient from "@/components/admin/baa-providers/BaaProvidersEmbeddedClient";
@@ -128,8 +128,8 @@ function SidebarNavItem({
       title={collapsed ? label : undefined}
       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150 group relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
         active
-          ? "bg-white/8 text-white"
-          : "text-white/65 hover:bg-white/10 hover:text-white"
+          ? "bg-white/8 text-white active:bg-white/12"
+          : "text-white/65 hover:bg-white/10 hover:text-white active:bg-white/15"
       }`}
     >
       {active && (
@@ -380,7 +380,7 @@ export default function ClinicStaffDashboardClient({
       key: "bv_requests" as TabKey,
       label: "BV Requests",
       icon: <ClipboardCheck className="w-5 h-5" />,
-      badge: bvRequests.filter((r) => r.status === "pending").length,
+      badge: bvRequests.filter((r) => r.status === "pending" || r.status === "pending_review").length,
     },
     {
       key: "product_orders" as TabKey,
@@ -736,7 +736,8 @@ export default function ClinicStaffDashboardClient({
                               (r.insurance ?? "").toLowerCase().includes(bvSearchQuery.toLowerCase()) ||
                               (r.placeOfService ?? "").toLowerCase().includes(bvSearchQuery.toLowerCase()) ||
                               (r.woundType ?? "").toLowerCase().includes(bvSearchQuery.toLowerCase()) ||
-                              r.status.toLowerCase().includes(bvSearchQuery.toLowerCase());
+                              r.status.toLowerCase().includes(bvSearchQuery.toLowerCase()) ||
+                            statusMeta(r.status, "staff").label.toLowerCase().includes(bvSearchQuery.toLowerCase());
                             
                             const matchesDate = !bvDateFilter || (r.createdAt && r.createdAt.startsWith(bvDateFilter));
                             
@@ -797,7 +798,8 @@ export default function ClinicStaffDashboardClient({
                             (r.insurance ?? "").toLowerCase().includes(bvSearchQuery.toLowerCase()) ||
                             (r.placeOfService ?? "").toLowerCase().includes(bvSearchQuery.toLowerCase()) ||
                             (r.woundType ?? "").toLowerCase().includes(bvSearchQuery.toLowerCase()) ||
-                            r.status.toLowerCase().includes(bvSearchQuery.toLowerCase());
+                            r.status.toLowerCase().includes(bvSearchQuery.toLowerCase()) ||
+                            statusMeta(r.status, "staff").label.toLowerCase().includes(bvSearchQuery.toLowerCase());
                           
                           const matchesDate = !bvDateFilter || (r.createdAt && r.createdAt.startsWith(bvDateFilter));
                           
