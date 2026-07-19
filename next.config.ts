@@ -13,14 +13,19 @@ const supabaseWss = supabaseUrl.replace(/^https:/, "wss:");
 const cspReportOnly = [
   "default-src 'self'",
   "base-uri 'self'",
-  "object-src 'none'",
+  // @react-pdf/renderer draws PDFs into a same-origin blob; the in-app viewer
+  // shows it via <object data="blob:…"> and the browser frames it. Both are
+  // our own same-origin blobs, so allow blob: for object/frame only.
+  "object-src 'self' blob:",
+  "frame-src 'self' blob:",
   "frame-ancestors 'self'",
   "form-action 'self'",
   "img-src 'self' data: blob: https://placehold.co " + supabaseUrl,
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
-  ["connect-src 'self'", supabaseUrl, supabaseWss,
+  // data: — @react-pdf/renderer fetches its layout/font WASM from a data: URI.
+  ["connect-src 'self' data:", supabaseUrl, supabaseWss,
     "https://va.vercel-scripts.com", "https://vitals.vercel-insights.com"]
     .filter(Boolean)
     .join(" "),
@@ -38,7 +43,7 @@ const securityHeaders = [
   // Disable browser features the app never uses.
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(), browsing-topics=()",
+    value: "camera=(), microphone=(), geolocation=()",
   },
   { key: "Content-Security-Policy-Report-Only", value: cspReportOnly },
 ];
