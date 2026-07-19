@@ -5,12 +5,11 @@ import type { NextConfig } from "next";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseWss = supabaseUrl.replace(/^https:/, "wss:");
 
-// Report-Only CSP: the browser reports violations to the console but blocks
-// NOTHING. This lets us observe what a strict policy would break (inline
-// scripts, third-party origins) before switching to an enforcing
-// `Content-Security-Policy` header. Tighten script-src/style-src (drop
-// 'unsafe-inline') once the console is clean, ideally with a nonce.
-const cspReportOnly = [
+// Enforcing CSP: the browser BLOCKS any resource that violates this policy.
+// Verified clean in Report-Only across dashboards, policy assistant, and the
+// PDF viewer before enforcing. Remaining loosening to harden later: drop
+// 'unsafe-inline'/'unsafe-eval' from script-src via a nonce.
+const csp = [
   "default-src 'self'",
   "base-uri 'self'",
   // @react-pdf/renderer draws PDFs into a same-origin blob; the in-app viewer
@@ -45,7 +44,7 @@ const securityHeaders = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=()",
   },
-  { key: "Content-Security-Policy-Report-Only", value: cspReportOnly },
+  { key: "Content-Security-Policy", value: csp },
 ];
 
 const nextConfig: NextConfig = {
