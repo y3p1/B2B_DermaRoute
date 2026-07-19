@@ -1,5 +1,6 @@
 import type { Request, Response } from "../http/types";
 import { z, ZodError } from "zod";
+import { isHttpError } from "../utils/httpError";
 import {
   ingestDocument,
   queryDocuments,
@@ -34,6 +35,9 @@ export async function ingestController(req: Request, res: Response) {
     const result = await ingestDocument(buffer, filename);
     return res.status(201).json({ success: true, data: result });
   } catch (error) {
+    if (isHttpError(error)) {
+      return res.status(error.status).json({ success: false, error: error.message });
+    }
     const message = error instanceof Error ? error.message : "Ingestion failed";
     return res.status(500).json({ success: false, error: message });
   }
@@ -49,6 +53,10 @@ export async function queryController(req: Request, res: Response) {
       return res
         .status(400)
         .json({ success: false, error: error.issues[0]?.message ?? "Validation error" });
+    }
+    // Global daily budget guard (and any other service-thrown HttpError).
+    if (isHttpError(error)) {
+      return res.status(error.status).json({ success: false, error: error.message });
     }
     const message = error instanceof Error ? error.message : "Query failed";
     if (message.includes("429") || message.includes("Too Many Requests")) {

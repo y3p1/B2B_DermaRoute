@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { sql } from "drizzle-orm";
 import { getDb } from "./db";
+import { assertLlmBudget } from "./llmBudget";
 import { documentChunks } from "../../db/document-chunks";
 
 function getGemini(): GoogleGenerativeAI {
@@ -49,6 +50,8 @@ function chunkText(text: string, chunkSize = 2000, overlap = 200): string[] {
 
 async function embedTexts(genAI: GoogleGenerativeAI, texts: string[]): Promise<number[][]> {
   const model = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
+  // Reserve budget for the whole batch before making any billable call.
+  await assertLlmBudget(texts.length);
   const embeddings: number[][] = [];
   for (const text of texts) {
     const result = await withRetry(() => model.embedContent(text));
@@ -150,6 +153,9 @@ export async function queryDocuments(
     .join("\n\n");
 
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+
+  // Count the generation call against the global daily budget.
+  await assertLlmBudget(1);
 
   const sanitizedQuestion = question
     .replace(/```/g, "")

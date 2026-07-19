@@ -49,3 +49,13 @@ export function getPort(): number {
 export function isDev(): boolean {
   return process.env.NODE_ENV !== "production";
 }
+
+// Global cap on Gemini API calls (embeddings + generation) per calendar day,
+// enforced durably across all serverless instances. Backstop against runaway
+// cost/flooding of the policy assistant. Set to 0 (or negative) to disable.
+export function getGeminiDailyCallBudget(): number {
+  const raw = process.env.GEMINI_DAILY_CALL_BUDGET;
+  if (raw === undefined || raw.trim() === "") return 2000; // default daily cap
+  const n = parseInt(raw, 10);
+  return Number.isFinite(n) ? n : 2000;
+}
