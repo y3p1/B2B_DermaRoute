@@ -127,8 +127,44 @@ export async function getLymphedemaOrders(filters?: { providerIds?: string[] }) 
 export async function getLymphedemaOrder(id: string) {
   const db = getDb();
   const rows = await db
-    .select()
+    .select({
+      id: lymphedemaOrders.id,
+      providerId: lymphedemaOrders.providerId,
+      submittedBy: lymphedemaOrders.submittedBy,
+      orderingProviderId: lymphedemaOrders.orderingProviderId,
+      patient: lymphedemaOrders.patient,
+      insurance: lymphedemaOrders.insurance,
+      placeOfService: lymphedemaOrders.placeOfService,
+      diagnosis: lymphedemaOrders.diagnosis,
+      conservativeTherapyCompleted: lymphedemaOrders.conservativeTherapyCompleted,
+      skinChanges: lymphedemaOrders.skinChanges,
+      extremity: lymphedemaOrders.extremity,
+      measurements: lymphedemaOrders.measurements,
+      device: lymphedemaOrders.device,
+      hcpcs: lymphedemaOrders.hcpcs,
+      deviceRecommended: lymphedemaOrders.deviceRecommended,
+      garmentType: lymphedemaOrders.garmentType,
+      garmentStyle: lymphedemaOrders.garmentStyle,
+      compressionLevel: lymphedemaOrders.compressionLevel,
+      quantity: lymphedemaOrders.quantity,
+      customMade: lymphedemaOrders.customMade,
+      manufacturerPreference: lymphedemaOrders.manufacturerPreference,
+      distalPressureMmhg: lymphedemaOrders.distalPressureMmhg,
+      timesPerDay: lymphedemaOrders.timesPerDay,
+      minutesPerSession: lymphedemaOrders.minutesPerSession,
+      pdfUrl: lymphedemaOrders.pdfUrl,
+      status: lymphedemaOrders.status,
+      submissionEmailUsed: lymphedemaOrders.submissionEmailUsed,
+      submittedAt: lymphedemaOrders.submittedAt,
+      lymphedemaProductId: lymphedemaOrders.lymphedemaProductId,
+      createdAt: lymphedemaOrders.createdAt,
+      updatedAt: lymphedemaOrders.updatedAt,
+      physicianName: providerAcct.clinicName,
+      physicianPhone: providerAcct.clinicPhone,
+      physicianNpi: providerAcct.npiNumber,
+    })
     .from(lymphedemaOrders)
+    .leftJoin(providerAcct, eq(lymphedemaOrders.providerId, providerAcct.id))
     .where(eq(lymphedemaOrders.id, id))
     .limit(1);
   return rows[0] ?? null;

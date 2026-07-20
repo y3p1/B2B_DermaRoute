@@ -749,6 +749,8 @@ export type LymphedemaOrderForPdf = {
     lastName?: string;
     dob?: string;
     mrn?: string;
+    signatureMode?: string;
+    signatureData?: string;
   } | null;
   insurance: string | null;
   placeOfService: string | null;
@@ -768,6 +770,9 @@ export type LymphedemaOrderForPdf = {
   minutesPerSession: number | null;
   submittedAt: string | null;
   createdAt: string | null;
+  physicianName?: string | null;
+  physicianPhone?: string | null;
+  physicianNpi?: string | null;
 };
 
 export function orderToFormData(order: LymphedemaOrderForPdf): LymphedemaFormData {
@@ -830,6 +835,11 @@ export function orderToFormData(order: LymphedemaOrderForPdf): LymphedemaFormDat
     })(),
     pumpArea: order.garmentType ?? "",
     orderType: order.hcpcs ? (order.garmentStyle ? "both" : "pump") : (order.garmentStyle ? "garment" : ""),
+    physicianName: order.physicianName ?? "",
+    physicianPhone: order.physicianPhone ?? "",
+    physicianNpi: order.physicianNpi ?? "",
+    signatureMode: order.patient?.signatureMode === "draw" ? "digital" : "manual",
+    signatureDataUrl: order.patient?.signatureData ?? "",
   };
 }
 

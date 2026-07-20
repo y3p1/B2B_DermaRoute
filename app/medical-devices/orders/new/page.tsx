@@ -100,6 +100,34 @@ const E0652_AREAS = [
   "Full Leg", "Left Leg", "Right Leg", "Bilateral", "Pant System",
   "Arm Left", "Arm Right", "Arm Plus Left", "Arm Plus Right",
 ];
+function deriveExtremity(pumpArea: string, selectedGarments: string[]): string[] {
+  const result = new Set<string>();
+
+  const pumpMap: Record<string, string[]> = {
+    "Full Leg": ["Left Leg", "Right Leg"],
+    "Left Leg": ["Left Leg"],
+    "Right Leg": ["Right Leg"],
+    "Bilateral": ["Bilateral Legs"],
+    "Pant System": ["Bilateral Legs"],
+    "Arm Left": ["Left Arm"],
+    "Arm Right": ["Right Arm"],
+    "Arm Plus Left": ["Left Arm"],
+    "Arm Plus Right": ["Right Arm"],
+  };
+  for (const ex of pumpMap[pumpArea] ?? []) result.add(ex);
+
+  const hasLower = selectedGarments.some((k) => k.startsWith("lower"));
+  const hasUpper = selectedGarments.some((k) => k.startsWith("upper"));
+  if (hasLower && !result.has("Left Leg") && !result.has("Right Leg") && !result.has("Bilateral Legs")) {
+    result.add("Bilateral Legs");
+  }
+  if (hasUpper && !result.has("Left Arm") && !result.has("Right Arm")) {
+    result.add("Left Arm");
+  }
+
+  return [...result];
+}
+
 const MMHG_OPTIONS = ["65", "60", "55", "50", "45", "40", "35", "30"];
 const DIAGNOSES = [
   { code: "I89.0", label: "(I89.0) Lymphedema" },
@@ -409,7 +437,7 @@ export default function MedicalDevicesNewOrderPage() {
       diagnosis: formData.diagnosisCode ? [formData.diagnosisCode] : [],
       conservativeTherapy: "yes",
       skinChanges: [],
-      extremity: [],
+      extremity: deriveExtremity(pumpArea, [...formData.selectedGarments]),
       measurements: {},
       device: deviceName,
       hcpcs: formData.pumpType,
@@ -507,6 +535,7 @@ export default function MedicalDevicesNewOrderPage() {
             physicianNPI: provider?.npiNumber ?? "",
             physicianDate: formData.physicianDate,
             signatureMode: formData.signatureMode,
+            signatureData: formData.signatureMode === "draw" ? formData.signatureData : undefined,
             productName: formData.productName || undefined,
             productWearTime: formData.productWearTime || undefined,
             customMadeNotes: formData.customMadeNotes || undefined,
@@ -515,7 +544,7 @@ export default function MedicalDevicesNewOrderPage() {
           diagnosis: formData.diagnosisCode ? [formData.diagnosisCode] : [],
           conservativeTherapyCompleted: false,
           skinChanges: [],
-          extremity: [],
+          extremity: deriveExtremity(pumpArea, [...formData.selectedGarments]),
           device: deviceName,
           hcpcs: formData.pumpType || undefined,
           garmentType: pumpArea || undefined,

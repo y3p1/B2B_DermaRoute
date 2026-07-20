@@ -1,12 +1,16 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
-import { Wind, RefreshCw, ChevronDown } from "lucide-react";
+import { Wind, RefreshCw, ChevronDown, Loader2 } from "lucide-react";
 import { apiGet, apiPatch } from "@/lib/apiClient";
 import { useAuthStore } from "@/store/auth";
 import { statusMeta } from "@/components/ui/status-badge";
 import { humanizeLabel } from "@/lib/format";
+import {
+  ReMarxOrderDocument,
+  orderToFormData,
+  type LymphedemaOrderForPdf,
+} from "@/components/dashboard/LymphedemaOrderPdf";
 
 type Patient = {
   firstName?: string;
@@ -46,7 +50,6 @@ function patientName(patient: Patient | null): string {
 }
 
 export function LymphedemaOrdersTab() {
-  const router = useRouter();
   const token = useAuthStore((s) => s.jwt);
   const [rows, setRows] = React.useState<LymphedemaOrderRow[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -54,6 +57,7 @@ export function LymphedemaOrdersTab() {
   const [updatingId, setUpdatingId] = React.useState<string | null>(null);
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
   const [sendingEmailId, setSendingEmailId] = React.useState<string | null>(null);
+  const [viewingPdfId, setViewingPdfId] = React.useState<string | null>(null);
 
   const refresh = React.useCallback(async () => {
     setLoading(true);
@@ -90,6 +94,26 @@ export function LymphedemaOrdersTab() {
       setError(err instanceof Error ? err.message : "Failed to send email");
     } finally {
       setSendingEmailId(null);
+    }
+  };
+
+  const handleViewPdf = async (orderId: string) => {
+    if (!token) return;
+    setViewingPdfId(orderId);
+    try {
+      const res = await apiGet<{ success: true; data: LymphedemaOrderForPdf }>(
+        `/api/lymphedema-orders/${orderId}`,
+        { token },
+      );
+      const formData = orderToFormData(res.data);
+      const { pdf } = await import("@react-pdf/renderer");
+      const blob = await pdf(<ReMarxOrderDocument data={formData} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to generate PDF");
+    } finally {
+      setViewingPdfId(null);
     }
   };
 
@@ -220,9 +244,11 @@ export function LymphedemaOrdersTab() {
                         </div>
                         <div className="flex items-center gap-2 pt-2 border-t border-slate-200">
                           <button
-                            onClick={(e) => { e.stopPropagation(); router.push(`/medical-devices/orders/${row.id}/pdf`); }}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+                            onClick={(e) => { e.stopPropagation(); void handleViewPdf(row.id); }}
+                            disabled={viewingPdfId === row.id}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 transition-colors"
                           >
+                            {viewingPdfId === row.id && <Loader2 className="w-3 h-3 animate-spin" />}
                             View PDF
                           </button>
                           <button

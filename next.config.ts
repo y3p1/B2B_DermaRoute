@@ -23,6 +23,7 @@ const csp = [
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
+  "worker-src 'self' blob:",
   // data: — @react-pdf/renderer fetches its layout/font WASM from a data: URI.
   ["connect-src 'self' data:", supabaseUrl, supabaseWss,
     "https://va.vercel-scripts.com", "https://vitals.vercel-insights.com"]
