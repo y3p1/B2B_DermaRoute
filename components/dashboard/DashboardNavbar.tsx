@@ -1,6 +1,7 @@
 ﻿"use client";
 import React from "react";
 import { useRouter } from "next/navigation";
+import BrandLogo from "@/components/BrandLogo";
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -179,8 +180,8 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
             <Menu className="w-5 h-5" />
           </Button>
         )}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/dermaroute-logo.svg" alt="DermaRoute" className="h-9 w-auto" />
+        { }
+        <BrandLogo height={36} />
       </div>
       <div className="flex items-center gap-2">
         {isClientDemoMode() && (

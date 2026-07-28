@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
+import BrandLogo from "@/components/BrandLogo";
 import { ClipboardList, Shield, Wind, Eye, Activity } from "lucide-react";
 import { type DemoRole, DEMO_TRACK_LABELS } from "@/lib/demoMode";
 import { useAuthStore } from "@/store/auth";
@@ -208,8 +209,8 @@ export function RoleSwitcher() {
       />
 
       <div className="relative mb-2 flex items-center gap-2">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/dermaroute-logo.svg" alt="DermaRoute Demo" className="h-12" />
+        { }
+        <BrandLogo height={48} />
       </div>
 
       <p className="relative text-sm mb-10 font-medium" style={{ color: "oklch(0.50 0.08 160)" }}>

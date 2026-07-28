@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import BrandLogo from "@/components/BrandLogo";
 import { useRouter } from "next/navigation";
 import { Activity, Wind, Eye, Lock, ChevronDown } from "lucide-react";
 import { useAuthStore, type TrackKey } from "@/store/auth";
@@ -85,8 +86,8 @@ export function LandingPage() {
       />
 
       <div className="relative mb-2 flex items-center gap-2">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/dermaroute-logo.svg" alt="DermaRoute" className="h-12" />
+        { }
+        <BrandLogo height={48} />
       </div>
 
       <p

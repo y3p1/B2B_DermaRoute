@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import BrandLogo from "@/components/BrandLogo";
 import { useRouter } from "next/navigation";
 import { AlertCircle } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
@@ -23,8 +24,8 @@ export default function NoTracksPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-white to-[oklch(0.96_0.03_160)] px-4 py-16">
       <div className="mb-8">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/dermaroute-logo.svg" alt="DermaRoute" className="h-10" />
+        { }
+        <BrandLogo height={40} />
       </div>
 
       <div className="flex flex-col items-center text-center max-w-md gap-4">
