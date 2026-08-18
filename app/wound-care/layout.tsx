@@ -76,7 +76,7 @@ export default function WoundCareLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-screen bg-emerald-50 flex flex-col">
-      <header className="h-16 bg-white border-b border-emerald-100 flex items-center px-4 gap-3 shrink-0 shadow-sm">
+      <header className="h-16 bg-white border-b border-emerald-100 flex items-center px-4 gap-3 shrink-0 shadow-sm sticky top-0 z-20">
         <button
           className="lg:hidden p-2 rounded-md text-emerald-700 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
           onClick={() => setMobileOpen(true)}
@@ -101,7 +101,7 @@ export default function WoundCareLayout({ children }: { children: React.ReactNod
       </header>
 
       <div className="flex flex-1">
-        <aside className="hidden lg:flex flex-col w-56 bg-white border-r border-emerald-100 shrink-0 relative z-10 h-[calc(100vh-4rem)] overflow-y-auto">
+        <aside className="hidden lg:flex flex-col w-56 bg-white border-r border-emerald-100 shrink-0 relative z-10 sticky top-16 self-start h-[calc(100vh-4rem)] overflow-y-auto">
           <div className="px-4 py-4 border-b border-emerald-50">
             <p className="text-xs font-semibold text-emerald-500 uppercase tracking-wider">Navigation</p>
           </div>
@@ -126,7 +126,7 @@ export default function WoundCareLayout({ children }: { children: React.ReactNod
           </div>
         )}
 
-        <main className="flex-1 min-w-0 overflow-y-auto h-[calc(100vh-4rem)]">
+        <main className="flex-1 min-w-0">
           {children}
         </main>
       </div>

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { z } from "zod";
 import { useAuthStore } from "@/store/auth";
 import { apiPost } from "@/lib/apiClient";
 
@@ -123,6 +124,7 @@ export default function NewOcularOrderPage() {
 
   const [diagSearch, setDiagSearch] = React.useState("");
   const [secDiagSearch, setSecDiagSearch] = React.useState("");
+  const [errors, setErrors] = React.useState<Record<string, string>>({});
 
   const makeInitial = React.useCallback((): FormState => ({
     firstName: "",
@@ -164,15 +166,64 @@ export default function NewOcularOrderPage() {
     }
   }, [provider]);
 
-  const set = <K extends keyof FormState>(k: K, v: FormState[K]) =>
+  const set = <K extends keyof FormState>(k: K, v: FormState[K]) => {
     setForm((f) => ({ ...f, [k]: v }));
+    // Clear this field's validation error as soon as the user edits it.
+    setErrors((e) => {
+      if (!e[k as string]) return e;
+      const next = { ...e };
+      delete next[k as string];
+      return next;
+    });
+  };
 
-  const canProceed = (): boolean => {
-    if (step === 0) return !!(form.firstName && form.lastName && form.dob);
-    if (step === 1) return !!(form.primaryDiagnosis && form.eyeTreated);
-    if (step === 2) return !!(form.variant && form.discSku && form.quantity >= 1);
-    if (step === 3) return !!(form.shipToAddress && form.shipToCity && form.shipToState && form.shipToZip);
-    return true;
+  // Per-step Zod schemas. Validating on "Continue" surfaces every missing
+  // required field for that step at once (consistent with the BV Request form).
+  const stepSchemas: Record<number, z.ZodTypeAny> = {
+    0: z.object({
+      firstName: z.string().trim().min(1, "First name is required"),
+      lastName: z.string().trim().min(1, "Last name is required"),
+      dob: z.string().min(1, "Date of birth is required"),
+    }),
+    1: z.object({
+      primaryDiagnosis: z.any().refine((v) => !!v, "Select a primary diagnosis"),
+      eyeTreated: z.string().min(1, "Select the eye to be treated"),
+    }),
+    2: z.object({
+      variant: z.string().min(1, "Select a product variant"),
+      discSku: z.string().min(1, "Select a disc size"),
+      quantity: z.number().min(1, "Quantity must be at least 1"),
+    }),
+    3: z.object({
+      shipToAddress: z.string().trim().min(1, "Ship-to address is required"),
+      shipToCity: z.string().trim().min(1, "City is required"),
+      shipToState: z.string().trim().min(1, "State is required"),
+      shipToZip: z.string().trim().min(1, "ZIP is required"),
+    }),
+  };
+
+  const validateStep = (s: number): Record<string, string> => {
+    const schema = stepSchemas[s];
+    if (!schema) return {};
+    const res = schema.safeParse(form);
+    if (res.success) return {};
+    const fieldErrors = res.error.flatten().fieldErrors as Record<string, string[]>;
+    const out: Record<string, string> = {};
+    for (const key of Object.keys(fieldErrors)) {
+      const msg = fieldErrors[key]?.[0];
+      if (msg) out[key] = msg;
+    }
+    return out;
+  };
+
+  const handleContinue = () => {
+    const errs = validateStep(step);
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
+      return;
+    }
+    setErrors({});
+    setStep((s) => s + 1);
   };
 
   const reset = () => {
@@ -182,6 +233,7 @@ export default function NewOcularOrderPage() {
     setSubmitError(null);
     setDiagSearch("");
     setSecDiagSearch("");
+    setErrors({});
     setScreen("selector");
   };
 
@@ -293,17 +345,17 @@ export default function NewOcularOrderPage() {
         {/* Card */}
         <div style={{ background: "white", borderRadius: 12, padding: "28px 32px", boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
           {step === 0 && (
-            <StepPatient form={form} set={set} provider={provider} />
+            <StepPatient form={form} set={set} provider={provider} errors={errors} />
           )}
           {step === 1 && (
             <StepDiagnosis
-              form={form} set={set}
+              form={form} set={set} errors={errors}
               diagSearch={diagSearch} setDiagSearch={setDiagSearch}
               secDiagSearch={secDiagSearch} setSecDiagSearch={setSecDiagSearch}
             />
           )}
-          {step === 2 && <StepProduct form={form} set={set} />}
-          {step === 3 && <StepShipping form={form} set={set} />}
+          {step === 2 && <StepProduct form={form} set={set} errors={errors} />}
+          {step === 3 && <StepShipping form={form} set={set} errors={errors} />}
           {step === 4 && <StepReview form={form} provider={provider} />}
 
           {submitError && (
@@ -314,14 +366,10 @@ export default function NewOcularOrderPage() {
 
           <div style={{ display: "flex", gap: 12, marginTop: 28, paddingTop: 20, borderTop: "1px solid #f3f4f6" }}>
             {step > 0 && (
-              <button onClick={() => setStep((s) => s - 1)} style={backBtnStyle}>← Back</button>
+              <button onClick={() => { setErrors({}); setStep((s) => s - 1); }} style={backBtnStyle}>← Back</button>
             )}
             {step < 4 ? (
-              <button
-                onClick={() => setStep((s) => s + 1)}
-                disabled={!canProceed()}
-                style={canProceed() ? nextBtnStyle : nextBtnDisabledStyle}
-              >
+              <button onClick={handleContinue} style={nextBtnStyle}>
                 Continue →
               </button>
             ) : (
@@ -400,10 +448,12 @@ function StepPatient({
   form,
   set,
   provider,
+  errors,
 }: {
   form: FormState;
   set: <K extends keyof FormState>(k: K, v: FormState[K]) => void;
   provider: { clinicName?: string | null; clinicAddress?: string | null } | null;
+  errors: Record<string, string>;
 }) {
   return (
     <div>
@@ -411,15 +461,18 @@ function StepPatient({
       <div style={grid2Style}>
         <div>
           <Lbl>First Name *</Lbl>
-          <Inp value={form.firstName} onChange={(e) => set("firstName", e.target.value)} placeholder="First name" />
+          <Inp error={!!errors.firstName} value={form.firstName} onChange={(e) => set("firstName", e.target.value)} placeholder="First name" />
+          <ErrText msg={errors.firstName} />
         </div>
         <div>
           <Lbl>Last Name *</Lbl>
-          <Inp value={form.lastName} onChange={(e) => set("lastName", e.target.value)} placeholder="Last name" />
+          <Inp error={!!errors.lastName} value={form.lastName} onChange={(e) => set("lastName", e.target.value)} placeholder="Last name" />
+          <ErrText msg={errors.lastName} />
         </div>
         <div>
           <Lbl>Date of Birth *</Lbl>
-          <Inp type="date" value={form.dob} onChange={(e) => set("dob", e.target.value)} />
+          <Inp error={!!errors.dob} type="date" value={form.dob} onChange={(e) => set("dob", e.target.value)} />
+          <ErrText msg={errors.dob} />
         </div>
         <div>
           <Lbl>MRN <span style={{ color: "#9ca3af", fontWeight: 400 }}>(optional)</span></Lbl>
@@ -441,12 +494,13 @@ function StepPatient({
 
 /* ─── STEP 1: DIAGNOSIS ─────────────────────────────────────────────────────── */
 function StepDiagnosis({
-  form, set,
+  form, set, errors,
   diagSearch, setDiagSearch,
   secDiagSearch, setSecDiagSearch,
 }: {
   form: FormState;
   set: <K extends keyof FormState>(k: K, v: FormState[K]) => void;
+  errors: Record<string, string>;
   diagSearch: string;
   setDiagSearch: (v: string) => void;
   secDiagSearch: string;
@@ -467,6 +521,7 @@ function StepDiagnosis({
       <div style={{ marginBottom: 20 }}>
         <Lbl>Primary Diagnosis (ICD-10) *</Lbl>
         <Inp
+          error={!!errors.primaryDiagnosis}
           value={diagSearch}
           onChange={(e) => {
             setDiagSearch(e.target.value);
@@ -474,6 +529,7 @@ function StepDiagnosis({
           }}
           placeholder="Search condition or code..."
         />
+        <ErrText msg={errors.primaryDiagnosis} />
         {diagSearch && !form.primaryDiagnosis && (
           <div style={{ border: "1px solid #e5e7eb", borderRadius: 8, marginTop: 4, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
             {filtered(diagSearch).length === 0 ? (
@@ -564,6 +620,7 @@ function StepDiagnosis({
             );
           })}
         </div>
+        <ErrText msg={errors.eyeTreated} />
       </div>
 
       {/* Clinical Notes */}
@@ -588,9 +645,11 @@ function StepDiagnosis({
 function StepProduct({
   form,
   set,
+  errors,
 }: {
   form: FormState;
   set: <K extends keyof FormState>(k: K, v: FormState[K]) => void;
+  errors: Record<string, string>;
 }) {
   const sizes = form.variant ? PRODUCTS[form.variant].sizes : [];
 
@@ -627,6 +686,7 @@ function StepProduct({
             );
           })}
         </div>
+        <ErrText msg={errors.variant} />
       </div>
 
       {/* Disc size */}
@@ -653,6 +713,7 @@ function StepProduct({
               );
             })}
           </div>
+          <ErrText msg={errors.discSku} />
           <div style={{ marginTop: 8, fontSize: 12, color: "#6b7280" }}>
             💡 Select disc size to adequately cover affected area with margin.
           </div>
@@ -713,9 +774,11 @@ function StepProduct({
 function StepShipping({
   form,
   set,
+  errors,
 }: {
   form: FormState;
   set: <K extends keyof FormState>(k: K, v: FormState[K]) => void;
+  errors: Record<string, string>;
 }) {
   return (
     <div>
@@ -727,25 +790,30 @@ function StepShipping({
 
       <div style={{ marginBottom: 14 }}>
         <Lbl>Ship-to Address *</Lbl>
-        <Inp value={form.shipToAddress} onChange={(e) => set("shipToAddress", e.target.value)} placeholder="Street address" />
+        <Inp error={!!errors.shipToAddress} value={form.shipToAddress} onChange={(e) => set("shipToAddress", e.target.value)} placeholder="Street address" />
+        <ErrText msg={errors.shipToAddress} />
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 12 }}>
         <div>
           <Lbl>City *</Lbl>
-          <Inp value={form.shipToCity} onChange={(e) => set("shipToCity", e.target.value)} placeholder="City" />
+          <Inp error={!!errors.shipToCity} value={form.shipToCity} onChange={(e) => set("shipToCity", e.target.value)} placeholder="City" />
+          <ErrText msg={errors.shipToCity} />
         </div>
         <div>
           <Lbl>State *</Lbl>
           <Inp
+            error={!!errors.shipToState}
             value={form.shipToState}
             onChange={(e) => set("shipToState", e.target.value.toUpperCase().slice(0, 2))}
             placeholder="GA"
             maxLength={2}
           />
+          <ErrText msg={errors.shipToState} />
         </div>
         <div>
           <Lbl>ZIP *</Lbl>
-          <Inp value={form.shipToZip} onChange={(e) => set("shipToZip", e.target.value)} placeholder="30301" />
+          <Inp error={!!errors.shipToZip} value={form.shipToZip} onChange={(e) => set("shipToZip", e.target.value)} placeholder="30301" />
+          <ErrText msg={errors.shipToZip} />
         </div>
       </div>
 
@@ -930,10 +998,16 @@ function Lbl({ children }: { children: React.ReactNode }) {
   return <div style={{ fontSize: 13, fontWeight: 500, color: "#374151", marginBottom: 4 }}>{children}</div>;
 }
 
+function ErrText({ msg }: { msg?: string }) {
+  if (!msg) return null;
+  return <div style={{ color: "#dc2626", fontSize: 12, marginTop: 4 }}>{msg}</div>;
+}
+
 function Inp({
   style,
+  error,
   ...props
-}: React.InputHTMLAttributes<HTMLInputElement>) {
+}: React.InputHTMLAttributes<HTMLInputElement> & { error?: boolean }) {
   return (
     <input
       {...props}
@@ -941,7 +1015,7 @@ function Inp({
         width: "100%",
         padding: "10px 12px",
         borderRadius: 8,
-        border: "1px solid #e5e7eb",
+        border: `1px solid ${error ? "#dc2626" : "#e5e7eb"}`,
         fontSize: 14,
         outline: "none",
         boxSizing: "border-box" as const,
@@ -962,11 +1036,6 @@ const backBtnStyle: React.CSSProperties = {
 const nextBtnStyle: React.CSSProperties = {
   flex: 2, padding: 12, borderRadius: 8, border: "none",
   background: PRIMARY, color: "white", cursor: "pointer", fontWeight: 600, fontSize: 15,
-};
-
-const nextBtnDisabledStyle: React.CSSProperties = {
-  flex: 2, padding: 12, borderRadius: 8, border: "none",
-  background: "#e5e7eb", color: "#9ca3af", cursor: "not-allowed", fontWeight: 600, fontSize: 15,
 };
 
 const qtyBtnStyle: React.CSSProperties = {

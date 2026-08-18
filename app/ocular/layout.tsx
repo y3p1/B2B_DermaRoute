@@ -79,7 +79,7 @@ export default function OcularLayout({ children }: { children: React.ReactNode }
   return (
     <div className="min-h-screen bg-teal-50 flex flex-col">
       {/* Top bar */}
-      <header className="h-16 bg-white border-b border-teal-100 flex items-center px-4 gap-3 shrink-0 shadow-sm">
+      <header className="h-16 bg-white border-b border-teal-100 flex items-center px-4 gap-3 shrink-0 shadow-sm sticky top-0 z-20">
         <button
           className="lg:hidden p-2 rounded-md text-teal-700 hover:bg-teal-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
           onClick={() => setMobileOpen(true)}
@@ -105,7 +105,7 @@ export default function OcularLayout({ children }: { children: React.ReactNode }
 
       <div className="flex flex-1">
         {/* Desktop sidebar */}
-        <aside className="hidden lg:flex flex-col w-56 bg-white border-r border-teal-100 shrink-0 relative z-10 h-[calc(100vh-4rem)] overflow-y-auto">
+        <aside className="hidden lg:flex flex-col w-56 bg-white border-r border-teal-100 shrink-0 relative z-10 sticky top-16 self-start h-[calc(100vh-4rem)] overflow-y-auto">
           <div className="px-4 py-4 border-b border-teal-50">
             <p className="text-xs font-semibold text-teal-500 uppercase tracking-wider">Navigation</p>
           </div>
@@ -138,7 +138,7 @@ export default function OcularLayout({ children }: { children: React.ReactNode }
         )}
 
         {/* Main content */}
-        <main className="flex-1 min-w-0 overflow-y-auto h-[calc(100vh-4rem)]">
+        <main className="flex-1 min-w-0">
           {children}
         </main>
       </div>

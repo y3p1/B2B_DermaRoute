@@ -6,6 +6,7 @@ import NextImage from "next/image";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { z } from "zod";
 import { useAuthStore } from "@/store/auth";
 import { apiPost } from "@/lib/apiClient";
 import { cn } from "@/lib/utils";
@@ -217,6 +218,11 @@ function SecLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
+function ErrText({ msg }: { msg?: string }) {
+  if (!msg) return null;
+  return <p className="text-xs text-red-600 mt-1">{msg}</p>;
+}
+
 function Chip({
   active,
   onClick,
@@ -343,12 +349,21 @@ export default function MedicalDevicesNewOrderPage() {
   const [formData, setFormData] = React.useState<FormData>(EMPTY_FORM);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [pdfDownloaded, setPdfDownloaded] = React.useState(false);
   const [pdfGenerating, setPdfGenerating] = React.useState(false);
   const sigCanvasRef = React.useRef<SignatureCanvas>(null);
 
-  const set = <K extends keyof FormData>(key: K, value: FormData[K]) =>
+  const set = <K extends keyof FormData>(key: K, value: FormData[K]) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
+    // Clear this field's validation error as soon as the user edits it.
+    setErrors((e) => {
+      if (!e[key as string]) return e;
+      const next = { ...e };
+      delete next[key as string];
+      return next;
+    });
+  };
 
   const toggleGarment = (key: string) =>
     setFormData((prev) => ({
@@ -368,37 +383,77 @@ export default function MedicalDevicesNewOrderPage() {
 
   const activeIdx = activeSteps.indexOf(step);
 
-  const canProceed = (): boolean => {
-    if (step === 0) return formData.orderType !== "";
-    if (step === 1) return formData.patientFullName.trim() !== "";
-    if (step === 2)
-      return (
-        formData.contraindications !== "" &&
-        formData.diagnosisCode !== "" &&
-        formData.pumpType !== "" &&
-        formData.mmHg !== "" &&
-        formData.timesPerDay !== "" &&
-        formData.minutesPerSession !== ""
-      );
-    if (step === 3)
-      return (
-        formData.compressionLevel !== "" &&
-        formData.quantityPerExtremity !== "" &&
-        formData.customMadeGarment !== ""
-      );
-    if (step === 4)
-      return (
-        formData.signatureMode !== "" &&
-        (formData.signatureMode === "manual" || formData.signatureData !== "")
-      );
-    return true;
+  // Per-step Zod schemas. Validating on "Continue" surfaces every missing
+  // required field for that step at once (consistent with the BV Request form).
+  const stepSchemas: Record<number, z.ZodTypeAny> = {
+    0: z.object({ orderType: z.string().min(1, "Select a product type") }),
+    1: z.object({ patientFullName: z.string().trim().min(1, "Patient full name is required") }),
+    2: z
+      .object({
+        contraindications: z.string().min(1, "Please answer the contraindications question"),
+        diagnosisCode: z.string().min(1, "Select a diagnosis code"),
+        pumpType: z.string().min(1, "Select a pump type"),
+        mmHg: z.string().min(1, "Select an mmHg distal pressure setting"),
+        mmHgOther: z.string().optional(),
+        timesPerDay: z.string().min(1, "Select times per day"),
+        minutesPerSession: z.string().min(1, "Select minutes per session"),
+      })
+      .refine((d) => d.mmHg !== "other" || (d.mmHgOther ?? "").trim() !== "", {
+        path: ["mmHgOther"],
+        message: "Enter the mmHg value",
+      }),
+    3: z
+      .object({
+        compressionLevel: z.string().min(1, "Select a compression level"),
+        quantityPerExtremity: z.string().min(1, "Select a quantity per extremity"),
+        customMadeGarment: z.string().min(1, "Select whether the garment is custom made"),
+        customMadeNotes: z.string().optional(),
+      })
+      .refine((d) => d.customMadeGarment !== "yes" || (d.customMadeNotes ?? "").trim() !== "", {
+        path: ["customMadeNotes"],
+        message: "A clinical explanation is required for custom garments",
+      }),
+    4: z
+      .object({
+        signatureMode: z.string().min(1, "Choose how the physician will sign"),
+        signatureData: z.string().optional(),
+      })
+      .refine((d) => d.signatureMode !== "draw" || (d.signatureData ?? "") !== "", {
+        path: ["signatureMode"],
+        message: "Please add the physician's signature",
+      }),
+  };
+
+  const validateStep = (s: number): Record<string, string> => {
+    const schema = stepSchemas[s];
+    if (!schema) return {};
+    const res = schema.safeParse(formData);
+    if (res.success) return {};
+    const fieldErrors = res.error.flatten().fieldErrors as Record<string, string[]>;
+    const out: Record<string, string> = {};
+    for (const key of Object.keys(fieldErrors)) {
+      const msg = fieldErrors[key]?.[0];
+      if (msg) out[key] = msg;
+    }
+    return out;
   };
 
   const goNext = () => {
     if (activeIdx < activeSteps.length - 1) setStep(activeSteps[activeIdx + 1]);
   };
   const goBack = () => {
+    setErrors({});
     if (activeIdx > 0) setStep(activeSteps[activeIdx - 1]);
+  };
+
+  const handleContinue = () => {
+    const errs = validateStep(step);
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
+      return;
+    }
+    setErrors({});
+    goNext();
   };
 
   // ─── PDF ──────────────────────────────────────────────────────────────────
@@ -665,6 +720,7 @@ export default function MedicalDevicesNewOrderPage() {
                   </div>
                 ))}
               </div>
+              <ErrText msg={errors.orderType} />
             </div>
           )}
 
@@ -683,11 +739,12 @@ export default function MedicalDevicesNewOrderPage() {
                 <div>
                   <Label className="text-xs text-slate-600 mb-1 block">Patient Full Name *</Label>
                   <Input
-                    className="h-9 text-sm"
+                    className={cn("h-9 text-sm", errors.patientFullName && "border-red-500")}
                     value={formData.patientFullName}
                     onChange={(e) => set("patientFullName", e.target.value)}
                     placeholder="Enter patient full name"
                   />
+                  <ErrText msg={errors.patientFullName} />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -747,6 +804,7 @@ export default function MedicalDevicesNewOrderPage() {
                   value={formData.contraindications}
                   onChange={(v) => set("contraindications", v as "yes" | "no")}
                 />
+                <ErrText msg={errors.contraindications} />
               </div>
 
               <div>
@@ -757,6 +815,7 @@ export default function MedicalDevicesNewOrderPage() {
                   onChange={(v) => set("diagnosisCode", v)}
                   vertical
                 />
+                <ErrText msg={errors.diagnosisCode} />
               </div>
 
               <div>
@@ -770,6 +829,7 @@ export default function MedicalDevicesNewOrderPage() {
                   onChange={(v) => set("pumpType", v as "E0651" | "E0652")}
                   vertical
                 />
+                <ErrText msg={errors.pumpType} />
                 {formData.pumpType === "E0651" && (
                   <div className="mt-3">
                     <p className="text-xs text-slate-500 mb-2">Select garment area:</p>
@@ -819,14 +879,18 @@ export default function MedicalDevicesNewOrderPage() {
                         Other
                       </Chip>
                     </div>
+                    <ErrText msg={errors.mmHg} />
                     {formData.mmHg === "other" && (
-                      <Input
-                        className="h-9 text-sm mt-2 max-w-[180px]"
-                        value={formData.mmHgOther}
-                        onChange={(e) => set("mmHgOther", e.target.value)}
-                        placeholder="Enter mmHg"
-                        type="number"
-                      />
+                      <>
+                        <Input
+                          className={cn("h-9 text-sm mt-2 max-w-[180px]", errors.mmHgOther && "border-red-500")}
+                          value={formData.mmHgOther}
+                          onChange={(e) => set("mmHgOther", e.target.value)}
+                          placeholder="Enter mmHg"
+                          type="number"
+                        />
+                        <ErrText msg={errors.mmHgOther} />
+                      </>
                     )}
                   </div>
                   <div>
@@ -842,6 +906,7 @@ export default function MedicalDevicesNewOrderPage() {
                         </Chip>
                       ))}
                     </div>
+                    <ErrText msg={errors.timesPerDay} />
                   </div>
                   <div>
                     <Label className="text-xs text-slate-600 mb-2 block">Minutes Per Session *</Label>
@@ -856,6 +921,7 @@ export default function MedicalDevicesNewOrderPage() {
                         </Chip>
                       ))}
                     </div>
+                    <ErrText msg={errors.minutesPerSession} />
                   </div>
                 </div>
               </div>
@@ -931,6 +997,7 @@ export default function MedicalDevicesNewOrderPage() {
                       onChange={(v) => set("compressionLevel", v)}
                       vertical
                     />
+                    <ErrText msg={errors.compressionLevel} />
                   </div>
 
                   <div>
@@ -946,6 +1013,7 @@ export default function MedicalDevicesNewOrderPage() {
                         </Chip>
                       ))}
                     </div>
+                    <ErrText msg={errors.quantityPerExtremity} />
                     <p className="text-[10px] text-slate-400 mt-1">
                       *Medicare provides 3 garments per extremity every 6 months
                     </p>
@@ -958,17 +1026,22 @@ export default function MedicalDevicesNewOrderPage() {
                       value={formData.customMadeGarment}
                       onChange={(v) => set("customMadeGarment", v as "yes" | "no")}
                     />
+                    <ErrText msg={errors.customMadeGarment} />
                     {formData.customMadeGarment === "yes" && (
                       <div className="mt-3 space-y-2">
                         <div className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
                           ⚠️ Custom garments require a clinical explanation below.
                         </div>
                         <textarea
-                          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 resize-none focus:outline-none focus:ring-2 focus:ring-purple-400 min-h-[80px]"
+                          className={cn(
+                            "w-full rounded-lg border px-3 py-2 text-sm text-slate-800 resize-none focus:outline-none focus:ring-2 focus:ring-purple-400 min-h-[80px]",
+                            errors.customMadeNotes ? "border-red-500" : "border-slate-200",
+                          )}
                           placeholder="Enter clinical explanation for custom garment..."
                           value={formData.customMadeNotes}
                           onChange={(e) => set("customMadeNotes", e.target.value)}
                         />
+                        <ErrText msg={errors.customMadeNotes} />
                       </div>
                     )}
                   </div>
@@ -1095,6 +1168,7 @@ export default function MedicalDevicesNewOrderPage() {
                     <div className="text-[10px] text-slate-500">Print and sign before faxing</div>
                   </div>
                 </div>
+                <ErrText msg={errors.signatureMode} />
 
                 {formData.signatureMode === "draw" && (
                   <div>
@@ -1266,8 +1340,7 @@ export default function MedicalDevicesNewOrderPage() {
           {!isLastStep ? (
             <Button
               size="sm"
-              onClick={goNext}
-              disabled={!canProceed()}
+              onClick={handleContinue}
               className="gap-1.5 bg-purple-600 hover:bg-purple-700 text-white"
             >
               Continue <ChevronRight className="w-4 h-4" />
